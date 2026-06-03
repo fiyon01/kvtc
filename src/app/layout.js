@@ -1,0 +1,46 @@
+import { Inter, Playfair_Display } from "next/font/google";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+import SplashScreen from "@/components/SplashScreen";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+
+export const metadata = {
+  title: "Kinoo Vocational Training Centre | Skills for Life",
+  description: "Kiambu County's premier public vocational training centre. NITA & KNEC certified courses in Food & Beverage, Electronics, Hair Dressing, Plumbing, and more. Intake ongoing!",
+  keywords: "Kinoo VTC, vocational training Kiambu, NITA courses Kenya, KNEC artisan, technical college Kikuyu, affordable vocational training",
+  openGraph: {
+    title: "Kinoo VTC – Skills for Life | Kiambu County",
+    description: "NITA & KNEC certified vocational training in Kikuyu, Kiambu. 13+ courses, subsidised fees. Apply today!",
+    url: "https://www.kinoovtc.ac.ke",
+    siteName: "Kinoo VTC",
+    images: [
+      {
+        url: "/logo.png",
+        width: 800,
+        height: 600,
+      },
+    ],
+    locale: "en_KE",
+    type: "website",
+  },
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+      <body className={inter.className}>
+        <SplashScreen />
+        <Navbar />
+        <main style={{ minHeight: '100vh' }}>
+          {children}
+        </main>
+        <Footer />
+        <FloatingWhatsApp />
+      </body>
+    </html>
+  );
+}
