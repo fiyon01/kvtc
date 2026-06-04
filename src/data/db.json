@@ -1,0 +1,802 @@
+{
+  "security": {
+    "password": "admin"
+  },
+  "intake": {
+    "isOngoing": true,
+    "yearText": "2026",
+    "endDate": "2026-06-30"
+  },
+  "contact": {
+    "phone1": "0113 582 008",
+    "phone2": "0748 455 116",
+    "email": "kinoovtc@gmail.com",
+    "address": "P.O. Box 351-00902, Kikuyu",
+    "hours": "Mon–Fri: 8am – 5pm"
+  },
+  "feeStructure": {
+    "year": "2026",
+    "annualTuition": 27000,
+    "termBreakdown": [
+      { "label": "Term 1", "amount": 9000 },
+      { "label": "Term 2", "amount": 9000 },
+      { "label": "Term 3", "amount": 9000 }
+    ],
+    "termVoteHeads": [
+      { "head": "Administrative Cost", "perTerm": 2500, "annual": 7500 },
+      { "head": "P. Emolument", "perTerm": 2500, "annual": 7500 },
+      { "head": "R.M.I.", "perTerm": 2500, "annual": 7500 },
+      { "head": "Contingencies Fund", "perTerm": 1500, "annual": 4500 }
+    ],
+    "admissionFees": [
+      { "item": "Admission Fee (Application)", "amount": 500 },
+      { "item": "School T-Shirt & ID Card", "amount": 950 },
+      { "item": "Departmental Uniform", "amount": 2000 }
+    ],
+    "admissionTotal": 3450,
+    "otherCharges": [
+      { "item": "Computer Packages", "amount": 4800 },
+      { "item": "Part-Time Classes (per term)", "amount": 4500 }
+    ],
+    "bankKCB": {
+      "bankName": "Kenya Commercial Bank (KCB), Kikuyu Branch",
+      "accountName": "Kinoo Vocational Training Centre",
+      "accountNumber": "1257104543"
+    },
+    "bankCoop": {
+      "bankName": "Co-operative Bank, Kangemi Branch",
+      "accountName": "Kinoo Vocational Training Centre",
+      "accountNumber": "01128763296200"
+    }
+  },
+  "leadership": [
+    {
+      "id": "l1",
+      "name": "Mr. James Kamau",
+      "title": "Principal",
+      "img": "/principal.png",
+      "bio": "A seasoned educator with over 20 years in technical and vocational training. Leads Kinoo VTC with a vision of excellence and community empowerment.",
+      "badge": "20+ Yrs Experience"
+    },
+    {
+      "id": "l2",
+      "name": "Mrs. Grace Wanjiru",
+      "title": "Deputy Principal",
+      "img": "/deputy.png",
+      "bio": "Passionate about student welfare and academic quality. Oversees curriculum delivery and ensures every trainee receives the support they need to succeed.",
+      "badge": "Curriculum Lead"
+    }
+  ],
+  "faculty": [
+    {
+      "id": "f1",
+      "name": "Mr. Peter Mwangi",
+      "dept": "Head of Engineering",
+      "img": "/faculty1.png",
+      "courses": "Electrical, Plumbing, Welding"
+    },
+    {
+      "id": "f2",
+      "name": "Ms. Fatuma Otieno",
+      "dept": "Head of Cosmetology",
+      "img": "/faculty2.png",
+      "courses": "Hair Dressing, Beauty Therapy"
+    },
+    {
+      "id": "f3",
+      "name": "Mr. Samuel Njoroge",
+      "dept": "Head of ICT",
+      "img": "/faculty1.png",
+      "courses": "Computer Operator, Packages, Security"
+    },
+    {
+      "id": "f4",
+      "name": "Mrs. Alice Kariuki",
+      "dept": "Head of Hospitality",
+      "img": "/faculty2.png",
+      "courses": "Food & Beverage, Baking, Barista"
+    }
+  ],
+  "departments": [
+    {
+      "id": "dept-1",
+      "slug": "hospitality",
+      "name": "Hospitality & Tourism",
+      "description": "Our Hospitality & Tourism department provides hands-on training in food production, service, and hotel management. With state-of-the-art training kitchens, our students graduate ready to excel in top-tier hotels and restaurants.",
+      "hod": "Chef Margaret Wanjiru",
+      "image": "https://images.unsplash.com/photo-1581299894007-aaa50297cf16?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "dept-2",
+      "slug": "cosmetology",
+      "name": "Cosmetology",
+      "description": "The Cosmetology department focuses on the art and science of beauty. From advanced hairdressing to beauty therapy and salon management, we empower our students to become sought-after beauty professionals and entrepreneurs.",
+      "hod": "Madam Eunice Njeri",
+      "image": "https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "dept-3",
+      "slug": "engineering",
+      "name": "Engineering & Technology",
+      "description": "Equipping the next generation of builders and fixers. The Engineering department covers electrical, electronics, and motor vehicle mechanics, offering NITA-certified training in fully equipped workshops.",
+      "hod": "Eng. Peter Omondi",
+      "image": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "dept-4",
+      "slug": "fashion",
+      "name": "Fashion Design & Clothing Technology",
+      "description": "Transform your creativity into a rewarding career. Our Fashion Design department teaches everything from pattern drafting and garment construction to modern fashion trends and boutique management.",
+      "hod": "Madam Grace Mutuku",
+      "image": "https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "dept-5",
+      "slug": "short-course",
+      "name": "Short Courses & Part-Time",
+      "description": "Designed for working professionals and those seeking fast-tracked skills. Our 1 to 3-month short courses deliver intensive, highly practical training in specialized areas like Barista skills, baking, and phone repair.",
+      "hod": "Mr. Kelvin Kinyanjui",
+      "image": "https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=800&auto=format&fit=crop"
+    }
+  ],
+  "courses": [
+    {
+      "id": "c1",
+      "slug": "food-and-beverage-production",
+      "type": "knec",
+      "tag": "Hospitality",
+      "name": "Food & Beverage Production & Service Artisan",
+      "cert": "KNEC",
+      "dur": "1 Year",
+      "img": "/food.png",
+      "description": "Master professional cooking, food safety, beverage service, and restaurant operations. Graduates work in hotels, restaurants, and catering companies across East Africa.",
+      "outcomes": [
+        "Professional food preparation & plating",
+        "Beverage service & barista skills",
+        "Food safety & hygiene (HACCP)",
+        "Restaurant and event management basics"
+      ],
+      "careers": ["Chef / Cook","Food Service Supervisor","Caterer","Hotel Staffer"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Kitchen Cloth – 3 pieces (2 big, 1 small)",
+        "Towels (Salon Size) – 3 pieces",
+        "Recipe cards (A5 size)",
+        "Black trouser/skirt & white blouse/shirt with bowtie and name tag",
+        "Melamine side plates – 2 pcs",
+        "Stainless steel plates – 2 pcs",
+        "Water glass (long) – 1 pc",
+        "Milk pot – 1 pc",
+        "Sauce pan – 1 pc",
+        "Plastic tray – 1 pc",
+        "White melamine dinner plates – 2 pcs",
+        "Coffee cups, saucers & coffee spoons – 2 pcs",
+        "Kitchen knives – 2 pcs"
+      ]
+    },
+    {
+      "id": "c2",
+      "slug": "hair-dressing-and-beauty-therapy",
+      "type": "nita",
+      "tag": "Cosmetology",
+      "name": "Hair Dressing and Beauty Therapy",
+      "cert": "NITA",
+      "dur": "1 Year",
+      "img": "/hair.png",
+      "description": "A comprehensive programme covering modern hair styling, colouring, skin care, and beauty therapy. One of our most popular courses with excellent employment rates.",
+      "outcomes": [
+        "Hair cutting, colouring & treatment",
+        "Skin care & facials",
+        "Nail care & manicure/pedicure",
+        "Salon management & customer service"
+      ],
+      "careers": ["Salon Owner","Hair Stylist","Beauty Therapist","Makeup Artist"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Assorted combs & ear pads",
+        "Towels (Salon Size) – 3 pcs (any colour)",
+        "Shower cap, tint bowl & brush",
+        "Draper & rubber gloves",
+        "Rollers (medium) & spray bottle",
+        "Styling pins, braids & weaves",
+        "Thread",
+        "Face shield",
+        "Dust bin – 1 pc",
+        "Hair Dressing Work Book (KSh 900)",
+        "Towels (Salon Size) – 3 pcs (Beauty Therapy)",
+        "White face towel – 1 pc",
+        "Nail polish & nail art materials",
+        "Manicure and pedicure tools",
+        "Scrub & cuticle cream",
+        "Small basin",
+        "Beauty Therapy Work Book (KSh 700)"
+      ]
+    },
+    {
+      "id": "c3",
+      "slug": "electrical-and-electronics",
+      "type": "nita",
+      "tag": "Engineering",
+      "name": "Electrical and Electronics",
+      "cert": "NITA",
+      "dur": "1 Year",
+      "img": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=800&auto=format&fit=crop",
+      "description": "Hands-on training in electrical wiring, installations, and electronics repair. Covers domestic and industrial electrical systems with practical workshop sessions every week.",
+      "outcomes": [
+        "Domestic & industrial wiring",
+        "Electronic circuit diagnosis & repair",
+        "Solar PV system basics",
+        "Electrical safety standards"
+      ],
+      "careers": ["Electrician","Electronics Technician","Solar Installer","Maintenance Engineer"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Combination pliers",
+        "Flat screwdriver",
+        "Star screwdriver",
+        "Tester",
+        "Ruler",
+        "Bending spring (20mm)",
+        "Hacksaw",
+        "Electrician hammer",
+        "Tape measure",
+        "Multimeter",
+        "Insulating tape",
+        "Soldering bit",
+        "Wood screws (gypsum)"
+      ]
+    },
+    {
+      "id": "c4",
+      "slug": "electronic-mechanics",
+      "type": "nita",
+      "tag": "Engineering",
+      "name": "Electronic Mechanics",
+      "cert": "NITA",
+      "dur": "1 Year",
+      "img": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop",
+      "description": "Focused training in electronic device repair, PCB troubleshooting, and consumer electronics maintenance. High demand from electronics repair shops and tech companies.",
+      "outcomes": [
+        "PCB repair & soldering",
+        "Consumer electronics diagnosis",
+        "Mobile device repair basics",
+        "Test equipment operation"
+      ],
+      "careers": ["Electronics Repair Technician","Service Centre Tech","IT Hardware Support"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Flat screwdrivers",
+        "Phase tester",
+        "Digital multimeter",
+        "Insulating tape",
+        "Soldering iron",
+        "Solder wire",
+        "Solder sucker",
+        "Perforated breadboard",
+        "Combination pliers",
+        "PCB copper strip board",
+        "Desoldering wick",
+        "Jumper wire"
+      ]
+    },
+    {
+      "id": "c5",
+      "slug": "solar-pv-installation",
+      "type": "nita",
+      "tag": "Engineering",
+      "name": "Solar PV Installation",
+      "cert": "NITA",
+      "dur": "6 Months",
+      "img": "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?q=80&w=800&auto=format&fit=crop",
+      "description": "Kenya's booming solar sector needs skilled installers. This accelerated 6-month course covers system design, installation, and maintenance of solar PV systems.",
+      "outcomes": [
+        "Solar system design & sizing",
+        "Panel & inverter installation",
+        "Battery & charge controller setup",
+        "System maintenance & fault-finding"
+      ],
+      "careers": ["Solar Installer","Solar Technician","Renewable Energy Contractor"],
+      "fees": "KSh 15,000",
+      "intake": "January, May & September",
+      "requirements": [
+        "Combination pliers",
+        "Flat screwdriver",
+        "Star screwdriver",
+        "Tester",
+        "Ruler",
+        "Bending spring (20mm)",
+        "Hacksaw",
+        "Electrician hammer",
+        "Tape measure",
+        "Multimeter",
+        "Insulating tape",
+        "Soldering bit",
+        "Wood screws (gypsum)"
+      ]
+    },
+    {
+      "id": "c6",
+      "slug": "plumbing",
+      "type": "nita",
+      "tag": "Construction",
+      "name": "Plumbing",
+      "cert": "NITA",
+      "dur": "1 Year",
+      "img": "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?q=80&w=800&auto=format&fit=crop",
+      "description": "Comprehensive plumbing training covering domestic and commercial installations. Graduates are in high demand as Kenya's construction sector continues to boom.",
+      "outcomes": [
+        "Pipe fitting & water systems",
+        "Drainage & sanitation",
+        "Bathroom & kitchen installations",
+        "Blueprint reading"
+      ],
+      "careers": ["Plumber","Plumbing Contractor","Facilities Maintenance Tech"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Pipe wrench (12\")",
+        "Hacksaw & blades",
+        "File",
+        "Tape measure",
+        "Navy blue/yellow safety helmet",
+        "Plumb bob",
+        "Cold chisel",
+        "Trowel",
+        "Masonry square",
+        "Wood float",
+        "Mason hammer (stone)",
+        "Corner trowel",
+        "Spirit level"
+      ]
+    },
+    {
+      "id": "c7",
+      "slug": "masonry",
+      "type": "nita",
+      "tag": "Construction",
+      "name": "Masonry",
+      "cert": "NITA",
+      "dur": "1 Year",
+      "img": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800&auto=format&fit=crop",
+      "description": "Learn bricklaying, concrete work, and construction techniques used across Kenya's fast-growing building industry. Practical training on real construction sites.",
+      "outcomes": [
+        "Bricklaying & block work",
+        "Concrete mixing & pouring",
+        "Plastering & rendering",
+        "Construction safety"
+      ],
+      "careers": ["Mason","Construction Foreman","Building Contractor"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Pipe wrench (12\")",
+        "Hacksaw & blades",
+        "File",
+        "Tape measure",
+        "Navy blue/yellow safety helmet",
+        "Plumb bob",
+        "Cold chisel",
+        "Trowel",
+        "Masonry square",
+        "Wood float",
+        "Mason hammer (stone)",
+        "Corner trowel",
+        "Spirit level"
+      ]
+    },
+    {
+      "id": "c8",
+      "slug": "fashion-design-and-dressmaking",
+      "type": "nita",
+      "tag": "Fashion",
+      "name": "Fashion Design and Dressmaking",
+      "cert": "NITA",
+      "dur": "1 Year",
+      "img": "/fashion.png",
+      "description": "Develop your creative and technical skills in fashion design, pattern making, and garment construction. Perfect for entrepreneurship in Kenya's growing fashion industry.",
+      "outcomes": [
+        "Pattern drafting & cutting",
+        "Garment construction & tailoring",
+        "Fashion illustration",
+        "Small business management"
+      ],
+      "careers": ["Fashion Designer","Tailor","Boutique Owner","Costume Designer"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Bobbin & bobbin case",
+        "Tape measure",
+        "Seam ripper",
+        "Brown pattern papers – 10 pcs",
+        "Room ruler",
+        "Paper cutting scissors – 1 pc",
+        "Pattern drawing book",
+        "Hand needle – 1 pkt",
+        "Sewing machine needles (Flat No.18)",
+        "Tailor chalks – 1 pkt",
+        "Tailor pins – 1 pkt",
+        "Threads – 1 pkt (small size)",
+        "Dress-maker pins – 1 pkt"
+      ]
+    },
+    {
+      "id": "c9",
+      "slug": "motor-vehicle-mechanics",
+      "type": "nita",
+      "tag": "Engineering",
+      "name": "Motor Vehicle Mechanics",
+      "cert": "NITA",
+      "dur": "1 Year",
+      "img": "/mechanic.png",
+      "description": "Practical training in vehicle diagnosis, engine repair, and maintenance for cars, trucks, and motorcycles. Our workshop is equipped with modern diagnostic tools.",
+      "outcomes": [
+        "Engine diagnosis & overhaul",
+        "Brakes, suspension & steering",
+        "Electrical & electronics systems",
+        "Vehicle inspection & servicing"
+      ],
+      "careers": ["Mechanic","Auto Workshop Owner","Fleet Maintenance Tech"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Safety boots",
+        "Overalls set",
+        "Steel rule",
+        "Soldering bit"
+      ]
+    },
+    {
+      "id": "c10",
+      "slug": "welding-and-fabrication",
+      "type": "nita",
+      "tag": "Engineering",
+      "name": "Welding & Fabrication",
+      "cert": "NITA",
+      "dur": "1 Year",
+      "img": "https://images.unsplash.com/photo-1504917595217-d4ce5eb928cc?q=80&w=800&auto=format&fit=crop",
+      "description": "Master MIG, TIG, and Arc welding techniques with hands-on training in metal fabrication. Skilled welders are highly sought after in construction and manufacturing.",
+      "outcomes": [
+        "Arc, MIG & TIG welding",
+        "Metal cutting & shaping",
+        "Structural fabrication",
+        "Welding safety & QC"
+      ],
+      "careers": ["Welder","Fabricator","Structural Steel Worker","Metal Workshop Owner"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Safety boots",
+        "Overalls set",
+        "Welding gloves",
+        "Steel rule",
+        "Combination pliers",
+        "Hacksaw & blades",
+        "File",
+        "Tape measure"
+      ]
+    },
+    {
+      "id": "c11",
+      "slug": "computer-operator",
+      "type": "nita",
+      "tag": "ICT",
+      "name": "Computer Operator",
+      "cert": "NITA",
+      "dur": "1 Year",
+      "img": "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800&auto=format&fit=crop",
+      "description": "A full-year ICT programme covering computer hardware, software, networking, and office applications. The NITA certificate is recognised across Kenya's formal employment sector.",
+      "outcomes": [
+        "MS Office & productivity suites",
+        "Computer hardware & troubleshooting",
+        "Networking basics",
+        "Internet & cybersecurity awareness"
+      ],
+      "careers": ["Data Entry Clerk","Office Administrator","IT Support Tech","Receptionist"],
+      "fees": "KSh 27,000/year",
+      "intake": "January & September",
+      "requirements": [
+        "Flash Disk (4GB)",
+        "Mouse"
+      ]
+    },
+    {
+      "id": "c12",
+      "slug": "computer-packages",
+      "type": "short",
+      "tag": "ICT",
+      "name": "Computer Packages",
+      "cert": "Internal",
+      "dur": "2 Months",
+      "img": "https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=800&auto=format&fit=crop",
+      "description": "A quick 2-month course in essential computer skills: Word, Excel, PowerPoint, and internet use. Perfect for job seekers and office workers looking to upskill fast.",
+      "outcomes": [
+        "Microsoft Word & document creation",
+        "Excel spreadsheets & data",
+        "PowerPoint presentations",
+        "Email & internet skills"
+      ],
+      "careers": ["Office Admin","Data Entry","Receptionist"],
+      "fees": "KSh 4,800",
+      "intake": "Every Month",
+      "requirements": [
+        "Flash Disk (4GB)",
+        "Mouse"
+      ]
+    },
+    {
+      "id": "c13",
+      "slug": "security-and-network-systems",
+      "type": "short",
+      "tag": "ICT",
+      "name": "Security & Network Systems",
+      "cert": "Internal",
+      "dur": "3 Months",
+      "img": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800&auto=format&fit=crop",
+      "description": "CCTV installation, access control systems, and basic networking. Perfect for those targeting the growing private security and smart building industry.",
+      "outcomes": [
+        "CCTV system installation",
+        "Access control & alarms",
+        "Network cabling & routers",
+        "Security system maintenance"
+      ],
+      "careers": ["CCTV Installer","Security System Tech","Network Technician"],
+      "fees": "KSh 10,000",
+      "intake": "Every Month",
+      "requirements": [
+        "Cable cutter",
+        "Combination pliers",
+        "Networking tester",
+        "Crimping tool",
+        "Insulating tape – 1 pkt",
+        "Flat screwdrivers",
+        "Star screwdrivers",
+        "Digital multimeter",
+        "Screw gypsum",
+        "Spirit level"
+      ]
+    },
+    {
+      "id": "c14",
+      "slug": "barista",
+      "type": "short",
+      "tag": "Short Course",
+      "name": "Barista",
+      "cert": "Internal",
+      "dur": "3 Months",
+      "img": "https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=800&auto=format&fit=crop",
+      "description": "Professional barista training covering espresso, latte art, tea service, and café operations. Get job-ready for Kenya's fast-growing coffee culture.",
+      "outcomes": [
+        "Espresso & coffee brewing",
+        "Latte art & milk frothing",
+        "Menu creation & pricing",
+        "Customer service in a café"
+      ],
+      "careers": ["Barista","Café Attendant","Café Owner"],
+      "fees": "KSh 10,000",
+      "intake": "Every Month",
+      "requirements": [
+        "Apron (clean, white or black)",
+        "Closed-toe shoes (safety requirement)",
+        "Notebook & pen for recipe notes"
+      ]
+    },
+    {
+      "id": "c15",
+      "slug": "baking-and-pastry",
+      "type": "short",
+      "tag": "Short Course",
+      "name": "Baking & Pastry",
+      "cert": "Internal",
+      "dur": "3 Months",
+      "img": "https://images.unsplash.com/photo-1581299894007-aaa50297cf16?q=80&w=800&auto=format&fit=crop",
+      "description": "From bread and cakes to pastries and confectionery — this hands-on 3-month course gives you the skills to bake professionally or launch your own home bakery.",
+      "outcomes": [
+        "Bread & cake baking",
+        "Pastry & confectionery",
+        "Packaging & food safety",
+        "Bakery business basics"
+      ],
+      "careers": ["Baker","Pastry Chef","Home Bakery Owner"],
+      "fees": "KSh 10,000",
+      "intake": "Every Month",
+      "requirements": [
+        "Apron (clean, white or black)",
+        "Closed-toe shoes (safety requirement)",
+        "Notebook & pen for recipe notes",
+        "Kitchen Cloth – 2 pieces"
+      ]
+    },
+    {
+      "id": "c16",
+      "slug": "cna-care-givers",
+      "type": "short",
+      "tag": "Short Course",
+      "name": "CNA – Care Givers",
+      "cert": "Internal",
+      "dur": "3 Months",
+      "img": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&auto=format&fit=crop",
+      "description": "Certified Nursing Assistant training for those seeking employment in home care, hospitals, and nursing homes. High demand locally and internationally.",
+      "outcomes": [
+        "Basic patient care & hygiene",
+        "Vital signs & first aid",
+        "Elder care & mobility assistance",
+        "Medical ethics & communication"
+      ],
+      "careers": ["Home Care Giver","Nursing Home Aide","Hospital Auxiliary Staff"],
+      "fees": "KSh 10,000",
+      "intake": "Every Month",
+      "requirements": [
+        "White uniform (nurse-style top & trouser)",
+        "Closed-toe white shoes",
+        "Notebook & pen",
+        "Medical gloves (1 box)"
+      ]
+    },
+    {
+      "id": "c17",
+      "slug": "driving-classes",
+      "type": "short",
+      "tag": "Short Course",
+      "name": "Driving Classes",
+      "cert": "NTSA",
+      "dur": "1 Month (18+ yrs)",
+      "img": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=800&auto=format&fit=crop",
+      "description": "NTSA-compliant driving lessons for Class B vehicles. Covers highway code, defensive driving, and practical road training. Must be 18 years or older.",
+      "outcomes": [
+        "Highway code & road signs",
+        "Defensive driving techniques",
+        "Parking & manoeuvring",
+        "NTSA test preparation"
+      ],
+      "careers": ["Licensed Driver","Chauffeur","Delivery Driver","PSV Driver (with upgrade)"],
+      "fees": "Contact us for pricing",
+      "intake": "Every Month",
+      "requirements": [
+        "Valid National ID (must be 18 years or older)",
+        "Passport photo – 2 pcs",
+        "Medical certificate (fit to drive)"
+      ]
+    }
+  ],
+  "gallery": [
+    {
+      "id": "1",
+      "src": "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&q=80",
+      "label": "Electronics Workshop",
+      "span": true
+    },
+    {
+      "id": "2",
+      "src": "https://images.unsplash.com/photo-1581299894007-aaa50297cf16?q=80&w=600&auto=format&fit=crop",
+      "label": "Food & Beverage Lab",
+      "span": false
+    },
+    {
+      "id": "3",
+      "src": "https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=600&auto=format&fit=crop",
+      "label": "Hair & Beauty Studio",
+      "span": false
+    },
+    {
+      "id": "4",
+      "src": "https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=600&auto=format&fit=crop",
+      "label": "Fashion & Design",
+      "span": false
+    },
+    {
+      "id": "5",
+      "src": "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=600&auto=format&fit=crop",
+      "label": "Motor Vehicle Workshop",
+      "span": false
+    }
+  ],
+  "faqs": [
+    {
+      "id": "faq-1",
+      "question": "What are the requirements to join Kinoo VTC?",
+      "answer": "For full programs (KNEC/NITA), you need a KCSE certificate (any grade), National ID or Birth Certificate, and two passport photos. Short courses only require an ID and photos."
+    },
+    {
+      "id": "faq-2",
+      "question": "How much are the school fees?",
+      "answer": "Thanks to government subsidies, our full-year technical programs cost only KSh 27,000 per year. Short courses range from KSh 8,000 to KSh 15,000."
+    },
+    {
+      "id": "faq-3",
+      "question": "Do you offer boarding facilities?",
+      "answer": "Currently, Kinoo VTC is a day institution. However, there are numerous affordable student hostels located just a few minutes walking distance from the campus in Kikuyu."
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-1",
+      "title": "2026 Open Day & Campus Tour",
+      "date": "2026-07-12",
+      "time": "9:00 AM – 3:00 PM",
+      "venue": "Kinoo VTC Main Campus, Kikuyu",
+      "category": "Open Day",
+      "description": "Come and experience Kinoo VTC first-hand! Tour our workshops, meet instructors, watch live demonstrations, and get all your questions answered. Parents and prospective students are warmly invited.",
+      "image": "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=800&auto=format&fit=crop",
+      "badge": "Free Admission"
+    },
+    {
+      "id": "evt-2",
+      "title": "NITA Certification Exams – July Session",
+      "date": "2026-07-20",
+      "time": "8:00 AM – 12:00 PM",
+      "venue": "Examination Hall, Block B",
+      "category": "Exams",
+      "description": "The National Industrial Training Authority (NITA) end-of-year certification examinations for all full-year programme students. Students must present their ID and admission card.",
+      "image": "https://images.unsplash.com/photo-1606761568499-6d2451b23c66?q=80&w=800&auto=format&fit=crop",
+      "badge": "Students Only"
+    },
+    {
+      "id": "evt-3",
+      "title": "Annual Skills & Talent Exhibition",
+      "date": "2026-08-05",
+      "time": "10:00 AM – 5:00 PM",
+      "venue": "Kinoo VTC Main Hall",
+      "category": "Exhibition",
+      "description": "An exciting showcase of student work, projects, and craftsmanship from every department. From fashion shows to live cooking, electrical setups to hair styling competitions — all are welcome!",
+      "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=800&auto=format&fit=crop",
+      "badge": "Public Welcome"
+    },
+    {
+      "id": "evt-4",
+      "title": "September Intake Orientation Week",
+      "date": "2026-09-01",
+      "time": "8:00 AM – 1:00 PM",
+      "venue": "Assembly Hall, Kinoo VTC",
+      "category": "Orientation",
+      "description": "Welcome to Kinoo VTC! New students joining the September intake will receive campus induction, meet their heads of department, collect their uniforms, and tour their departments.",
+      "image": "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=800&auto=format&fit=crop",
+      "badge": "New Students"
+    },
+    {
+      "id": "evt-5",
+      "title": "Kiambu County VTC Sports Day",
+      "date": "2026-09-20",
+      "time": "9:00 AM – 4:00 PM",
+      "venue": "Kikuyu Sports Ground",
+      "category": "Sports",
+      "description": "Kinoo VTC takes on other county polytechnics in our annual sports competition. Events include football, athletics, netball, and tug-of-war. Come cheer our team to victory!",
+      "image": "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?q=80&w=800&auto=format&fit=crop",
+      "badge": "Support Team Kinoo!"
+    },
+    {
+      "id": "evt-6",
+      "title": "Graduation Ceremony – Class of 2026",
+      "date": "2026-11-28",
+      "time": "10:00 AM – 2:00 PM",
+      "venue": "Kinoo VTC Main Campus Grounds",
+      "category": "Graduation",
+      "description": "Join us as we celebrate the success of the Class of 2026! Families, guests, and the public are warmly invited to witness our graduates receive their NITA and KNEC certificates.",
+      "image": "https://images.unsplash.com/photo-1627556704302-624286467c65?q=80&w=800&auto=format&fit=crop",
+      "badge": "All Welcome"
+    }
+  ],
+  "blogs": [
+    {
+      "id": "blog-1",
+      "slug": "kinoo-vtc-opens-new-electronics-lab",
+      "title": "Kinoo VTC Opens State-of-the-Art Electronics Lab",
+      "excerpt": "Thanks to new county funding, our engineering students now have access to modern oscilloscopes and PCB fabrication tools.",
+      "content": "We are thrilled to announce the opening of our new Electronics Laboratory. Thanks to the support from the County Government of Kiambu, we have successfully installed modern diagnostic equipment, oscilloscopes, and PCB fabrication tools. This upgrade will significantly enhance the practical training for our Electrical and Electronics engineering students, ensuring they graduate with industry-standard skills that are highly sought after by employers across Kenya.\n\nThe lab will also be utilized for our upcoming short courses in mobile phone repair and advanced circuit board diagnostics.",
+      "image": "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=800&q=80",
+      "date": "2026-05-15"
+    },
+    {
+      "id": "blog-2",
+      "slug": "graduates-shine-in-hospitality-sector",
+      "title": "Our Hospitality Graduates Are Shining in Top Nairobi Hotels",
+      "excerpt": "Recent graduates from our Food & Beverage program have secured placements at leading 5-star hotels.",
+      "content": "The standard of training at Kinoo VTC continues to pay off as our recent Food & Beverage Production graduates secure competitive placements across Nairobi. Several students from the class of 2025 have been absorbed into 5-star establishments in Westlands and the CBD.\n\nOur hands-on approach in the training kitchen, coupled with rigorous KNEC curriculum standards, means our trainees are job-ready from day one. We congratulate our alumni and invite aspiring chefs to join our next intake!",
+      "image": "https://images.unsplash.com/photo-1616400619175-5beda3a17896?w=800&q=80",
+      "date": "2026-04-22"
+    }
+  ]
+}

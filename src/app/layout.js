@@ -1,14 +1,12 @@
-import { Inter, Playfair_Display } from "next/font/google";
+import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import FloatingWhatsApp from "@/components/FloatingWhatsApp";
-import SplashScreen from "@/components/SplashScreen";
+import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const dmsans = DM_Sans({ subsets: ["latin"], variable: "--font-dmsans" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 export const metadata = {
+  metadataBase: new URL("https://www.kinoovtc.ac.ke"),
   title: "Kinoo Vocational Training Centre | Skills for Life",
   description: "Kiambu County's premier public vocational training centre. NITA & KNEC certified courses in Food & Beverage, Electronics, Hair Dressing, Plumbing, and more. Intake ongoing!",
   keywords: "Kinoo VTC, vocational training Kiambu, NITA courses Kenya, KNEC artisan, technical college Kikuyu, affordable vocational training",
@@ -31,15 +29,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className={inter.className}>
-        <SplashScreen />
-        <Navbar />
-        <main style={{ minHeight: '100vh' }}>
+    <html lang="en" className={`${dmsans.variable} ${playfair.variable}`} data-scroll-behavior="smooth">
+      <body className={dmsans.className}>
+        <ClientLayoutWrapper>
           {children}
-        </main>
-        <Footer />
-        <FloatingWhatsApp />
+        </ClientLayoutWrapper>
       </body>
     </html>
   );

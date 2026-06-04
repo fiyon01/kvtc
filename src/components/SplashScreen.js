@@ -1,31 +1,84 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 
 export default function SplashScreen() {
-  const [show, setShow] = useState(true);
+  const [visible, setVisible] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShow(false);
-    }, 2500);
-    return () => clearTimeout(timer);
+    const fadeTimer = setTimeout(() => setFadeOut(true), 2200);
+    const removeTimer = setTimeout(() => setVisible(false), 2700);
+    return () => { clearTimeout(fadeTimer); clearTimeout(removeTimer); };
   }, []);
 
-  if (!show) return null;
+  if (!visible) return null;
 
   return (
-    <div className="splash-screen">
-      <div className="splash-content">
-        <Image src="/logo.png" alt="KVTC Logo" width={120} height={120} className="splash-logo" />
-        <h1 style={{ fontSize: '2rem', marginTop: '20px', letterSpacing: '1px' }}>
-          <span style={{ color: 'var(--green-light)' }}>Kinoo</span> VTC
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', letterSpacing: '2px', textTransform: 'uppercase' }}>
-          Skills for Life
-        </p>
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: '#fff',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexDirection: 'column', gap: '16px',
+      opacity: fadeOut ? 0 : 1,
+      transition: 'opacity 0.5s ease',
+    }}>
+      {/* Logo Badge */}
+      <div style={{
+        width: '90px', height: '90px', borderRadius: '24px',
+        background: 'linear-gradient(135deg, #0F6E56, #1D9E75)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 20px 60px rgba(15,110,86,0.35)',
+        animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+      }}>
+        <span style={{ fontFamily: 'Georgia, serif', fontSize: '36px', fontWeight: 700, color: '#fff' }}>KV</span>
       </div>
+
+      <div style={{ textAlign: 'center' }}>
+        <h1 style={{
+          fontFamily: 'Georgia, serif',
+          fontSize: '2rem', color: '#1a1a1a',
+          letterSpacing: '1px', margin: 0,
+          animation: 'splash-up 0.6s 0.2s both',
+        }}>
+          <span style={{ color: '#0F6E56' }}>Kinoo</span> VTC
+        </h1>
+        <p style={{
+          color: '#888', fontSize: '11px',
+          letterSpacing: '2px', textTransform: 'uppercase',
+          marginTop: '6px',
+          animation: 'splash-up 0.6s 0.4s both',
+        }}>Technology for Empowerment</p>
+      </div>
+
+      {/* Loading bar */}
+      <div style={{
+        width: '120px', height: '3px', background: '#E1F5EE',
+        borderRadius: '99px', overflow: 'hidden',
+        marginTop: '8px',
+        animation: 'splash-up 0.6s 0.5s both',
+      }}>
+        <div style={{
+          height: '100%', background: '#0F6E56',
+          borderRadius: '99px',
+          animation: 'load-bar 2s ease forwards',
+        }}></div>
+      </div>
+
+      <style>{`
+        @keyframes splash-bounce {
+          0% { transform: scale(0.5); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes splash-up {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes load-bar {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+      `}</style>
     </div>
   );
 }

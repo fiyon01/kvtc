@@ -1,0 +1,26 @@
+"use client";
+
+import { usePathname } from 'next/navigation';
+import Navbar from './Navbar';
+import Footer from './Footer';
+import TopBanner from './TopBanner';
+import FloatingWhatsApp from './FloatingWhatsApp';
+import SplashScreen from './SplashScreen';
+
+export default function ClientLayoutWrapper({ children }) {
+  const pathname = usePathname();
+  const isApp = !pathname.startsWith('/admin') && !pathname.startsWith('/prospectus');
+
+  return (
+    <>
+      {isApp && <SplashScreen />}
+      {isApp && <TopBanner />}
+      {isApp && <Navbar />}
+      <main style={{ minHeight: '100vh', background: !isApp ? '#f8f7f4' : 'transparent' }}>
+        {children}
+      </main>
+      {isApp && <Footer />}
+      {isApp && <FloatingWhatsApp />}
+    </>
+  );
+}
