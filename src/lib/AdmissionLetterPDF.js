@@ -297,13 +297,6 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
         <View style={s.rulesBody}>
           <Text style={s.rulesTitle}>RULES AND REGULATIONS</Text>
 
-          {/*
-            FIX: Rules overlapping/duplicating — root cause was wrap={false} on
-            individual items forcing react-pdf to clip them rather than page-break.
-            Solution: remove wrap={false} entirely and let the renderer flow naturally.
-            Each rule is a simple flexDirection row; sub-items are indented Views.
-            This guarantees no overlapping and correct page-break behaviour.
-          */}
           {RULES.map((rule, i) => (
             <View style={s.ruleItem} key={i}>
               <Text style={s.ruleNum}>{i + 1}.</Text>
