@@ -13,8 +13,10 @@ function SignatureModal({ onSave, onClose }) {
   const [mode, setMode] = useState("draw");
   const [typed, setTyped] = useState("");
   const [isEmpty, setIsEmpty] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = prev; };
@@ -72,7 +74,9 @@ function SignatureModal({ onSave, onClose }) {
     onClose();
   };
 
-  return (
+  if (!mounted) return null;
+
+  const modalContent = (
     <div
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
       style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.55)", zIndex:9999, display:"flex", alignItems:"center", justifyContent:"center", padding:16, backdropFilter: "blur(4px)" }}
@@ -121,25 +125,36 @@ function SignatureModal({ onSave, onClose }) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
 
 // ── Payment Modal ───────────────────────────────────────────────
-function PaymentModal({ name, phone, amount, onClose, onSuccess }) {
+function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess }) {
+  const [phone, setPhone] = useState(initialPhone);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("input"); // input -> loading -> success
   const [mounted, setMounted] = useState(false);
+  const pollRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    return () => {
+      document.body.style.overflow = prev;
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
   }, []);
+
+  // Simple phone validation for M-PESA (07XX, 01XX, or 2547XX, 2541XX)
+  const isValidPhone = (p) => /^(\+?254|0)[17]\d{8}$/.test(p.replace(/\s/g, ""));
 
   const handlePay = async (e) => {
     e.preventDefault();
     if (!email) return alert("Please enter your email address to receive the receipt and copy of your application.");
+    if (!isValidPhone(phone)) return alert("Please enter a valid M-PESA phone number (e.g. 0712345678).");
     
     setLoading(true);
     setStep("loading");
@@ -152,16 +167,56 @@ function PaymentModal({ name, phone, amount, onClose, onSuccess }) {
       });
       const data = await res.json();
       
-      setTimeout(() => {
-        setStep("success");
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Payment request failed. Please try again.");
+      }
+      
+      // Mock mode (no M-PESA credentials) — simulate success after delay
+      if (data.mock) {
         setTimeout(() => {
-          onSuccess(email);
-        }, 2000);
-      }, 3000);
+          setStep("success");
+          setTimeout(() => onSuccess(email), 2000);
+        }, 3000);
+        return;
+      }
+      
+      // Real mode — poll for callback confirmation
+      const checkoutId = data.CheckoutRequestID;
+      const maxAttempts = 30;
+      let attempts = 0;
+      
+      pollRef.current = setInterval(async () => {
+        attempts++;
+        try {
+          const statusRes = await fetch(`/api/mpesa-status?CheckoutRequestID=${checkoutId}`);
+          const statusData = await statusRes.json();
+          
+          if (statusData.status === "success") {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+            setStep("success");
+            setTimeout(() => onSuccess(email), 2000);
+          } else if (statusData.status === "failed" || attempts >= maxAttempts) {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+            alert(statusData.message || "Payment was not completed. Please try again.");
+            setStep("input");
+            setLoading(false);
+          }
+        } catch {
+          if (attempts >= maxAttempts) {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+            alert("Payment confirmation timed out. If you paid, please contact the institution.");
+            setStep("input");
+            setLoading(false);
+          }
+        }
+      }, 2000);
       
     } catch (err) {
       console.error(err);
-      alert("Payment failed or cancelled. Please try again.");
+      alert(err.message || "Payment failed. Please try again.");
       setStep("input");
       setLoading(false);
     }
@@ -196,8 +251,8 @@ function PaymentModal({ name, phone, amount, onClose, onSuccess }) {
               </div>
 
               <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontFamily: "var(--sans)", fontSize: "13px", fontWeight: 600, color: "#333", marginBottom: "6px" }}>M-PESA Phone Number</label>
-                <input type="text" value={phone} readOnly style={{ width: "100%", padding: "12px", background: "#f5f5f5", border: "1px solid #ddd", borderRadius: "8px", fontFamily: "var(--sans)", color: "#777", boxSizing: "border-box" }} />
+                <label style={{ display: "block", fontFamily: "var(--sans)", fontSize: "13px", fontWeight: 600, color: "#333", marginBottom: "6px" }}>M-PESA Phone Number <span style={{color: "#e53e3e"}}>*</span></label>
+                <input type="tel" required value={phone} onChange={e => setPhone(e.target.value)} placeholder="e.g. 0712345678" style={{ width: "100%", padding: "12px", border: "1.5px solid #0F6E56", borderRadius: "8px", fontFamily: "var(--sans)", color: "#1a1a1a", boxSizing: "border-box", outline: "none" }} />
               </div>
 
               <div style={{ marginBottom: "24px" }}>
@@ -297,6 +352,32 @@ const SigDisplay = ({ value, onClick }) => (
       ? <img src={value} alt="sig" style={{ height:28, maxWidth:"100%", display:"block", objectFit:"contain", objectPosition:"left center" }} />
       : <span style={{ color:"#bbb", fontSize:11, fontStyle:"italic" }}>click to sign</span>}
   </span>
+);
+
+// ── Reusable helpers (defined outside to prevent remount on every render) ──
+const F = {
+  border:"none", borderBottom:"1.5px dotted #444",
+  outline:"none", background:"transparent",
+  fontFamily:"'Times New Roman',serif",
+  fontSize:"inherit", color:"#000", fontWeight:400,
+  padding:"0 2px 0", lineHeight:"1.9em",
+  width:"100%", display:"block",
+  scrollMarginTop:"120px",
+};
+const S = { ...F, cursor:"pointer", appearance:"none", WebkitAppearance:"none" };
+const Row = ({children, mt=0}) => (
+  <div style={{display:"flex", flexWrap:"wrap", gap:"0 6px", alignItems:"baseline", marginBottom:1, marginTop:mt, lineHeight:"1.9em"}}>
+    {children}
+  </div>
+);
+const L = ({t}) => <span style={{whiteSpace:"nowrap", flexShrink:0, fontFamily:"'Times New Roman',serif"}}>{t}</span>;
+const GI = ({ value, onChange, max=400, min=60, type="text", placeholder="" }) => (
+  <div style={{flex:"1 1 auto", maxWidth:max, minWidth:min}}>
+    <input type={type} placeholder={placeholder} value={value || ""} onChange={e => onChange(e.target.value)} style={F} />
+  </div>
+);
+const Sec = ({t}) => (
+  <div style={{fontWeight:700, textDecoration:"underline", marginTop:10, marginBottom:2, fontFamily:"'Times New Roman',serif"}}>{t}</div>
 );
 
 // ═════════════════════════════════════════════════════════════
@@ -401,35 +482,6 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
     }
   };
 
-// base field style — normal weight matching physical form
-const F = {
-  border:"none", borderBottom:"1.5px dotted #444",
-  outline:"none", background:"transparent",
-  fontFamily:"'Times New Roman',serif",
-  fontSize:"inherit", color:"#000", fontWeight:400,
-  padding:"0 2px 0", lineHeight:"1.9em",
-  width:"100%", display:"block",
-  scrollMarginTop:"120px",
-};
-
-// select style
-const S = { ...F, cursor:"pointer", appearance:"none", WebkitAppearance:"none" };
-
-const Row = ({children, mt=0}) => (
-  <div style={{display:"flex", flexWrap:"wrap", gap:"0 6px", alignItems:"baseline", marginBottom:1, marginTop:mt, lineHeight:"1.9em"}}>
-    {children}
-  </div>
-);
-const L = ({t}) => <span style={{whiteSpace:"nowrap", flexShrink:0, fontFamily:"'Times New Roman',serif"}}>{t}</span>;
-const GI = ({ value, onChange, max=400, min=60, type="text", placeholder="" }) => (
-  <div style={{flex:"1 1 auto", maxWidth:max, minWidth:min}}>
-    <input type={type} placeholder={placeholder} value={value || ""} onChange={e => onChange(e.target.value)} style={F} />
-  </div>
-);
-const Sec = ({t}) => (
-  <div style={{fontWeight:700, textDecoration:"underline", marginTop:10, marginBottom:2, fontFamily:"'Times New Roman',serif"}}>{t}</div>
-);
-
   // Extract unique exam bodies & durations from db for dropdowns (fallback)
   const DURATIONS = [...new Set(courseList.map(c => c.dur))].filter(Boolean);
   const EXAM_BODIES = [...new Set(courseList.map(c => c.cert))].filter(Boolean);
@@ -531,8 +583,8 @@ const Sec = ({t}) => (
           <Sec t="ADMISSION DETAILS"/>
           <Row>
             <L t="COURSE&nbsp;"/>
-            <div style={{flex:"1 1 auto",maxWidth:420,minWidth:80}}>
-              <select value={form.course} onChange={e=>set("course",e.target.value)} style={S}>
+            <div style={{flex:"1 1 auto",minWidth:80, maxWidth:"none"}}>
+              <select value={form.course} onChange={e=>set("course",e.target.value)} style={{...S, whiteSpace:"normal", overflow:"visible"}}>
                 <option value="">{"............................................."}</option>
                 {courseList.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}
               </select>

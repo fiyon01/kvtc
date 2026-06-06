@@ -80,6 +80,7 @@ const s = StyleSheet.create({
   instName: { fontSize: 11, fontFamily: 'Times-Bold', color: green, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 2, textAlign: 'center' },
   contactText: { fontSize: 7.5, color: '#444', textAlign: 'center' },
   body: { paddingTop: 14, paddingBottom: 20, paddingLeft: 30, paddingRight: 30, flex: 1 },
+  rulesBody: { paddingLeft: 30, paddingRight: 30, paddingTop: 14 },
   title: { textAlign: 'center', fontFamily: 'Times-Bold', fontSize: 14, textDecoration: 'underline', marginBottom: 16, letterSpacing: 1 },
   inputRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 14 },
   label: { fontFamily: 'Times-Bold', fontSize: 10, marginRight: 6 },
@@ -207,13 +208,13 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
       </Page>
 
       {/* PAGE 2: RULES AND REGULATIONS */}
-      <Page size="A4" style={s.page}>
-        <View style={s.body}>
+      <Page size="A4" style={s.page} wrap>
+        <View style={s.rulesBody}>
           <Text style={s.title}>RULES AND REGULATIONS</Text>
 
           <View style={s.ruleList}>
             {RULES.map((rule, i) => (
-              <View key={i} style={s.ruleItem}>
+              <View key={i} style={s.ruleItem} wrap={false}>
                 <Text style={s.ruleNum}>{i + 1}.</Text>
                 <View style={{ flex: 1 }}>
                   {typeof rule === 'string' ? (
@@ -240,7 +241,7 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
             I hereby declare that I will adhere to all the rules and regulations of this institution.
           </Text>
 
-          <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }} wrap={false}>
             <View style={{ flex: 2, marginRight: 16 }}>
               <Text style={s.label}>NAME:</Text>
               <Text style={{ borderBottomWidth: 1.5, borderBottomColor: '#333', paddingBottom: 2, fontSize: 10, marginTop: 4 }}>
