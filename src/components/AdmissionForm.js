@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 
+const KVTC_LOGO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23fdf4e3' stroke='%23aaa' stroke-width='1.5'/%3E%3Ctext x='50' y='48' font-size='9' fill='%23555' text-anchor='middle' font-family='serif'%3EKVTC%3C/text%3E%3Ctext x='50' y='62' font-size='8' fill='%23555' text-anchor='middle' font-family='serif'%3ELogo%3C/text%3E%3C/svg%3E";
 
 // ── Signature Modal ────────────────────────────────────────────
 function SignatureModal({ onSave, onClose }) {
