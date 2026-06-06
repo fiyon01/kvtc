@@ -69,11 +69,7 @@ export default function Navbar() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#fff', fontFamily: 'var(--serif)', fontSize: '18px', fontWeight: 700,
           }}>KV</div>
-          <div style={{ lineHeight: 1.2 }}>
-            <strong style={{ display: 'block', fontSize: '15px', fontWeight: 600, color: '#1a1a1a' }}>Kinoo VTC</strong>
-            <span style={{ fontSize: '11px', color: '#888', letterSpacing: '0.5px' }}>Kiambu County</span>
-          </div>
-        </Link>
+                </Link>
 
         {/* Desktop Nav */}
         <ul style={{ display: 'flex', gap: '28px', listStyle: 'none', margin: 0, padding: 0 }} className="nav-desktop-ul">
