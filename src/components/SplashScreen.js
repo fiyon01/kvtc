@@ -23,15 +23,26 @@ export default function SplashScreen() {
       opacity: fadeOut ? 0 : 1,
       transition: 'opacity 0.5s ease',
     }}>
-      {/* Logo Badge */}
-      <div style={{
-        width: '90px', height: '90px', borderRadius: '24px',
-        background: 'linear-gradient(135deg, #0F6E56, #1D9E75)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 20px 60px rgba(15,110,86,0.35)',
-        animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-      }}>
-        <span style={{ fontFamily: 'Georgia, serif', fontSize: '36px', fontWeight: 700, color: '#fff' }}>KV</span>
+      {/* Logos Row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <img src="/logo.png" alt="KVTC" style={{ height: '90px', objectFit: 'contain', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} onError={e => {
+          e.target.style.display = 'none';
+          e.target.nextSibling.style.display = 'flex';
+        }} />
+        <div style={{
+          width: '90px', height: '90px', borderRadius: '24px',
+          background: 'linear-gradient(135deg, #0F6E56, #1D9E75)',
+          display: 'none', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 20px 60px rgba(15,110,86,0.35)',
+          animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: '36px', fontWeight: 700, color: '#fff' }}>KV</span>
+        </div>
+
+        {/* Separator */}
+        <div style={{ width: '1px', height: '50px', background: 'rgba(0,0,0,0.1)', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+
+        <img src="/cgok-logo.png" alt="CGOK" style={{ height: '90px', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
       </div>
 
       <div style={{ textAlign: 'center' }}>

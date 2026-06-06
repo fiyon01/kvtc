@@ -2,8 +2,8 @@ import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 
-const dmsans = DM_Sans({ subsets: ["latin"], variable: "--font-dmsans" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const dmsans = DM_Sans({ subsets: ["latin"], variable: "--font-dmsans", preload: false });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair", preload: false });
 
 export const metadata = {
   metadataBase: new URL("https://www.kinoovtc.ac.ke"),

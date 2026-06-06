@@ -130,6 +130,7 @@ export default function AdminDashboard() {
     { id: 'gallery', label: '🖼️ Gallery Manager' },
     { id: 'contact', label: '📞 Contact Info' },
     { id: 'letter', label: '✉️ Admission Letter' },
+    { id: 'applications', label: '📄 Applications & Payments' },
     { id: 'security', label: '🔒 Security' },
   ];
 
@@ -580,6 +581,52 @@ export default function AdminDashboard() {
                     <button onClick={() => setDb({...db, gallery: db.gallery.filter(g => g.id !== img.id)})} style={{ background: '#fff5f5', color: '#ff4444', border: '1px solid #ffccc7', borderRadius: '8px', padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '12px', flexShrink: 0 }}>Delete</button>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── APPLICATIONS & PAYMENTS ── */}
+          {activeTab === 'applications' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <h2 style={{ fontFamily: 'var(--serif)', margin: 0, fontSize: '22px' }}>Applications & Payments</h2>
+                  <p style={{ color: '#888', margin: '4px 0 0', fontSize: '13px' }}>View all student applications and M-PESA payments.</p>
+                </div>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+                  <thead>
+                    <tr style={{ background: '#f8f7f4', borderBottom: '2px solid #eee' }}>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '13px', color: '#555' }}>Date</th>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '13px', color: '#555' }}>Name</th>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '13px', color: '#555' }}>Course Applied</th>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '13px', color: '#555' }}>Phone / Email</th>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '13px', color: '#555' }}>Amount Paid</th>
+                      <th style={{ padding: '12px 16px', fontWeight: 600, fontSize: '13px', color: '#555' }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(db.applications || []).length === 0 ? (
+                      <tr>
+                        <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#888' }}>No applications received yet.</td>
+                      </tr>
+                    ) : (
+                      db.applications.map(app => (
+                        <tr key={app.id} style={{ borderBottom: '1px solid #eee' }}>
+                          <td style={{ padding: '16px', fontSize: '13px' }}>{new Date(app.date).toLocaleDateString()}</td>
+                          <td style={{ padding: '16px', fontSize: '14px', fontWeight: 600 }}>{app.name}</td>
+                          <td style={{ padding: '16px', fontSize: '13px', color: '#0F6E56' }}>{app.course}</td>
+                          <td style={{ padding: '16px', fontSize: '13px' }}>{app.phone}<br/><span style={{ color: '#888', fontSize: '12px' }}>{app.email}</span></td>
+                          <td style={{ padding: '16px', fontSize: '14px', fontWeight: 600 }}>KSh {app.amount}</td>
+                          <td style={{ padding: '16px' }}>
+                            <span style={{ display: 'inline-block', background: '#E1F5EE', color: '#0F6E56', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 600 }}>{app.status}</span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}

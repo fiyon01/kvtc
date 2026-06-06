@@ -118,15 +118,12 @@ export default function Contact() {
                 const waText = `Hello Kinoo VTC, I am interested in ${course}.\n\n*Name:* ${fname} ${lname}\n*Phone:* ${phone}\n*Message:* ${msg || 'N/A'}`;
                 window.open(`https://wa.me/254113582008?text=${encodeURIComponent(waText)}`, '_blank');
 
-                // 2. Web3Forms Submission (Background)
-                fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd }).catch(console.error);
+                // 2. Nodemailer Email Submission (Background)
+                fetch('/api/contact', { method: 'POST', body: fd }).catch(console.error);
 
                 alert('Thank you! Redirecting you to WhatsApp to complete your message...');
                 e.target.reset();
               }}>
-                {/* Web3Forms required access key */}
-                <input type="hidden" name="access_key" value="2ceb1091-7d6f-4428-8b86-a78b375cae34" />
-                
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="form-r">
                   <div style={{ marginBottom: '16px' }}>
                     <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#1a1a1a', marginBottom: '6px' }}>First Name</label>

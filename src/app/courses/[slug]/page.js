@@ -85,7 +85,7 @@ export default async function CourseDetail({ params }) {
             </div>
 
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <Link href={`/apply?course=${encodeURIComponent(course.name)}`} style={{
+              <Link href={`/apply?course=${encodeURIComponent(course.name)}&skipPre=true`} style={{
                 background: '#0F6E56', color: '#fff', padding: '14px 28px',
                 borderRadius: '10px', fontWeight: 600, fontSize: '14px', textDecoration: 'none',
               }}>Apply for This Course</Link>
@@ -97,13 +97,21 @@ export default async function CourseDetail({ params }) {
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                 Call Us
               </a>
-              <a href="/prospectus" download style={{
+              <a href="/api/prospectus-pdf" download="Kinoo_VTC_Prospectus.pdf" style={{
                 color: '#555', padding: '14px 28px', borderRadius: '10px',
                 fontWeight: 600, fontSize: '14px', textDecoration: 'none',
                 border: '1.5px solid rgba(0,0,0,0.12)', display: 'inline-flex', alignItems: 'center', gap: '8px',
               }}>
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                 Prospectus
+              </a>
+              <a href="/api/fee-structure-pdf" download="Kinoo_VTC_Fee_Structure.pdf" style={{
+                color: '#555', padding: '14px 28px', borderRadius: '10px',
+                fontWeight: 600, fontSize: '14px', textDecoration: 'none',
+                border: '1.5px solid rgba(0,0,0,0.12)', display: 'inline-flex', alignItems: 'center', gap: '8px',
+              }}>
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Fee Structure
               </a>
             </div>
           </div>
@@ -150,7 +158,7 @@ export default async function CourseDetail({ params }) {
               </div>
             ))}
             <div style={{ marginTop: '28px' }}>
-              <Link href={`/apply?course=${encodeURIComponent(course.name)}`} style={{ background: '#EF9F27', color: '#1a1a1a', padding: '14px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>Apply for This Course</Link>
+              <Link href={`/apply?course=${encodeURIComponent(course.name)}&skipPre=true`} style={{ background: '#EF9F27', color: '#1a1a1a', padding: '14px 24px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>Apply for This Course</Link>
             </div>
           </div>
         </div>
@@ -182,7 +190,7 @@ export default async function CourseDetail({ params }) {
                 ))}
               </div>
               <div style={{ marginTop: '28px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <Link href={`/apply?course=${encodeURIComponent(course.name)}`} style={{ background: '#0F6E56', color: '#fff', padding: '14px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>Apply Now – {course.name}</Link>
+                <Link href={`/apply?course=${encodeURIComponent(course.name)}&skipPre=true`} style={{ background: '#0F6E56', color: '#fff', padding: '14px 28px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>Apply Now – {course.name}</Link>
                 <a href="tel:+254113582008" style={{ color: '#0F6E56', padding: '14px 24px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', textDecoration: 'none', border: '1.5px solid #0F6E56' }}>📞 Call for Guidance</a>
               </div>
             </div>

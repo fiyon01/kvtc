@@ -18,25 +18,65 @@
     "year": "2026",
     "annualTuition": 27000,
     "termBreakdown": [
-      { "label": "Term 1", "amount": 9000 },
-      { "label": "Term 2", "amount": 9000 },
-      { "label": "Term 3", "amount": 9000 }
+      {
+        "label": "Term 1",
+        "amount": 9000
+      },
+      {
+        "label": "Term 2",
+        "amount": 9000
+      },
+      {
+        "label": "Term 3",
+        "amount": 9000
+      }
     ],
     "termVoteHeads": [
-      { "head": "Administrative Cost", "perTerm": 2500, "annual": 7500 },
-      { "head": "P. Emolument", "perTerm": 2500, "annual": 7500 },
-      { "head": "R.M.I.", "perTerm": 2500, "annual": 7500 },
-      { "head": "Contingencies Fund", "perTerm": 1500, "annual": 4500 }
+      {
+        "head": "Administrative Cost",
+        "perTerm": 2500,
+        "annual": 7500
+      },
+      {
+        "head": "P. Emolument",
+        "perTerm": 2500,
+        "annual": 7500
+      },
+      {
+        "head": "R.M.I.",
+        "perTerm": 2500,
+        "annual": 7500
+      },
+      {
+        "head": "Contingencies Fund",
+        "perTerm": 1500,
+        "annual": 4500
+      }
     ],
     "admissionFees": [
-      { "item": "Admission Fee (Application)", "amount": 500 },
-      { "item": "School T-Shirt & ID Card", "amount": 950 },
-      { "item": "Departmental Uniform", "amount": 2000 }
+      {
+        "item": "Admission Fee (Application)",
+        "amount": 500
+      },
+      {
+        "item": "School T-Shirt & ID Card",
+        "amount": 950
+      },
+      {
+        "item": "Departmental Uniform",
+        "amount": 2000
+      }
     ],
     "admissionTotal": 3450,
     "otherCharges": [
-      { "item": "Computer Packages", "amount": 4800 },
-      { "item": "Part-Time Classes (per term)", "amount": 4500 }
+      {
+        "item": "Computer Packages",
+        "amount": 4800
+      },
+      {
+        "item": "Part-Time Classes (per term)",
+        "amount": 4500
+      }
     ],
     "bankKCB": {
       "bankName": "Kenya Commercial Bank (KCB), Kikuyu Branch",
@@ -156,7 +196,12 @@
         "Food safety & hygiene (HACCP)",
         "Restaurant and event management basics"
       ],
-      "careers": ["Chef / Cook","Food Service Supervisor","Caterer","Hotel Staffer"],
+      "careers": [
+        "Chef / Cook",
+        "Food Service Supervisor",
+        "Caterer",
+        "Hotel Staffer"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -191,7 +236,12 @@
         "Nail care & manicure/pedicure",
         "Salon management & customer service"
       ],
-      "careers": ["Salon Owner","Hair Stylist","Beauty Therapist","Makeup Artist"],
+      "careers": [
+        "Salon Owner",
+        "Hair Stylist",
+        "Beauty Therapist",
+        "Makeup Artist"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -230,7 +280,12 @@
         "Solar PV system basics",
         "Electrical safety standards"
       ],
-      "careers": ["Electrician","Electronics Technician","Solar Installer","Maintenance Engineer"],
+      "careers": [
+        "Electrician",
+        "Electronics Technician",
+        "Solar Installer",
+        "Maintenance Engineer"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -265,7 +320,11 @@
         "Mobile device repair basics",
         "Test equipment operation"
       ],
-      "careers": ["Electronics Repair Technician","Service Centre Tech","IT Hardware Support"],
+      "careers": [
+        "Electronics Repair Technician",
+        "Service Centre Tech",
+        "IT Hardware Support"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -299,7 +358,11 @@
         "Battery & charge controller setup",
         "System maintenance & fault-finding"
       ],
-      "careers": ["Solar Installer","Solar Technician","Renewable Energy Contractor"],
+      "careers": [
+        "Solar Installer",
+        "Solar Technician",
+        "Renewable Energy Contractor"
+      ],
       "fees": "KSh 15,000",
       "intake": "January, May & September",
       "requirements": [
@@ -334,7 +397,11 @@
         "Bathroom & kitchen installations",
         "Blueprint reading"
       ],
-      "careers": ["Plumber","Plumbing Contractor","Facilities Maintenance Tech"],
+      "careers": [
+        "Plumber",
+        "Plumbing Contractor",
+        "Facilities Maintenance Tech"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -369,7 +436,11 @@
         "Plastering & rendering",
         "Construction safety"
       ],
-      "careers": ["Mason","Construction Foreman","Building Contractor"],
+      "careers": [
+        "Mason",
+        "Construction Foreman",
+        "Building Contractor"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -404,7 +475,12 @@
         "Fashion illustration",
         "Small business management"
       ],
-      "careers": ["Fashion Designer","Tailor","Boutique Owner","Costume Designer"],
+      "careers": [
+        "Fashion Designer",
+        "Tailor",
+        "Boutique Owner",
+        "Costume Designer"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -439,7 +515,11 @@
         "Electrical & electronics systems",
         "Vehicle inspection & servicing"
       ],
-      "careers": ["Mechanic","Auto Workshop Owner","Fleet Maintenance Tech"],
+      "careers": [
+        "Mechanic",
+        "Auto Workshop Owner",
+        "Fleet Maintenance Tech"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -465,7 +545,12 @@
         "Structural fabrication",
         "Welding safety & QC"
       ],
-      "careers": ["Welder","Fabricator","Structural Steel Worker","Metal Workshop Owner"],
+      "careers": [
+        "Welder",
+        "Fabricator",
+        "Structural Steel Worker",
+        "Metal Workshop Owner"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -495,7 +580,12 @@
         "Networking basics",
         "Internet & cybersecurity awareness"
       ],
-      "careers": ["Data Entry Clerk","Office Administrator","IT Support Tech","Receptionist"],
+      "careers": [
+        "Data Entry Clerk",
+        "Office Administrator",
+        "IT Support Tech",
+        "Receptionist"
+      ],
       "fees": "KSh 27,000/year",
       "intake": "January & September",
       "requirements": [
@@ -519,7 +609,11 @@
         "PowerPoint presentations",
         "Email & internet skills"
       ],
-      "careers": ["Office Admin","Data Entry","Receptionist"],
+      "careers": [
+        "Office Admin",
+        "Data Entry",
+        "Receptionist"
+      ],
       "fees": "KSh 4,800",
       "intake": "Every Month",
       "requirements": [
@@ -543,7 +637,11 @@
         "Network cabling & routers",
         "Security system maintenance"
       ],
-      "careers": ["CCTV Installer","Security System Tech","Network Technician"],
+      "careers": [
+        "CCTV Installer",
+        "Security System Tech",
+        "Network Technician"
+      ],
       "fees": "KSh 10,000",
       "intake": "Every Month",
       "requirements": [
@@ -575,7 +673,11 @@
         "Menu creation & pricing",
         "Customer service in a café"
       ],
-      "careers": ["Barista","Café Attendant","Café Owner"],
+      "careers": [
+        "Barista",
+        "Café Attendant",
+        "Café Owner"
+      ],
       "fees": "KSh 10,000",
       "intake": "Every Month",
       "requirements": [
@@ -600,7 +702,11 @@
         "Packaging & food safety",
         "Bakery business basics"
       ],
-      "careers": ["Baker","Pastry Chef","Home Bakery Owner"],
+      "careers": [
+        "Baker",
+        "Pastry Chef",
+        "Home Bakery Owner"
+      ],
       "fees": "KSh 10,000",
       "intake": "Every Month",
       "requirements": [
@@ -626,7 +732,11 @@
         "Elder care & mobility assistance",
         "Medical ethics & communication"
       ],
-      "careers": ["Home Care Giver","Nursing Home Aide","Hospital Auxiliary Staff"],
+      "careers": [
+        "Home Care Giver",
+        "Nursing Home Aide",
+        "Hospital Auxiliary Staff"
+      ],
       "fees": "KSh 10,000",
       "intake": "Every Month",
       "requirements": [
@@ -652,7 +762,12 @@
         "Parking & manoeuvring",
         "NTSA test preparation"
       ],
-      "careers": ["Licensed Driver","Chauffeur","Delivery Driver","PSV Driver (with upgrade)"],
+      "careers": [
+        "Licensed Driver",
+        "Chauffeur",
+        "Delivery Driver",
+        "PSV Driver (with upgrade)"
+      ],
       "fees": "Contact us for pricing",
       "intake": "Every Month",
       "requirements": [
@@ -797,6 +912,19 @@
       "content": "The standard of training at Kinoo VTC continues to pay off as our recent Food & Beverage Production graduates secure competitive placements across Nairobi. Several students from the class of 2025 have been absorbed into 5-star establishments in Westlands and the CBD.\n\nOur hands-on approach in the training kitchen, coupled with rigorous KNEC curriculum standards, means our trainees are job-ready from day one. We congratulate our alumni and invite aspiring chefs to join our next intake!",
       "image": "https://images.unsplash.com/photo-1616400619175-5beda3a17896?w=800&q=80",
       "date": "2026-04-22"
+    }
+  ],
+  "applications": [
+    {
+      "id": "app-1780752612306",
+      "name": "6",
+      "email": "jonathangithinji63@gmail.com",
+      "phone": "6",
+      "course": "Hair Dressing and Beauty Therapy",
+      "idNo": "5",
+      "amount": "500",
+      "date": "2026-06-06T13:30:12.306Z",
+      "status": "Paid via M-PESA"
     }
   ]
 }

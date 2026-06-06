@@ -2,269 +2,436 @@
 
 import { useRef, useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import AdmissionForm from '@/components/AdmissionForm';
 
+/* ─────────────────────────────────────────
+   Fade-in animation helper
+───────────────────────────────────────── */
 function FadeIn({ children, delay = 0, style = {} }) {
   const ref = useRef();
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.08 });
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.05 }
+    );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, []);
   return (
-    <div ref={ref} style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(28px)', transition: `opacity 0.7s ${delay}s ease, transform 0.7s ${delay}s ease`, ...style }}>
+    <div ref={ref} style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(28px)',
+      transition: `opacity 0.65s ${delay}s ease, transform 0.65s ${delay}s ease`,
+      ...style
+    }}>
       {children}
     </div>
   );
 }
 
-const inputStyle = {
-  width: '100%', padding: '12px 14px',
-  borderWidth: '1.5px', borderStyle: 'solid', borderColor: 'rgba(0,0,0,0.1)', borderRadius: '10px',
-  fontFamily: 'var(--sans)', fontSize: '14px', color: '#1a1a1a',
-  background: '#f8f7f4', outline: 'none', transition: 'border-color 0.2s, background 0.2s',
-  boxSizing: 'border-box',
-};
-
-function ApplyForm({ dbData }) {
-  const [focused, setFocused] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [waLink, setWaLink] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState('');
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const pre = searchParams.get('course') || '';
-    setSelectedCourse(pre);
-  }, [searchParams]);
-
-  const focusStyle = (name) => focused === name
-    ? { ...inputStyle, borderColor: '#0F6E56', background: '#fff' }
-    : inputStyle;
-
-  // Dynamically extract courses and requirements from dbData
-  const courseList = dbData?.courses || [];
-  const selectedCourseData = courseList.find(c => c.name === selectedCourse);
-  const deptReqs = selectedCourseData?.requirements || [];
-
-  // Extract application fee amount from first item in admission fees
-  const appFee = dbData?.feeStructure?.admissionFees?.[0]?.amount || 500;
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const fname = fd.get('fname');
-    const lname = fd.get('lname');
-    const phone = fd.get('phone');
-    const course = fd.get('course');
-
-    const waText = `*New Online Application – Kinoo VTC*\n\n*Name:* ${fname} ${lname}\n*Phone:* ${phone}\n*Course:* ${course}`;
-    const waUrl = `https://wa.me/254113582008?text=${encodeURIComponent(waText)}`;
-    fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd }).catch(console.error);
-    setWaLink(waUrl);
-    setSubmitted(true);
-    window.open(waUrl, '_blank');
-  };
-
-  if (submitted) {
-    return (
-      <div style={{ textAlign: 'center', padding: '20px 0' }}>
-        <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#E1F5EE', color: '#0F6E56', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', animation: 'popIn 0.4s ease' }}>
-          <svg width="36" height="36" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-        <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.6rem', color: '#1a1a1a', marginBottom: '12px' }}>Application Received!</h3>
-        <p style={{ color: '#555', fontSize: '15px', marginBottom: '8px', lineHeight: 1.6 }}>
-          Your application has been submitted. A WhatsApp window should have opened — if not, tap the button below to send your details to our admissions team.
-        </p>
-        <p style={{ color: '#888', fontSize: '13px', marginBottom: '24px' }}>Our team will get back to you within 24 hours to confirm your spot.</p>
-        <a href={waLink} target="_blank" rel="noopener noreferrer"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '15px', background: '#25D366', color: '#fff', borderRadius: '10px', fontSize: '15px', fontWeight: 700, textDecoration: 'none' }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Continue on WhatsApp →
-        </a>
-        <style>{`@keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }`}</style>
-      </div>
-    );
-  }
-
+/* ─────────────────────────────────────────
+   Success screen shown after submission
+───────────────────────────────────────── */
+function SuccessScreen({ applicantName, email }) {
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="hidden" name="access_key" value="2ceb1091-7d6f-4428-8b86-a78b375cae34" />
-      <input type="hidden" name="subject" value="New Online Application – Kinoo VTC" />
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }} className="form-r">
-        <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1a1a1a', marginBottom: '6px' }}>First Name *</label>
-          <input type="text" name="fname" placeholder="John" required style={focusStyle('fname')} onFocus={() => setFocused('fname')} onBlur={() => setFocused(null)} />
-        </div>
-        <div>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1a1a1a', marginBottom: '6px' }}>Last Name *</label>
-          <input type="text" name="lname" placeholder="Doe" required style={focusStyle('lname')} onFocus={() => setFocused('lname')} onBlur={() => setFocused(null)} />
-        </div>
+    <div style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px', textAlign: 'center' }}>
+      <div style={{
+        width: 88, height: 88, borderRadius: '50%',
+        background: 'linear-gradient(135deg, #0F6E56, #1D9E75)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        margin: '0 auto 28px',
+        boxShadow: '0 12px 40px rgba(15,110,86,0.3)',
+        animation: 'popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
+      }}>
+        <svg width="44" height="44" fill="none" stroke="#fff" strokeWidth="3" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
       </div>
-
-      <div style={{ marginBottom: '12px' }}>
-        <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1a1a1a', marginBottom: '6px' }}>Phone Number *</label>
-        <input type="tel" name="phone" placeholder="0712 345 678" required style={focusStyle('phone')} onFocus={() => setFocused('phone')} onBlur={() => setFocused(null)} />
+      <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.8rem,4vw,2.6rem)', color: '#1a1a1a', marginBottom: 12 }}>
+        Application Submitted! 🎉
+      </h2>
+      <p style={{ fontFamily: 'var(--sans)', color: '#555', fontSize: '16px', lineHeight: 1.7, maxWidth: 520, marginBottom: 8 }}>
+        Thank you, <strong>{applicantName}</strong>! Your admission application and M-PESA payment have been received.
+      </p>
+      <p style={{ fontFamily: 'var(--sans)', color: '#888', fontSize: '14px', marginBottom: 32, lineHeight: 1.6 }}>
+        Your official <strong>Admission Letter</strong> and payment receipt have been sent to <strong>{email}</strong>. Please print it out and bring it on your admission day. Our admissions team will also contact you within <strong>24–48 hours</strong> to confirm your reporting details.
+      </p>
+      <div style={{ background: '#E1F5EE', border: '1px solid #a5d6c5', borderRadius: 12, padding: '18px 28px', marginBottom: 32, display: 'inline-block' }}>
+        <p style={{ fontFamily: 'var(--sans)', color: '#0F6E56', fontSize: '14px', margin: 0 }}>
+          📞 Questions? Call us at <strong>0113 582 008</strong> or email <strong>kinoovtc@gmail.com</strong>
+        </p>
       </div>
-
-      <div style={{ marginBottom: '12px' }}>
-        <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#1a1a1a', marginBottom: '6px' }}>Course Applying For *</label>
-        <select name="course" required value={selectedCourse} onChange={e => setSelectedCourse(e.target.value)}
-          style={focusStyle('course')} onFocus={() => setFocused('course')} onBlur={() => setFocused(null)}>
-          <option value="" disabled>Select a course...</option>
-          {courseList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-        </select>
-      </div>
-
-      {/* Dynamic dept requirements */}
-      {deptReqs.length > 0 && (
-        <div style={{ background: '#FFF8E8', border: '1.5px solid #EF9F27', borderRadius: '10px', padding: '16px', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <svg width="18" height="18" fill="none" stroke="#BA7517" strokeWidth="2.5" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-            <strong style={{ fontSize: '13px', color: '#BA7517' }}>Department Tools & Uniform to Bring</strong>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {deptReqs.map((req, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px', color: '#555' }}>
-                <span style={{ color: '#BA7517', fontWeight: 700, flexShrink: 0 }}>{i + 1}.</span>
-                <span>{req}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-
-
-      <button type="submit"
-        style={{ width: '100%', padding: '15px', background: '#0F6E56', color: '#fff', border: 'none', borderRadius: '10px', fontFamily: 'var(--sans)', fontSize: '15px', fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s, transform 0.15s' }}
-        onMouseEnter={e => { e.target.style.background = '#1D9E75'; e.target.style.transform = 'translateY(-1px)'; }}
-        onMouseLeave={e => { e.target.style.background = '#0F6E56'; e.target.style.transform = 'translateY(0)'; }}>
-        Submit Application →
-      </button>
-    </form>
+      <a href="/"
+        style={{
+          display: 'inline-block', padding: '14px 36px',
+          background: '#0F6E56', color: '#fff', borderRadius: 10,
+          fontFamily: 'var(--sans)', fontSize: '15px', fontWeight: 700,
+          textDecoration: 'none', transition: 'transform 0.2s',
+        }}
+        onMouseEnter={e => e.target.style.transform = 'translateY(-2px)'}
+        onMouseLeave={e => e.target.style.transform = 'translateY(0)'}
+      >
+        ← Back to Home
+      </a>
+      <style>{`@keyframes popIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }`}</style>
+    </div>
   );
 }
 
-export default function ApplyClientPage({ dbData }) {
-  const { feeStructure, contact } = dbData || {};
-  const { admissionFees, admissionTotal, annualTuition, termBreakdown, bankKCB, bankCoop } = feeStructure || {};
+/* ─────────────────────────────────────────
+   Pre-application: Requirements + Fees
+───────────────────────────────────────── */
+function PreApplicationScreen({ course, dbData, onProceed }) {
+  const { feeStructure } = dbData || {};
+  const { admissionFees, annualTuition, termBreakdown } = feeStructure || {};
+  const appFee = admissionFees?.[0]?.amount || 500;
+
+  const generalRequirements = [
+    'Two (2) passport-size photos',
+    'Copy of National ID or Birth Certificate',
+    'Photocopies (set)',
+    'Three (3) foolscap papers',
+    'Copy of previous academic result slip (if any)',
+    'Medical certificate',
+    'Two (2) quire counter books',
+    'Four (4) A4 exercise books',
+  ];
 
   return (
-    <>
-      {/* Header */}
-      <div style={{ padding: '140px 8% 60px', background: 'linear-gradient(135deg, rgba(15,110,86,0.07) 0%, #fff 100%)', borderBottom: '1px solid rgba(0,0,0,0.07)', textAlign: 'center' }}>
+    <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 16px 64px' }}>
+
+      {/* ── Course Banner ── */}
+      {course && (
         <FadeIn>
-          <span style={{ display: 'inline-block', fontSize: '11px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: '#0F6E56', background: '#E1F5EE', padding: '6px 14px', borderRadius: '100px', marginBottom: '16px' }}>Online Admission</span>
-          <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#1a1a1a', marginBottom: '16px' }}>Apply to Kinoo VTC</h1>
-          <p style={{ color: '#888', fontSize: '1.1rem', maxWidth: '560px', margin: '0 auto' }}>Complete your application online in just a few minutes. Our admissions team will contact you to confirm your spot.</p>
+          <div style={{
+            background: 'linear-gradient(135deg, #0F6E56 0%, #1a6e2e 100%)',
+            color: '#fff', borderRadius: 16, padding: '28px 36px',
+            marginBottom: 32,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16,
+            boxShadow: '0 8px 32px rgba(15,110,86,0.25)',
+          }}>
+            <div>
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase', opacity: 0.75, display: 'block', marginBottom: 6, fontFamily: 'var(--sans)' }}>
+                Applying For
+              </span>
+              <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.4rem,3vw,2rem)', margin: 0 }}>{course.name}</h2>
+              <div style={{ display: 'flex', gap: 20, marginTop: 10, fontSize: 13, opacity: 0.9, fontFamily: 'var(--sans)', flexWrap: 'wrap' }}>
+                {course.cert && <span>🏅 {course.cert} Certified</span>}
+                {course.dur && <span>⏱ {course.dur}</span>}
+                {course.fees && <span>💰 {course.fees}</span>}
+              </div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 20px', textAlign: 'center', backdropFilter: 'blur(8px)' }}>
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 11, opacity: 0.8, marginBottom: 4 }}>Application Fee</div>
+              <div style={{ fontFamily: 'var(--serif)', fontSize: '2rem', fontWeight: 900, letterSpacing: 1 }}>KSh {appFee.toLocaleString()}</div>
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 11, opacity: 0.7 }}>paid via M-PESA</div>
+            </div>
+          </div>
         </FadeIn>
-      </div>
+      )}
 
-      <section style={{ padding: '64px 8%', background: '#f8f7f4' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '56px', alignItems: 'start', maxWidth: '1200px', margin: '0 auto' }} className="apply-r">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }} className="pre-app-grid">
 
-          {/* LEFT COLUMN */}
-          <FadeIn>
-
-
-            {/* Fee Breakdown */}
-            {admissionFees && (
-              <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '14px', padding: '24px', marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a1a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ background: '#EF9F27', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, flexShrink: 0 }}>1</span>
-                  Admission Fee Breakdown
-                </h3>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-                  <tbody>
-                    {admissionFees.map((af, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-                        <td style={{ padding: '10px 4px', color: '#555' }}>{af.item}</td>
-                        <td style={{ padding: '10px 4px', textAlign: 'right', fontWeight: 500, color: '#1a1a1a' }}>KSh {af.amount.toLocaleString()}</td>
-                      </tr>
-                    ))}
-                    <tr style={{ background: '#E1F5EE' }}>
-                      <td style={{ padding: '12px 4px', fontWeight: 700, color: '#0F6E56', borderRadius: '4px 0 0 4px' }}>Total One-Time Admission</td>
-                      <td style={{ padding: '12px 4px', textAlign: 'right', fontWeight: 700, color: '#0F6E56', borderRadius: '0 4px 4px 0' }}>KSh {admissionTotal?.toLocaleString()}</td>
-                    </tr>
-                  </tbody>
-                </table>
+        {/* ── Admission Fees ── */}
+        <FadeIn delay={0.1}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '28px', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', height: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#FFF8E8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 18 }}>💰</span>
               </div>
-            )}
+              <div>
+                <h3 style={{ fontFamily: 'var(--sans)', fontSize: 15, fontWeight: 700, color: '#1a1a1a', margin: 0 }}>Admission Fees</h3>
+                <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#888', margin: 0 }}>One-time fees on joining</p>
+              </div>
+            </div>
 
-            {/* Annual Fee / Term Breakdown */}
-            {termBreakdown && (
-              <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '14px', padding: '24px', marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a1a', marginBottom: '4px' }}>Annual Tuition – Day Scholar</h3>
-                <p style={{ fontSize: '13px', color: '#888', marginBottom: '16px' }}>Subsidised by the County Government of Kiambu</p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '8px', textAlign: 'center', marginBottom: '16px' }}>
-                  {termBreakdown.map((t, i) => (
-                    <div key={i} style={{ background: '#f8f7f4', borderRadius: '10px', padding: '12px 6px' }}>
-                      <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>{t.label}</div>
-                      <div style={{ fontWeight: 700, color: '#1a1a1a', fontSize: '13px' }}>KSh {t.amount.toLocaleString()}</div>
-                    </div>
-                  ))}
-                  <div style={{ background: '#E1F5EE', borderRadius: '10px', padding: '12px 6px' }}>
-                    <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>Total</div>
-                    <div style={{ fontWeight: 700, color: '#0F6E56', fontSize: '13px' }}>KSh {annualTuition?.toLocaleString()}</div>
-                  </div>
+            {admissionFees?.map((af, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: i < admissionFees.length - 1 ? '1px solid #f0f0f0' : 'none', fontFamily: 'var(--sans)', fontSize: 14 }}>
+                <span style={{ color: '#555' }}>{af.item}</span>
+                <span style={{ fontWeight: 600, color: '#1a1a1a' }}>KSh {af.amount.toLocaleString()}</span>
+              </div>
+            ))}
+
+            <div style={{ marginTop: 16, background: '#E1F5EE', borderRadius: 10, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontFamily: 'var(--sans)', fontWeight: 700, color: '#0F6E56', fontSize: 14 }}>Total One-Time</span>
+              <span style={{ fontFamily: 'var(--sans)', fontWeight: 800, color: '#0F6E56', fontSize: 16 }}>KSh {feeStructure?.admissionTotal?.toLocaleString()}</span>
+            </div>
+
+            <div style={{ marginTop: 14, background: '#FFF8E8', borderRadius: 10, padding: '12px 16px', border: '1px solid #f5dea0' }}>
+              <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#7a5a00', margin: 0, lineHeight: 1.5 }}>
+                ⚡ <strong>KSh {appFee}</strong> application fee is paid online via M-PESA today. The remaining fees are paid on your first day.
+              </p>
+            </div>
+          </div>
+        </FadeIn>
+
+        {/* ── Annual Tuition ── */}
+        <FadeIn delay={0.2}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '28px', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', height: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#E1F5EE', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 18 }}>📅</span>
+              </div>
+              <div>
+                <h3 style={{ fontFamily: 'var(--sans)', fontSize: 15, fontWeight: 700, color: '#1a1a1a', margin: 0 }}>Annual Tuition</h3>
+                <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#888', margin: 0 }}>Subsidised by Kiambu County Govt</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginBottom: 16 }}>
+              {termBreakdown?.map((t, i) => (
+                <div key={i} style={{ background: '#f8f7f4', borderRadius: 10, padding: '12px 8px', textAlign: 'center' }}>
+                  <div style={{ fontFamily: 'var(--sans)', fontSize: 11, color: '#888', marginBottom: 4 }}>{t.label}</div>
+                  <div style={{ fontFamily: 'var(--sans)', fontWeight: 700, color: '#1a1a1a', fontSize: 13 }}>KSh {t.amount.toLocaleString()}</div>
                 </div>
-                {bankKCB && bankCoop && (
-                  <div style={{ fontSize: '13px', color: '#555', background: '#f8f7f4', borderRadius: '8px', padding: '12px 14px', lineHeight: 1.7 }}>
-                    <strong style={{ color: '#1a1a1a' }}>Pay via {bankKCB.bankName}</strong><br/>
-                    A/C Name: {bankKCB.accountName} &nbsp;|&nbsp; A/C No: <strong>{bankKCB.accountNumber}</strong><br/>
-                    <strong style={{ color: '#1a1a1a' }}>Or {bankCoop.bankName}</strong><br/>
-                    A/C No: <strong>{bankCoop.accountNumber}</strong>
-                  </div>
-                )}
-              </div>
-            )}
+              ))}
+            </div>
 
-            {/* STEP 3: General Requirements */}
-            <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '14px', padding: '24px' }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a1a', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ background: '#0F6E56', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, flexShrink: 0 }}>3</span>
-                General Admission Requirements
-              </h3>
-              <p style={{ fontSize: '13px', color: '#888', marginBottom: '14px' }}>Bring these documents on your first day of admission:</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {[
-                  'Two (2) passport-size photos',
-                  'Copy of National ID or Birth Certificate',
-                  'Photocopies (set)',
-                  'Three (3) foolscap papers',
-                  'Copy of previous academic result slip (if any)',
-                  'Medical certificate',
-                  'Two (2) quire counter books',
-                  'Four (4) A4 exercise books',
-                ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', background: '#f8f7f4', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', color: '#555' }}>
-                    <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#0F6E56', color: '#fff', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</span>
-                    {item}
+            <div style={{ background: '#E1F5EE', borderRadius: 10, padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <span style={{ fontFamily: 'var(--sans)', fontWeight: 700, color: '#0F6E56', fontSize: 14 }}>Total / Year</span>
+              <span style={{ fontFamily: 'var(--sans)', fontWeight: 800, color: '#0F6E56', fontSize: 16 }}>KSh {annualTuition?.toLocaleString()}</span>
+            </div>
+
+            <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#888', margin: 0, lineHeight: 1.6 }}>
+              📍 Fees can be paid at <strong>KCB Kikuyu</strong> or <strong>Co-op Bank Kangemi</strong>. See full payment instructions after admission.
+            </p>
+          </div>
+        </FadeIn>
+
+        {/* ── Course-specific requirements ── */}
+        {course?.requirements?.length > 0 && (
+          <FadeIn delay={0.3}>
+            <div style={{ background: '#fff', borderRadius: 16, padding: '28px', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#FFF0F0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 18 }}>🛠️</span>
+                </div>
+                <div>
+                  <h3 style={{ fontFamily: 'var(--sans)', fontSize: 15, fontWeight: 700, color: '#1a1a1a', margin: 0 }}>Department Tools & Uniform</h3>
+                  <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#888', margin: 0 }}>Bring on your first day</p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {course.requirements.map((req, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 12px', background: '#f8f7f4', borderRadius: 8 }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: '#EF9F27', color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'var(--sans)' }}>{i + 1}</span>
+                    <span style={{ fontFamily: 'var(--sans)', fontSize: 13, color: '#444', lineHeight: 1.5 }}>{req}</span>
                   </div>
                 ))}
               </div>
             </div>
           </FadeIn>
+        )}
 
-          {/* RIGHT COLUMN: Form */}
-          <FadeIn delay={0.15}>
-            <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 32px rgba(0,0,0,0.06)', position: 'sticky', top: '100px' }}>
-              <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#1a1a1a', marginBottom: '6px' }}>Online Application Form</h3>
-              <p style={{ fontSize: '13px', color: '#888', marginBottom: '24px' }}>Select your course to see department-specific requirements.</p>
-              <Suspense fallback={<p>Loading form...</p>}>
-                <ApplyForm dbData={dbData} />
-              </Suspense>
+        {/* ── General Requirements ── */}
+        <FadeIn delay={0.4}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '28px', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 2px 16px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#EEF2FF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 18 }}>📋</span>
+              </div>
+              <div>
+                <h3 style={{ fontFamily: 'var(--sans)', fontSize: 15, fontWeight: 700, color: '#1a1a1a', margin: 0 }}>General Requirements</h3>
+                <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#888', margin: 0 }}>Documents to bring on admission day</p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {generalRequirements.map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 12px', background: '#f8f7f4', borderRadius: 8 }}>
+                  <span style={{ width: 20, height: 20, borderRadius: '50%', background: '#0F6E56', color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'var(--sans)' }}>{i + 1}</span>
+                  <span style={{ fontFamily: 'var(--sans)', fontSize: 13, color: '#444', lineHeight: 1.5 }}>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </FadeIn>
+      </div>
+
+      {/* ── CTA ── */}
+      <FadeIn delay={0.5} style={{ textAlign: 'center', marginTop: 48 }}>
+        <div style={{ background: '#fff', borderRadius: 20, padding: '36px 40px', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
+          <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.6rem', color: '#1a1a1a', marginBottom: 10 }}>
+            Ready to Apply?
+          </h3>
+          <p style={{ fontFamily: 'var(--sans)', color: '#666', fontSize: 14, lineHeight: 1.7, marginBottom: 28, maxWidth: 480, margin: '0 auto 28px' }}>
+            You will fill out the official <strong>Kinoo VTC Admission Form</strong>. Once complete, you will be prompted to pay the <strong>KSh {appFee} application fee</strong> securely via M-PESA. Your form will be automatically sent to our admissions team as a PDF.
+          </p>
+          <button
+            onClick={onProceed}
+            style={{
+              padding: '16px 48px', background: 'linear-gradient(135deg, #0F6E56, #1D9E75)',
+              color: '#fff', border: 'none', borderRadius: 12,
+              fontFamily: 'var(--sans)', fontSize: '16px', fontWeight: 700, cursor: 'pointer',
+              boxShadow: '0 6px 24px rgba(15,110,86,0.35)', transition: 'transform 0.2s, box-shadow 0.2s',
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(15,110,86,0.4)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(15,110,86,0.35)'; }}
+          >
+            Proceed to Application Form
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+          </button>
+          <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#aaa', marginTop: 16 }}>🔒 Secure M-PESA payment · No hidden charges</p>
+        </div>
+      </FadeIn>
+
+      <style>{`
+        @media(max-width:700px){
+          .pre-app-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   Inner component that reads search params
+───────────────────────────────────────── */
+function ApplyInner({ dbData }) {
+  const searchParams = useSearchParams();
+  const courseSlug = searchParams.get('course') || '';
+  const skipPre = searchParams.get('skipPre') === 'true';
+  const courseList = dbData?.courses || [];
+  const preselectedCourse = courseList.find(c => c.name === courseSlug) || null;
+
+  const [step, setStep] = useState(skipPre ? 'form' : 'pre'); // 'pre' | 'form' | 'success'
+  const [applicantName, setApplicantName] = useState('');
+  const [applicantEmail, setApplicantEmail] = useState('');
+
+  const handleSuccess = (name, email) => {
+    setApplicantName(name);
+    setApplicantEmail(email);
+    setStep('success');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <>
+      {/* ── Page Header ── */}
+      <div style={{
+        padding: '130px 8% 56px',
+        background: 'linear-gradient(135deg, rgba(15,110,86,0.06) 0%, #fff 60%)',
+        borderBottom: '1px solid rgba(0,0,0,0.07)',
+        textAlign: 'center',
+      }}>
+        <FadeIn>
+          {/* Step Indicator */}
+          {step !== 'success' && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 28 }}>
+              {[
+                { label: 'Review Requirements', num: 1 },
+                { label: 'Fill Application Form', num: 2 },
+                { label: 'Pay & Submit', num: 3 },
+              ].map((s, i) => {
+                const isActive = (step === 'pre' && i === 0) || (step === 'form' && i >= 1);
+                const isDone = (step === 'form' && i === 0);
+                return (
+                  <div key={s.num} style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: '50%',
+                        background: isDone ? '#0F6E56' : isActive ? '#0F6E56' : 'rgba(0,0,0,0.1)',
+                        color: '#fff',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: 'var(--sans)', fontSize: 14, fontWeight: 700,
+                        transition: 'background 0.4s',
+                        boxShadow: isActive ? '0 4px 16px rgba(15,110,86,0.35)' : 'none',
+                      }}>
+                        {isDone ? '✓' : s.num}
+                      </div>
+                      <span style={{ fontFamily: 'var(--sans)', fontSize: 11, color: isActive ? '#0F6E56' : '#aaa', marginTop: 6, fontWeight: isActive ? 700 : 400, transition: 'color 0.4s', whiteSpace: 'nowrap' }}>
+                        {s.label}
+                      </span>
+                    </div>
+                    {i < 2 && (
+                      <div style={{ width: 48, height: 2, background: isDone ? '#0F6E56' : 'rgba(0,0,0,0.1)', margin: '0 8px', transition: 'background 0.4s', marginBottom: 22 }} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <span style={{
+            display: 'inline-block', fontSize: 11, fontWeight: 600,
+            letterSpacing: '2px', textTransform: 'uppercase', color: '#0F6E56',
+            background: '#E1F5EE', padding: '6px 16px', borderRadius: '100px', marginBottom: 16,
+            fontFamily: 'var(--sans)',
+          }}>Online Admission</span>
+
+          <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2.2rem,5vw,3.4rem)', color: '#1a1a1a', marginBottom: 14, lineHeight: 1.15 }}>
+            {step === 'success' ? 'Application Complete' : 'Apply to Kinoo VTC'}
+          </h1>
+          <p style={{ fontFamily: 'var(--sans)', color: '#888', fontSize: '1.05rem', maxWidth: 560, margin: '0 auto' }}>
+            {step === 'pre' && 'Review course requirements and fees before filling the official admission form.'}
+            {step === 'form' && 'Fill in the official Kinoo VTC Admission Form. Click "Sign" to add your signature.'}
+            {step === 'success' && 'Your application has been received successfully.'}
+          </p>
+        </FadeIn>
+      </div>
+
+      {/* ── Content Area ── */}
+      <section style={{ padding: '52px 8% 64px', background: '#f8f7f4', minHeight: '60vh' }}>
+        {step === 'pre' && (
+          <PreApplicationScreen
+            course={preselectedCourse}
+            dbData={dbData}
+            onProceed={() => { setStep('form'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          />
+        )}
+
+        {step === 'form' && (
+          <FadeIn>
+            <div style={{ maxWidth: 800, margin: '0 auto' }}>
+              {/* Back button */}
+              <button
+                onClick={() => { setStep('pre'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: 'none', border: 'none', color: '#0F6E56',
+                  fontFamily: 'var(--sans)', fontSize: 14, fontWeight: 600,
+                  cursor: 'pointer', padding: '0 0 20px', transition: 'opacity 0.2s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+              >
+                ← Back to Requirements
+              </button>
+
+              <AdmissionForm
+                dbData={dbData}
+                selectedCoursePre={preselectedCourse?.name || courseSlug}
+                onApplicationSuccess={(name, email) => handleSuccess(name, email)}
+              />
             </div>
           </FadeIn>
+        )}
 
-        </div>
-        <style>{`
-          @media(max-width:900px){ .apply-r{grid-template-columns:1fr !important; gap: 32px !important;} }
-          @media(max-width:600px){ .form-r{grid-template-columns:1fr !important;} }
-        `}</style>
+        {step === 'success' && (
+          <SuccessScreen applicantName={applicantName} email={applicantEmail} />
+        )}
       </section>
     </>
+  );
+}
+
+/* ─────────────────────────────────────────
+   Default export (Suspense wrapper required
+   because of useSearchParams)
+───────────────────────────────────────── */
+export default function ApplyClientPage({ dbData }) {
+  return (
+    <Suspense fallback={
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: 48, height: 48, border: '4px solid rgba(15,110,86,0.2)', borderTopColor: '#0F6E56', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }}></div>
+          <p style={{ fontFamily: 'var(--sans)', color: '#888' }}>Loading...</p>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    }>
+      <ApplyInner dbData={dbData} />
+    </Suspense>
   );
 }

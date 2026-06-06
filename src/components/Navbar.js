@@ -62,6 +62,7 @@ export default function Navbar() {
         transition: 'box-shadow 0.3s, top 0.3s',
       }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+          <img src="/cgok-logo.png" alt="CGOK" style={{ height: '42px', width: 'auto', objectFit: 'contain' }} />
           <div style={{
             width: '42px', height: '42px', borderRadius: '10px',
             background: '#0F6E56',
@@ -142,10 +143,14 @@ export default function Navbar() {
             color: '#0F6E56', fontWeight: 600, fontSize: '13px', textDecoration: 'none',
             border: '1.5px solid #0F6E56', padding: '8px 14px', borderRadius: '8px',
           }}>Call Us</a>
-          <Link href="/prospectus" style={{
+          <a href="/api/prospectus-pdf" download="Kinoo_VTC_Prospectus.pdf" style={{
             color: '#555', fontWeight: 500, fontSize: '13px', textDecoration: 'none',
             border: '1.5px solid rgba(0,0,0,0.12)', padding: '8px 14px', borderRadius: '8px',
-          }}>Prospectus</Link>
+          }}>Prospectus</a>
+          <a href="/api/fee-structure-pdf" download="Kinoo_VTC_Fee_Structure.pdf" style={{
+            color: '#555', fontWeight: 500, fontSize: '13px', textDecoration: 'none',
+            border: '1.5px solid rgba(0,0,0,0.12)', padding: '8px 14px', borderRadius: '8px',
+          }}>Fee Structure</a>
           <Link href="/apply" style={{
             background: '#0F6E56', color: '#fff',
             padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 500,
@@ -204,10 +209,14 @@ export default function Navbar() {
               )}
             </div>
           ))}
-          <Link href="/prospectus" onClick={() => setMobileOpen(false)} style={{
+          <a href="/api/prospectus-pdf" download="Kinoo_VTC_Prospectus.pdf" onClick={() => setMobileOpen(false)} style={{
             color: '#0F6E56', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
             borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',
-          }}>Download Prospectus</Link>
+          }}>Download Prospectus</a>
+          <a href="/api/fee-structure-pdf" download="Kinoo_VTC_Fee_Structure.pdf" onClick={() => setMobileOpen(false)} style={{
+            color: '#0F6E56', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
+            borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',
+          }}>Download Fee Structure</a>
           <a href={`tel:${phoneNumber}`} style={{
             color: '#1a1a1a', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
             borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',
