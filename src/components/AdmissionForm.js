@@ -332,10 +332,11 @@ function DateField({ value, onChange, flex=1, maxWidth=180 }) {
 const Locked = ({ val="", flex=1, maxWidth=160 }) => (
   <span style={{
     display:"inline-block", flex:`${flex} 1 auto`, maxWidth, minWidth:50,
-    borderBottom:"1.5px dotted #bbb",
-    padding:"0 2px", lineHeight:"1.9em",
-    fontFamily:"'Times New Roman',serif", color:"#bbb", userSelect:"none",
-  }}>{val||"\u00A0"}</span>
+    borderBottom:"1.5px dotted #ccc", background: "rgba(0,0,0,0.03)",
+    padding:"0 4px", lineHeight:"1.9em", borderRadius: "2px",
+    fontFamily:"'Times New Roman',serif", color:"#888", userSelect:"none",
+    cursor: "not-allowed"
+  }} title="This field is locked and for official use only.">{val||"\u00A0"}</span>
 );
 
 // ── Sig inline display ────────────────────────────────────────
@@ -518,10 +519,15 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       {paymentModal && <PaymentModal name={form.name} phone={form.tel} amount={admissionAmount} onClose={()=>setPaymentModal(false)} onSuccess={handlePaymentSuccess} />}
       
       {submitting && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(255,255,255,0.8)", zIndex:9999, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", backdropFilter: "blur(4px)" }}>
-           <div className="spinner" style={{ width: "60px", height: "60px", border: "5px solid rgba(15,110,86,0.1)", borderTopColor: "#0F6E56", borderRadius: "50%", margin: "0 auto 20px", animation: "spin 1s linear infinite" }}></div>
-           <h3 style={{ fontFamily: "var(--sans)", color: "#1a1a1a" }}>Finalizing your application...</h3>
-           <p style={{ fontFamily: "var(--sans)", color: "#666" }}>Generating PDF and sending to admissions.</p>
+        <div style={{ position:"fixed", inset:0, background:"rgba(255,255,255,0.9)", zIndex:9999, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", backdropFilter: "blur(8px)" }}>
+           <div style={{ background: "#fff", padding: "40px", borderRadius: "24px", boxShadow: "0 12px 40px rgba(0,0,0,0.08)", textAlign: "center", border: "1px solid rgba(0,0,0,0.05)" }}>
+             <div className="spinner" style={{ width: "64px", height: "64px", border: "4px solid rgba(15,110,86,0.1)", borderTopColor: "#0F6E56", borderRadius: "50%", margin: "0 auto 24px", animation: "spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite" }}></div>
+             <h3 style={{ fontFamily: "var(--serif)", fontSize: "24px", color: "#1a1a1a", marginBottom: "8px" }}>Finalizing Application</h3>
+             <p style={{ fontFamily: "var(--sans)", color: "#666", fontSize: "15px", maxWidth: "260px", margin: "0 auto", lineHeight: 1.5 }}>
+               Generating your official documents and sending them securely...
+             </p>
+           </div>
+           <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
         </div>
       )}
 
@@ -543,6 +549,9 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
         {/* BODY */}
         <div className="fbody" style={{padding:"12px 22px 16px"}}>
           <div style={{textAlign:"center",fontWeight:900,fontSize:"12pt",textDecoration:"underline",marginBottom:10}}>ADMISSION FORM</div>
+          <p style={{fontSize:"10px", color:"#e53e3e", marginBottom: "8px", fontStyle:"italic", textAlign:"center", fontFamily:"var(--sans)"}}>
+            Note: Fields with a gray background are locked for official use only.
+          </p>
 
           {/* PERSONAL DETAILS */}
           <Sec t="PART I: PERSONAL DETAILS"/>
@@ -630,8 +639,9 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
             I&nbsp;
             <span style={{
               display:"inline-block", borderBottom:"1.5px dotted #444",
-              minWidth:200, padding:"0 2px", fontFamily:"'Times New Roman',serif",
-              fontWeight:400, color:"#000", lineHeight:"1.9em",
+              minWidth:240, padding:"0 6px", fontFamily:"'Times New Roman',serif",
+              fontWeight:600, color:"#000", lineHeight:"1.4em", textAlign: "center",
+              transform: "translateY(2px)"
             }}>{form.name || "\u00A0"}</span>
             &nbsp;declare that I shall abide by the rules and regulations and be obedient to the management and staff in the institution.
           </div>
@@ -644,7 +654,7 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
           </Row>
 
           {/* OFFICIAL USE */}
-          <div style={{borderTop:"2px solid #1a3a6e", marginTop:12, paddingTop:8}}>
+          <div style={{marginTop:16, paddingTop:8}}>
             <Sec t="OFFICIAL USE"/>
             <Row>
               <L t="NAME OF STUDENT&nbsp;"/>

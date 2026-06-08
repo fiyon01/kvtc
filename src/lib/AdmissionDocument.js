@@ -71,7 +71,7 @@ const s = StyleSheet.create({
   sigImg: { width: 100, height: 24, objectFit: 'contain', objectPosition: 'left bottom' },
 
   // ── OFFICIAL USE ──
-  officialDivider: { borderTopWidth: 2, borderTopColor: navyBlue, marginTop: 10, paddingTop: 6 },
+  officialDivider: { marginTop: 10, paddingTop: 6 },
 
   // ── FOOTER ──
   footer: {
@@ -88,19 +88,6 @@ const s = StyleSheet.create({
   footerText: { fontFamily: 'Times-Roman', fontSize: 8.5, color: mid, flex: 1, lineHeight: 1.5 },
   footerRow: { flexDirection: 'row', marginBottom: 3 },
 
-  // ── PAYMENT RECEIPT BAND ──
-  receiptBand: {
-    backgroundColor: green,
-    paddingTop: 6,
-    paddingBottom: 6,
-    paddingLeft: 20,
-    paddingRight: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  receiptText: { color: white, fontSize: 8.5, fontFamily: 'Times-Bold' },
-  receiptValue: { color: gold, fontSize: 9, fontFamily: 'Times-Bold' },
 });
 
 // Thin helper: label + dotted field value
@@ -150,13 +137,6 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
       subject="Student Admission Form"
     >
       <Page size="A4" style={s.page}>
-
-        {/* ── PAYMENT RECEIPT BAND ── */}
-        <View style={s.receiptBand}>
-          <Text style={s.receiptText}>✓ M-PESA APPLICATION FEE PAID</Text>
-          <Text style={s.receiptValue}>KSh {paymentAmount?.toLocaleString?.() || paymentAmount} · {dateStr}</Text>
-          <Text style={[s.receiptText, { fontSize: 7.5 }]}>{email}</Text>
-        </View>
 
         {/* ── HEADER ── */}
         <View style={s.header}>
