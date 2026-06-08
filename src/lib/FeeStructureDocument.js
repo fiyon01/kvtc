@@ -120,7 +120,9 @@ export default function FeeStructureDocument({ courses, feeStructure, kvtcLogoUr
           <Text style={styles.noteItem}>1. Admission Fee: A non-refundable fee of KSh 500 is payable during application.</Text>
           <Text style={styles.noteItem}>2. Government Capitation: Trainees may apply for the National Government Capitation (KSh 30,000 per year) through KUCCPS. The fees stated above are the subsidised out-of-pocket amounts payable by parents/guardians.</Text>
           <Text style={styles.noteItem}>3. Examination Fees: NITA and KNEC examination fees are NOT included in the tuition fees and vary by course.</Text>
-          <Text style={styles.noteItem}>4. Payment Method: All payments should be made via M-PESA Paybill or directly to the institution's bank account. NO CASH is accepted.</Text>
+          <Text style={styles.noteItem}>4. Payment Method: All payments must be made to the respective bank accounts. NO CASH is accepted.</Text>
+          <Text style={[styles.noteItem, { marginLeft: 10 }]}>• Tuition Fees: KCB Kikuyu Branch (A/C: 1104169527)</Text>
+          <Text style={[styles.noteItem, { marginLeft: 10 }]}>• Registration & Admission: Co-operative Bank Kangemi (A/C: 01141151624400)</Text>
         </View>
 
         <Text style={styles.footer}>

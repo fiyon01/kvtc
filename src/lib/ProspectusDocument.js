@@ -358,12 +358,14 @@ const CourseRows = ({ rows, startIdx = 0 }) =>
             <View style={s.contactGridRow}>
               {bankKCB && (
                 <View style={[s.contactBox]}>
+                  <Text style={[s.contactLabel, { color: '#0F6E56' }]}>Tuition Fees Account</Text>
                   <Text style={s.contactLabel}>Bank: {bankKCB.bankName}</Text>
                   <Text style={s.contactVal}>A/C: {bankKCB.accountNumber}</Text>
                 </View>
               )}
               {bankCoop && (
                 <View style={[s.contactBox, { marginRight: 0 }]}>
+                  <Text style={[s.contactLabel, { color: '#38bdf8' }]}>Registration & Admission Account</Text>
                   <Text style={s.contactLabel}>Bank: {bankCoop.bankName}</Text>
                   <Text style={s.contactVal}>A/C: {bankCoop.accountNumber}</Text>
                 </View>

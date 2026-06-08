@@ -129,24 +129,28 @@ export async function POST(req) {
 
     // HTML Email body for Admin
     const adminHtmlContent = `
-      <div style="font-family: 'Times New Roman', Times, serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+      <div style="font-family: 'Times New Roman', Times, serif; color: #333; max-width: 600px; width: 100%; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-sizing: border-box;">
         <div style="background-color: #1a3a6e; padding: 20px; text-align: center;">
+          <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 12px;">
+            <img src="${baseUrl}/logo.png" alt="KVTC Logo" style="height: 60px;" />
+            <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="height: 60px;" />
+          </div>
           <h1 style="color: #fff; margin: 0; font-size: 22px; letter-spacing: 1px;">NEW ADMISSION RECEIVED</h1>
           <p style="color: #60a5fa; margin: 6px 0 0; font-size: 14px; font-weight: bold;">Kinoo Vocational Training Centre</p>
         </div>
-        <div style="padding: 30px; background-color: #fcfcfc;">
-          <p style="font-size: 16px; margin-bottom: 20px;">A new admission application has been submitted and paid via M-PESA.</p>
+        <div style="padding: 24px 20px; background-color: #fcfcfc;">
+          <p style="font-size: 16px; margin-bottom: 20px; line-height: 1.5;">A new admission application has been submitted and paid via M-PESA.</p>
           
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 15px;">
-            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; width: 140px; color: #666;"><strong>Applicant Name</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${name}</td></tr>
-            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>Course</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>${course}</strong></td></tr>
-            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>Phone</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${phone}</td></tr>
-            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>Email</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${email || 'N/A'}</td></tr>
-            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>ID No</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${idNo}</td></tr>
-            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666;"><strong>Application Fee</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; color: #16a34a; font-weight: bold;">KSh ${admissionAmount} (M-PESA)</td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; width: 130px; vertical-align: top;"><strong>Name</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${name}</td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Course</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;"><strong>${course}</strong></td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Phone</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${phone}</td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Email</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${email || 'N/A'}</td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>ID No</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${idNo}</td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Fee Paid</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; color: #16a34a; font-weight: bold;">KSh ${admissionAmount} (M-PESA)</td></tr>
           </table>
 
-          <p style="font-size: 15px; color: #555; background: #f0fdf4; padding: 12px; border-radius: 6px; border: 1px solid #bbf7d0;">
+          <p style="font-size: 15px; color: #555; background: #f0fdf4; padding: 12px; border-radius: 6px; border: 1px solid #bbf7d0; line-height: 1.5; margin: 0;">
             ✅ The fully filled and signed <strong>Admission Form</strong> is attached to this email.
           </p>
         </div>

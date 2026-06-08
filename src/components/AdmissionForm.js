@@ -439,6 +439,7 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
   const handlePaymentSuccess = async (userEmail) => {
     setPaymentModal(false);
     setSubmitting(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
     try {
       // 1a. Generate the filled Admission Form PDF for the admin

@@ -194,7 +194,7 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
             </div>
 
             <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#888', margin: 0, lineHeight: 1.6 }}>
-              📍 Fees can be paid at <strong>KCB Kikuyu</strong> or <strong>Co-op Bank Kangemi</strong>. See full payment instructions after admission.
+              📍 <strong>Tuition Fees</strong> are paid at KCB Kikuyu, while <strong>Registration/Admission fees</strong> are paid at Co-op Bank Kangemi. See full payment instructions after admission.
             </p>
           </div>
         </FadeIn>

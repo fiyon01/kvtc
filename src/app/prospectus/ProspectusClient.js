@@ -294,8 +294,10 @@ export default function ProspectusClient({ dbData }) {
                 </div>
 
                 <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a', marginBottom: '4px' }}>Bank Accounts (No Cash Allowed)</h3>
-                <div style={{ fontSize: '11px', color: '#555' }}>
+                <div style={{ fontSize: '11px', color: '#555', lineHeight: 1.6 }}>
+                  <span style={{ color: '#0F6E56', fontWeight: 700, fontSize: '10px', textTransform: 'uppercase' }}>Tuition Fees Account</span><br/>
                   <strong>{feeStructure?.bankKCB?.bankName}:</strong> {feeStructure?.bankKCB?.accountNumber}<br/>
+                  <span style={{ color: '#38bdf8', fontWeight: 700, fontSize: '10px', textTransform: 'uppercase', display: 'inline-block', marginTop: '4px' }}>Registration & Admission Account</span><br/>
                   <strong>{feeStructure?.bankCoop?.bankName}:</strong> {feeStructure?.bankCoop?.accountNumber}
                 </div>
               </div>

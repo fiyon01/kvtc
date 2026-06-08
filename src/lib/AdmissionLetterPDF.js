@@ -66,16 +66,15 @@ const s = StyleSheet.create({
   },
 
   // ── Header ──
-  headerTopBar: { backgroundColor: green, height: 5 },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 8,
+    paddingTop: 12,
     paddingBottom: 8,
     paddingLeft: 14,
     paddingRight: 14,
     borderBottomWidth: 3,
-    borderBottomColor: green,
+    borderBottomColor: '#1a3a6e',
   },
   logo: { width: 60, height: 60, objectFit: 'contain' },
   headerCenter: { flex: 1, alignItems: 'center', paddingLeft: 8, paddingRight: 8 },
@@ -166,7 +165,6 @@ const s = StyleSheet.create({
 function Header({ kvtcLogoUrl, cgokLogoUrl }) {
   return (
     <>
-      <View style={s.headerTopBar} />
       <View style={s.headerRow}>
         {kvtcLogoUrl
           ? <Image src={kvtcLogoUrl} style={s.logo} />
@@ -299,7 +297,7 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
           <Text style={s.rulesTitle}>RULES AND REGULATIONS</Text>
 
           {RULES.map((rule, i) => (
-            <View style={s.ruleItem} key={i} wrap={false}>
+            <View style={s.ruleItem} key={i}>
               <Text style={s.ruleNum}>{i + 1}.</Text>
               <View style={{ flex: 1 }}>
                 {typeof rule === 'string' ? (
