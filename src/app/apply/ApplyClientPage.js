@@ -277,12 +277,22 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
       </FadeIn>
       {/* Styles */}
       <style>{`
+        .step-circle { width: 36px; height: 36px; font-size: 14px; }
+        .step-label { font-size: 11px; white-space: nowrap; }
+        .step-line { width: 48px; height: 2px; margin: 0 8px; margin-bottom: 22px; }
+
         @media (max-width: 650px) {
           .pre-app-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
         }
-        @media (max-width: 480px) {
-          .step-line { width: 16px !important; margin: 0 4px !important; }
-          .step-label { font-size: 10px !important; white-space: normal !important; text-align: center; max-width: 60px; line-height: 1.1; }
+        @media (max-width: 580px) {
+          .step-circle { width: 28px !important; height: 28px !important; font-size: 12px !important; }
+          .step-line { width: 20px !important; margin: 0 6px !important; margin-bottom: 26px !important; }
+          .step-label { font-size: 10px !important; white-space: normal !important; text-align: center; max-width: 70px; line-height: 1.2; }
+        }
+        @media (max-width: 380px) {
+          .step-circle { width: 24px !important; height: 24px !important; font-size: 11px !important; }
+          .step-line { width: 12px !important; margin: 0 4px !important; margin-bottom: 28px !important; }
+          .step-label { font-size: 9px !important; max-width: 54px; }
         }
       `}</style>
     </div>
@@ -322,7 +332,7 @@ function ApplyInner({ dbData }) {
         <FadeIn>
           {/* Step Indicator */}
           {step !== 'success' && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 0, marginBottom: 28 }}>
               {[
                 { label: 'Review Requirements', num: 1 },
                 { label: 'Fill Application Form', num: 2 },
@@ -333,23 +343,23 @@ function ApplyInner({ dbData }) {
                 return (
                   <div key={s.num} style={{ display: 'flex', alignItems: 'center' }} className="step-item">
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{
-                        width: 36, height: 36, borderRadius: '50%',
+                      <div className="step-circle" style={{
+                        borderRadius: '50%',
                         background: isDone ? '#0F6E56' : isActive ? '#0F6E56' : 'rgba(0,0,0,0.1)',
                         color: '#fff',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontFamily: 'var(--sans)', fontSize: 14, fontWeight: 700,
+                        fontFamily: 'var(--sans)', fontWeight: 700,
                         transition: 'background 0.4s',
                         boxShadow: isActive ? '0 4px 16px rgba(15,110,86,0.35)' : 'none',
                       }}>
                         {isDone ? '✓' : s.num}
                       </div>
-                      <span style={{ fontFamily: 'var(--sans)', fontSize: 11, color: isActive ? '#0F6E56' : '#aaa', marginTop: 6, fontWeight: isActive ? 700 : 400, transition: 'color 0.4s', whiteSpace: 'nowrap' }} className="step-label">
+                      <span style={{ fontFamily: 'var(--sans)', color: isActive ? '#0F6E56' : '#aaa', marginTop: 6, fontWeight: isActive ? 700 : 400, transition: 'color 0.4s' }} className="step-label">
                         {s.label}
                       </span>
                     </div>
                     {i < 2 && (
-                      <div style={{ width: 48, height: 2, background: isDone ? '#0F6E56' : 'rgba(0,0,0,0.1)', margin: '0 8px', transition: 'background 0.4s', marginBottom: 22 }} className="step-line" />
+                      <div style={{ background: isDone ? '#0F6E56' : 'rgba(0,0,0,0.1)', transition: 'background 0.4s' }} className="step-line" />
                     )}
                   </div>
                 );
