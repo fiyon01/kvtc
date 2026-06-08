@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 import React from 'react';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { AdmissionLetterPDF } from '@/lib/AdmissionLetterPDF';
+import { AdmissionDocument } from '@/lib/AdmissionDocument';
 
 export async function POST(req) {
   try {
@@ -13,8 +14,10 @@ export async function POST(req) {
     const protocol = req.headers.get('x-forwarded-proto') || 'http';
     const baseUrl = `${protocol}://${host}`;
 
+    const PdfComponent = formData.pdfType === 'form' ? AdmissionDocument : AdmissionLetterPDF;
+
     const buffer = await renderToBuffer(
-      React.createElement(AdmissionLetterPDF, {
+      React.createElement(PdfComponent, {
         formData,
         kvtcLogoUrl: `${baseUrl}/logo.png`,
         cgokLogoUrl: `${baseUrl}/cgok-logo.png`,

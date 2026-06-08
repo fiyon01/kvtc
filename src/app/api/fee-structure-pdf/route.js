@@ -3,10 +3,19 @@ import FeeStructureDocument from '@/lib/FeeStructureDocument';
 import db from '@/data/db.json';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(req) {
   try {
+    const host = req.headers.get('host') || 'localhost:3000';
+    const protocol = req.headers.get('x-forwarded-proto') || 'http';
+    const baseUrl = `${protocol}://${host}`;
+
     const stream = await renderToStream(
-      <FeeStructureDocument courses={db.courses} feeStructure={db.feeStructure} />
+      <FeeStructureDocument 
+        courses={db.courses} 
+        feeStructure={db.feeStructure} 
+        kvtcLogoUrl={`${baseUrl}/logo.png`}
+        cgokLogoUrl={`${baseUrl}/cgok-logo.png`}
+      />
     );
     
     // Convert Node stream to web ReadableStream

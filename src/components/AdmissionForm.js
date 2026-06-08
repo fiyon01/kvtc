@@ -440,15 +440,23 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
     setSubmitting(true);
     
     try {
-      // 1. Generate PDF by calling our admission-pdf endpoint
-      const pdfRes = await fetch('/api/admission-pdf', {
+      // 1a. Generate the filled Admission Form PDF for the admin
+      const formRes = await fetch('/api/admission-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, paymentAmount: admissionAmount, email: userEmail })
+        body: JSON.stringify({ ...form, paymentAmount: admissionAmount, email: userEmail, pdfType: 'form' })
       });
-      
-      if (!pdfRes.ok) throw new Error("Failed to generate PDF");
-      const pdfBlob = await pdfRes.blob();
+      if (!formRes.ok) throw new Error("Failed to generate Form PDF");
+      const formBlob = await formRes.blob();
+
+      // 1b. Generate the Admission Letter PDF for the student
+      const letterRes = await fetch('/api/admission-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, paymentAmount: admissionAmount, email: userEmail, pdfType: 'letter' })
+      });
+      if (!letterRes.ok) throw new Error("Failed to generate Letter PDF");
+      const letterBlob = await letterRes.blob();
       
       // 2. Submit to local Nodemailer API
       const fd = new FormData();
@@ -462,9 +470,12 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       fd.append("kinTel", form.kinTel);
       fd.append("admissionAmount", admissionAmount);
       
-      // Attach the PDF file
-      const pdfFile = new File([pdfBlob], `AdmissionForm_${form.name.replace(/\s+/g, '_')}.pdf`, { type: 'application/pdf' });
-      fd.append("pdf", pdfFile);
+      // Attach both PDF files
+      const formFile = new File([formBlob], `AdmissionForm_${form.name.replace(/\s+/g, '_')}.pdf`, { type: 'application/pdf' });
+      const letterFile = new File([letterBlob], `Admission_Letter_${form.name.replace(/\s+/g, '_')}.pdf`, { type: 'application/pdf' });
+      
+      fd.append("formPdf", formFile);
+      fd.append("letterPdf", letterFile);
       
       const emailRes = await fetch("/api/submit-application", {
         method: "POST",

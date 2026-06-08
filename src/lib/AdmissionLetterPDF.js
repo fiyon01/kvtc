@@ -62,6 +62,7 @@ const s = StyleSheet.create({
     fontFamily: 'Times-Roman',
     fontSize: 10,
     color: dark,
+    paddingBottom: 30,
   },
 
   // ── Header ──
@@ -298,7 +299,7 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
           <Text style={s.rulesTitle}>RULES AND REGULATIONS</Text>
 
           {RULES.map((rule, i) => (
-            <View style={s.ruleItem} key={i}>
+            <View style={s.ruleItem} key={i} wrap={false}>
               <Text style={s.ruleNum}>{i + 1}.</Text>
               <View style={{ flex: 1 }}>
                 {typeof rule === 'string' ? (

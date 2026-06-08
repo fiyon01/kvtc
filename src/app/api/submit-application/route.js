@@ -16,7 +16,8 @@ export async function POST(req) {
     const kinName = formData.get('kinName') || 'N/A';
     const kinTel = formData.get('kinTel') || 'N/A';
     const admissionAmount = formData.get('admissionAmount') || '500';
-    const pdfFile = formData.get('pdf');
+    const formPdfFile = formData.get('formPdf');
+    const letterPdfFile = formData.get('letterPdf');
 
     // Check if email credentials are provided
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -104,29 +105,62 @@ export async function POST(req) {
       </div>
     `;
 
-    // Convert PDF to buffer
-    const arrayBuffer = await pdfFile.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    // Convert PDFs to buffers
+    const letterBuffer = letterPdfFile ? Buffer.from(await letterPdfFile.arrayBuffer()) : null;
+    const formBuffer = formPdfFile ? Buffer.from(await formPdfFile.arrayBuffer()) : null;
 
     const adminEmail = process.env.RECEIVER_EMAIL || process.env.EMAIL_USER;
 
-    const mailOptions = {
+    // 1. Email to Applicant (contains the Admission Letter)
+    const applicantMailOptions = {
       from: '"Kinoo VTC Admissions" <' + process.env.EMAIL_USER + '>',
       to: email, // Send directly to the applicant
-      bcc: adminEmail, // Copy to admin
       replyTo: adminEmail,
       subject: 'Your Admission Letter — Kinoo VTC (' + course + ')',
       html: htmlContent,
-      attachments: [
+      attachments: letterBuffer ? [
         {
           filename: 'Admission_Letter_' + name.replace(/\s+/g, '_') + '.pdf',
-          content: buffer,
+          content: letterBuffer,
           contentType: 'application/pdf',
         },
-      ],
+      ] : [],
     };
 
-    await transporter.sendMail(mailOptions);
+    // HTML Email body for Admin
+    const adminHtmlContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2>New Admission Application Received</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Course:</strong> ${course}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>ID No:</strong> ${idNo}</p>
+        <p><strong>Application Fee:</strong> KSh ${admissionAmount} (Paid via M-PESA)</p>
+        <br/>
+        <p>The filled Admission Form is attached.</p>
+      </div>
+    `;
+
+    // 2. Email to Admin (contains the filled Admission Form)
+    const adminMailOptions = {
+      from: '"Kinoo VTC Admissions" <' + process.env.EMAIL_USER + '>',
+      to: adminEmail,
+      replyTo: email,
+      subject: 'NEW APPLICATION: ' + name + ' (' + course + ')',
+      html: adminHtmlContent,
+      attachments: formBuffer ? [
+        {
+          filename: 'Admission_Form_' + name.replace(/\s+/g, '_') + '.pdf',
+          content: formBuffer,
+          contentType: 'application/pdf',
+        },
+      ] : [],
+    };
+
+    // Send both emails
+    await transporter.sendMail(applicantMailOptions);
+    await transporter.sendMail(adminMailOptions);
 
     // Save to db.json
     try {

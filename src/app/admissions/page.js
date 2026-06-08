@@ -135,52 +135,67 @@ export default function Admissions() {
               Admission Requirements
             </h2>
 
-            <div style={{ background: '#fff', borderRadius: '24px', padding: '32px', boxShadow: '0 12px 32px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)', marginBottom: '32px' }}>
-              <p style={{ color: '#888', fontSize: '14px', marginBottom: '20px' }}>Please prepare the following documents and items for your admission day:</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ background: '#fff', borderRadius: '24px', padding: '40px', boxShadow: '0 20px 40px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.04)', marginBottom: '32px' }}>
+              <p style={{ color: '#555', fontSize: '15px', marginBottom: '24px', lineHeight: 1.6 }}>Please ensure you have the following items ready for your admission day:</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {[
-                  'Two (2) passport photos',
+                  'Two (2) passport-size photos',
                   'Copy of National ID or Birth Certificate',
-                  'Team of photocopies',
+                  'One ream of photocopying paper',
                   'Three (3) foolscap papers',
-                  'Copy of previous result slip (if any)',
-                  'Medical certificate',
+                  'Copy of previous result slip/certificate',
+                  'Valid Medical Certificate',
                   'Two (2) quire counter books',
                   'Four (4) A4 exercise books'
                 ].map((req, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '12px 16px', background: '#f8f7f4', borderRadius: '12px', fontSize: '14px', color: '#444' }}>
-                    <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#0F6E56', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>
-                      {i + 1}
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '14px 18px', background: '#f8f7f4', borderRadius: '12px', fontSize: '14px', color: '#444', fontWeight: 500, transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background='#f0fdf4'} onMouseLeave={e => e.currentTarget.style.background='#f8f7f4'}>
+                    <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#0F6E56', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>
+                      ✓
                     </span>
                     {req}
                   </div>
                 ))}
               </div>
-              <p style={{ fontSize: '13px', color: '#BA7517', fontWeight: 600, marginTop: '20px', padding: '12px', background: '#FFF8E8', borderRadius: '10px' }}>
-                * NOTE: Each department has specific tool and uniform requirements. Please check your specific course page for the full list.
-              </p>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginTop: '24px', padding: '16px', background: 'rgba(239, 159, 39, 0.08)', borderRadius: '12px', border: '1px solid rgba(239, 159, 39, 0.2)' }}>
+                <span style={{ fontSize: '20px' }}>💡</span>
+                <p style={{ fontSize: '13px', color: '#8c5810', fontWeight: 500, margin: 0, lineHeight: 1.5 }}>
+                  <strong>Important:</strong> Each department has specific tool and uniform requirements. Please check your specific course page or the prospectus for the full technical list.
+                </p>
+              </div>
             </div>
 
             {/* Bank Accounts */}
-            <div style={{ background: '#1a1a1a', borderRadius: '24px', padding: '32px', color: '#fff' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <svg width="22" height="22" fill="none" stroke="#EF9F27" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+            <div style={{ background: '#1a1a1a', borderRadius: '24px', padding: '36px', color: '#fff', boxShadow: '0 20px 40px rgba(0,0,0,0.12)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(239,159,39,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="20" height="20" fill="none" stroke="#EF9F27" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                </div>
                 Bank Payment Details
               </h3>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginBottom: '24px' }}>All tuition fees should be paid directly to the institution's bank accounts. Do not pay cash.</p>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginBottom: '32px', lineHeight: 1.6 }}>
+                All fees should be paid directly to the institution's designated bank accounts. <strong>Cash payments are strictly not accepted.</strong>
+              </p>
               
-              <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '16px', padding: '20px', marginBottom: '16px' }}>
-                <div style={{ fontSize: '12px', color: '#EF9F27', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Primary Account</div>
-                <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '4px' }}>{bankKCB.bankName}</div>
-                <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', marginBottom: '8px' }}>A/C Name: {bankKCB.accountName}</div>
-                <div style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '1px', fontFamily: 'monospace' }}>{bankKCB.accountNumber}</div>
+              {/* KCB - Tuition */}
+              <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))', borderRadius: '16px', padding: '24px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#4ade80', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', background: 'rgba(74, 222, 128, 0.1)', padding: '4px 10px', borderRadius: '100px' }}>Tuition Fees Account</div>
+                  <img src="/kcb-logo.png" alt="" style={{ height: '20px', opacity: 0.8 }} onError={(e) => e.target.style.display='none'} />
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px', color: '#fff' }}>{bankKCB.bankName}</div>
+                <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '12px' }}>A/C Name: {bankKCB.accountName}</div>
+                <div style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '2px', fontFamily: 'monospace', color: '#EF9F27' }}>{bankKCB.accountNumber}</div>
               </div>
 
-              <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '16px', padding: '20px' }}>
-                <div style={{ fontSize: '12px', color: '#EF9F27', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Alternative Account</div>
-                <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '4px' }}>{bankCoop.bankName}</div>
-                <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', marginBottom: '8px' }}>A/C Name: {bankCoop.accountName}</div>
-                <div style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '1px', fontFamily: 'monospace' }}>{bankCoop.accountNumber}</div>
+              {/* Coop - Registration */}
+              <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))', borderRadius: '16px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', background: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '100px' }}>Registration & Admission Account</div>
+                  <img src="/coop-logo.png" alt="" style={{ height: '20px', opacity: 0.8 }} onError={(e) => e.target.style.display='none'} />
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px', color: '#fff' }}>{bankCoop.bankName}</div>
+                <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '12px' }}>A/C Name: {bankCoop.accountName}</div>
+                <div style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '2px', fontFamily: 'monospace', color: '#EF9F27' }}>{bankCoop.accountNumber}</div>
               </div>
 
               <div style={{ marginTop: '32px' }}>

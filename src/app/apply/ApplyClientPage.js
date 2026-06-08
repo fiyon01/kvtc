@@ -275,10 +275,14 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
           <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#aaa', marginTop: 16 }}>🔒 Secure M-PESA payment · No hidden charges</p>
         </div>
       </FadeIn>
-
+      {/* Styles */}
       <style>{`
-        @media(max-width:700px){
-          .pre-app-grid { grid-template-columns: 1fr !important; }
+        @media (max-width: 650px) {
+          .pre-app-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .step-line { width: 16px !important; margin: 0 4px !important; }
+          .step-label { font-size: 10px !important; white-space: normal !important; text-align: center; max-width: 60px; line-height: 1.1; }
         }
       `}</style>
     </div>
@@ -327,7 +331,7 @@ function ApplyInner({ dbData }) {
                 const isActive = (step === 'pre' && i === 0) || (step === 'form' && i >= 1);
                 const isDone = (step === 'form' && i === 0);
                 return (
-                  <div key={s.num} style={{ display: 'flex', alignItems: 'center' }}>
+                  <div key={s.num} style={{ display: 'flex', alignItems: 'center' }} className="step-item">
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <div style={{
                         width: 36, height: 36, borderRadius: '50%',
@@ -340,12 +344,12 @@ function ApplyInner({ dbData }) {
                       }}>
                         {isDone ? '✓' : s.num}
                       </div>
-                      <span style={{ fontFamily: 'var(--sans)', fontSize: 11, color: isActive ? '#0F6E56' : '#aaa', marginTop: 6, fontWeight: isActive ? 700 : 400, transition: 'color 0.4s', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontFamily: 'var(--sans)', fontSize: 11, color: isActive ? '#0F6E56' : '#aaa', marginTop: 6, fontWeight: isActive ? 700 : 400, transition: 'color 0.4s', whiteSpace: 'nowrap' }} className="step-label">
                         {s.label}
                       </span>
                     </div>
                     {i < 2 && (
-                      <div style={{ width: 48, height: 2, background: isDone ? '#0F6E56' : 'rgba(0,0,0,0.1)', margin: '0 8px', transition: 'background 0.4s', marginBottom: 22 }} />
+                      <div style={{ width: 48, height: 2, background: isDone ? '#0F6E56' : 'rgba(0,0,0,0.1)', margin: '0 8px', transition: 'background 0.4s', marginBottom: 22 }} className="step-line" />
                     )}
                   </div>
                 );

@@ -162,8 +162,8 @@ function GalleryCarousel({ images }) {
           className="hide-scrollbar"
         >
           {images.map((item, i) => (
-            <div key={i} onClick={() => { setActiveIdx(i); setModalOpen(true); }} style={{
-              flex: '0 0 auto', width: 'clamp(280px, 40vw, 400px)', height: '320px',
+            <div key={i} onClick={() => { setActiveIdx(i); setModalOpen(true); }} className="gallery-card" style={{
+              flex: '0 0 auto',
               borderRadius: '16px', overflow: 'hidden', position: 'relative', scrollSnapAlign: 'start',
               boxShadow: '0 12px 24px rgba(0,0,0,0.06)', cursor: 'pointer'
             }}>
@@ -196,7 +196,13 @@ function GalleryCarousel({ images }) {
         }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-50%) scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F6E56" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </button>
-        <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
+        <style>{`
+          .hide-scrollbar::-webkit-scrollbar { display: none; }
+          .gallery-card { width: clamp(280px, 40vw, 400px); height: 320px; }
+          @media (max-width: 768px) {
+            .gallery-card { width: 85vw !important; height: 260px !important; }
+          }
+        `}</style>
       </div>
 
       {/* View All Button */}
@@ -339,7 +345,7 @@ function TestimonialsCarousel({ testimonials }) {
       <div ref={scrollRef} style={{ display: 'flex', gap: '24px', overflowX: 'auto', scrollSnapType: 'x mandatory', padding: '8px 8% 24px', scrollbarWidth: 'none' }}
         className="hide-scrollbar">
         {testimonials.map((t, i) => (
-          <div key={i} onClick={() => setActiveIdx(i)} style={{ flexShrink: 0, width: 'clamp(280px, 36vw, 420px)', scrollSnapAlign: 'start', background: i === activeIdx ? 'linear-gradient(135deg, #0F6E56, #1D9E75)' : '#f8f7f4', border: `1px solid ${i === activeIdx ? 'transparent' : 'rgba(0,0,0,0.07)'}`, borderRadius: '20px', padding: '32px', position: 'relative', transition: 'all 0.35s', cursor: 'pointer', boxShadow: i === activeIdx ? '0 20px 60px rgba(15,110,86,0.25)' : '0 2px 12px rgba(0,0,0,0.04)' }}>
+          <div key={i} className="testimonial-card" onClick={() => setActiveIdx(i)} style={{ flexShrink: 0, scrollSnapAlign: 'start', background: i === activeIdx ? 'linear-gradient(135deg, #0F6E56, #1D9E75)' : '#f8f7f4', border: `1px solid ${i === activeIdx ? 'transparent' : 'rgba(0,0,0,0.07)'}`, borderRadius: '20px', padding: '32px', position: 'relative', transition: 'all 0.35s', cursor: 'pointer', boxShadow: i === activeIdx ? '0 20px 60px rgba(15,110,86,0.25)' : '0 2px 12px rgba(0,0,0,0.04)' }}>
             <div style={{ fontFamily: 'var(--serif)', fontSize: '4rem', color: i === activeIdx ? 'rgba(255,255,255,0.2)' : '#E1F5EE', position: 'absolute', top: '12px', left: '22px', lineHeight: 1, pointerEvents: 'none' }}>&ldquo;</div>
             <div style={{ color: '#EF9F27', fontSize: '14px', marginBottom: '14px', letterSpacing: '2px' }}>★★★★★</div>
             <p style={{ fontSize: '15px', color: i === activeIdx ? 'rgba(255,255,255,0.92)' : '#555', lineHeight: 1.75, marginBottom: '28px', position: 'relative', zIndex: 1 }}>{t.text}</p>
@@ -362,7 +368,13 @@ function TestimonialsCarousel({ testimonials }) {
         ))}
       </div>
 
-      <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .testimonial-card { width: clamp(280px, 36vw, 420px); }
+        @media (max-width: 768px) {
+          .testimonial-card { width: 85vw !important; }
+        }
+      `}</style>
     </section>
   );
 }
@@ -439,22 +451,13 @@ export default function Home() {
         </p>
 
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '60px', animation: 'heroFadeUp 0.8s 0.5s both' }}>
-          <Link href="/contact" style={{ background: '#EF9F27', color: '#1a1a1a', padding: '16px 36px', borderRadius: '10px', fontWeight: 700, fontSize: '15px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63 19.79 19.79 0 01.22 2 2 2 0 012.18.22h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.29 6.29l1.46-1.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-            Enquire
-          </Link>
-          <Link href="/apply" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', padding: '16px 36px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(10px)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <Link href="/apply" style={{ background: '#EF9F27', color: '#1a1a1a', padding: '16px 36px', borderRadius: '10px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 24px rgba(239,159,39,0.25)', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
             Apply Now
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </Link>
-          <a href="/api/prospectus-pdf" download="Kinoo_VTC_Prospectus_2026.pdf" style={{ background: 'transparent', color: '#fff', padding: '16px 28px', borderRadius: '10px', fontWeight: 500, fontSize: '15px', textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.5)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            Prospectus
-          </a>
-          <a href="/api/fee-structure-pdf" download="Kinoo_VTC_Fee_Structure_2026.pdf" style={{ background: 'rgba(239,159,39,0.18)', color: '#fbbf24', padding: '16px 28px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1.5px solid rgba(251,191,36,0.5)', backdropFilter: 'blur(10px)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Fee Structure
-          </a>
+          <Link href="/contact" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', padding: '16px 36px', borderRadius: '10px', fontWeight: 600, fontSize: '16px', textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(10px)', display: 'inline-flex', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}>
+            Enquire Now
+          </Link>
         </div>
 
         {/* Animated Stats */}
@@ -480,46 +483,114 @@ export default function Home() {
         `}</style>
       </section>
 
-      {/* ── TRUST BAR ── */}
-      <div style={{ background: '#f8f7f4', padding: '28px 8%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '40px', flexWrap: 'wrap', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
-        
-        {/* Emphasized Certified Badge */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#E1F5EE', color: '#0F6E56', padding: '10px 20px', borderRadius: '100px', border: '1.5px solid #0F6E56', boxShadow: '0 4px 14px rgba(15,110,86,0.12)' }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <span style={{ fontSize: '15px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Certified &amp; Accredited</span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444' }}>
-          <img src="/gok-logo.png" alt="Government of Kenya" style={{ height: '46px', objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} />
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          <img src="/tveta-logo.png" alt="TVETA" style={{ height: '38px', objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} />
-          <span>TVETA Approved</span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          <img src="/nita.png" alt="NITA" style={{ height: '34px', objectFit: 'contain' }} />
-          <span>NITA Certified</span>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          <img src="/knec.png" alt="KNEC" style={{ height: '38px', objectFit: 'contain' }} />
-          <span>KNEC Exams</span>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src="/cgok-logo.png" alt="County Government of Kiambu" style={{ height: '46px', objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} />
-          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25 }}>
-            <span style={{ fontSize: '10px', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>County Government of</span>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: '#0F6E56', textTransform: 'uppercase', letterSpacing: '0.3px' }}>Kiambu</span>
+      {/* ── TRUST BAR MARQUEE ── */}
+      <div style={{ background: '#f8f7f4', padding: '20px 0', overflow: 'hidden', borderBottom: '1px solid rgba(0,0,0,0.07)', whiteSpace: 'nowrap', display: 'flex' }}>
+        <div className="marquee-content" style={{ display: 'flex', alignItems: 'center', gap: '50px', paddingLeft: '50px' }}>
+          
+          {/* Item 1 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#E1F5EE', color: '#0F6E56', padding: '8px 18px', borderRadius: '100px', border: '1.5px solid #0F6E56', boxShadow: '0 4px 14px rgba(15,110,86,0.12)' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Certified &amp; Accredited</span>
           </div>
+
+          {/* Item 2 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444' }}>
+            <img src="/gok-logo.png" alt="Government of Kenya" style={{ height: '40px', objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} />
+          </div>
+          
+          {/* Item 3 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <img src="/tveta-logo.png" alt="TVETA" style={{ height: '32px', objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} />
+            <span>TVETA Approved</span>
+          </div>
+
+          {/* Item 4 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <img src="/nita.png" alt="NITA" style={{ height: '28px', objectFit: 'contain' }} />
+            <span>NITA Certified</span>
+          </div>
+          
+          {/* Item 5 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <img src="/knec.png" alt="KNEC" style={{ height: '32px', objectFit: 'contain' }} />
+            <span>KNEC Exams</span>
+          </div>
+          
+          {/* Item 6 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/cgok-logo.png" alt="County Government of Kiambu" style={{ height: '40px', objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} />
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25 }}>
+              <span style={{ fontSize: '9px', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>County Government of</span>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#0F6E56', textTransform: 'uppercase', letterSpacing: '0.3px' }}>Kiambu</span>
+            </div>
+          </div>
+          
+          {/* Item 7 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600, color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <IconClockSmall />
+            Part-Time Classes Available
+          </div>
+
         </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600, color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          <IconClockSmall />
-          Part-Time Classes Available
+
+        {/* Duplicate content for seamless scrolling */}
+        <div className="marquee-content" style={{ display: 'flex', alignItems: 'center', gap: '50px', paddingLeft: '50px' }}>
+          
+          {/* Item 1 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#E1F5EE', color: '#0F6E56', padding: '8px 18px', borderRadius: '100px', border: '1.5px solid #0F6E56', boxShadow: '0 4px 14px rgba(15,110,86,0.12)' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Certified &amp; Accredited</span>
+          </div>
+
+          {/* Item 2 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444' }}>
+            <img src="/gok-logo.png" alt="Government of Kenya" style={{ height: '40px', objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} />
+          </div>
+          
+          {/* Item 3 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <img src="/tveta-logo.png" alt="TVETA" style={{ height: '32px', objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} />
+            <span>TVETA Approved</span>
+          </div>
+
+          {/* Item 4 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <img src="/nita.png" alt="NITA" style={{ height: '28px', objectFit: 'contain' }} />
+            <span>NITA Certified</span>
+          </div>
+          
+          {/* Item 5 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 600, color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <img src="/knec.png" alt="KNEC" style={{ height: '32px', objectFit: 'contain' }} />
+            <span>KNEC Exams</span>
+          </div>
+          
+          {/* Item 6 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/cgok-logo.png" alt="County Government of Kiambu" style={{ height: '40px', objectFit: 'contain' }} onError={(e) => e.target.style.display='none'} />
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25 }}>
+              <span style={{ fontSize: '9px', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>County Government of</span>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#0F6E56', textTransform: 'uppercase', letterSpacing: '0.3px' }}>Kiambu</span>
+            </div>
+          </div>
+          
+          {/* Item 7 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600, color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <IconClockSmall />
+            Part-Time Classes Available
+          </div>
+
         </div>
+
+        <style>{`
+          .marquee-content {
+            animation: marquee 30s linear infinite;
+          }
+          @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+          }
+        `}</style>
       </div>
 
       {/* ── ABOUT SNIPPET ── */}

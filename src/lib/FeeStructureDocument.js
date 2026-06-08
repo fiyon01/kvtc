@@ -4,7 +4,8 @@ import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/render
 const styles = StyleSheet.create({
   page: { padding: 40, fontFamily: 'Times-Roman', fontSize: 12, backgroundColor: '#ffffff' },
   header: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
-  headerText: { textAlign: 'center', flex: 1 },
+  logo: { width: 60, height: 60, objectFit: 'contain' },
+  headerText: { textAlign: 'center', flex: 1, paddingHorizontal: 10 },
   title: { fontSize: 20, fontFamily: 'Times-Bold', color: '#0F6E56', marginBottom: 5 },
   subtitle: { fontSize: 14, fontFamily: 'Times-Roman', color: '#333' },
   address: { fontSize: 10, color: '#666', marginTop: 4 },
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
   noteItem: { marginBottom: 5, fontSize: 10, fontFamily: 'Times-Italic' }
 });
 
-export default function FeeStructureDocument({ courses, feeStructure }) {
+export default function FeeStructureDocument({ courses, feeStructure, kvtcLogoUrl, cgokLogoUrl }) {
   // Use data from db.feeStructure if available, otherwise fallback to defaults
   const t1 = feeStructure?.termBreakdown?.[0]?.amount || 9000;
   const t2 = feeStructure?.termBreakdown?.[1]?.amount || 9000;
@@ -34,11 +35,13 @@ export default function FeeStructureDocument({ courses, feeStructure }) {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
+          {kvtcLogoUrl ? <Image src={kvtcLogoUrl} style={styles.logo} /> : <View style={styles.logo} />}
           <View style={styles.headerText}>
             <Text style={styles.title}>KINOO VOCATIONAL TRAINING CENTRE</Text>
             <Text style={styles.subtitle}>COUNTY GOVERNMENT OF KIAMBU</Text>
             <Text style={styles.address}>P.O Box 123 - 00902 Kikuyu, Kenya | Tel: +254 113 582 008 | Email: info@kinoovtc.ac.ke</Text>
           </View>
+          {cgokLogoUrl ? <Image src={cgokLogoUrl} style={styles.logo} /> : <View style={styles.logo} />}
         </View>
 
         <Text style={{ textAlign: 'center', fontSize: 16, fontFamily: 'Times-Bold', marginVertical: 10, textDecoration: 'underline' }}>
