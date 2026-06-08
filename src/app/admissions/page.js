@@ -148,7 +148,7 @@ export default function Admissions() {
                   'Two (2) quire counter books',
                   'Four (4) A4 exercise books'
                 ].map((req, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '14px 18px', background: '#f8f7f4', borderRadius: '12px', fontSize: '14px', color: '#444', fontWeight: 500, transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background='#f0fdf4'} onMouseLeave={e => e.currentTarget.style.background='#f8f7f4'}>
+                  <div key={i} className="req-item">
                     <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#0F6E56', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>
                       ✓
                     </span>
@@ -180,7 +180,7 @@ export default function Admissions() {
               <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))', borderRadius: '16px', padding: '24px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <div style={{ fontSize: '11px', color: '#4ade80', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', background: 'rgba(74, 222, 128, 0.1)', padding: '4px 10px', borderRadius: '100px' }}>Tuition Fees Account</div>
-                  <img src="/kcb-logo.png" alt="" style={{ height: '20px', opacity: 0.8 }} onError={(e) => e.target.style.display='none'} />
+                  <img src="/kcb-logo.png" alt="KCB" style={{ height: '20px', opacity: 0.8 }} />
                 </div>
                 <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px', color: '#fff' }}>{bankKCB.bankName}</div>
                 <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '12px' }}>A/C Name: {bankKCB.accountName}</div>
@@ -191,7 +191,7 @@ export default function Admissions() {
               <div style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))', borderRadius: '16px', padding: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <div style={{ fontSize: '11px', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', background: 'rgba(56, 189, 248, 0.1)', padding: '4px 10px', borderRadius: '100px' }}>Registration & Admission Account</div>
-                  <img src="/coop-logo.png" alt="" style={{ height: '20px', opacity: 0.8 }} onError={(e) => e.target.style.display='none'} />
+                  <img src="/coop-logo.png" alt="Co-op Bank" style={{ height: '20px', opacity: 0.8 }} />
                 </div>
                 <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px', color: '#fff' }}>{bankCoop.bankName}</div>
                 <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', marginBottom: '12px' }}>A/C Name: {bankCoop.accountName}</div>
@@ -216,6 +216,13 @@ export default function Admissions() {
           .vote-heads summary::-webkit-details-marker { display: none; }
           .vote-heads[open] summary .icon { transform: rotate(180deg); }
           .vote-heads summary .icon { transition: transform 0.2s; }
+          .req-item {
+            display: flex; align-items: flex-start; gap: 14px;
+            padding: 14px 18px; background: #f8f7f4;
+            border-radius: 12px; font-size: 14px; color: #444;
+            font-weight: 500; transition: background 0.2s;
+          }
+          .req-item:hover { background: #f0fdf4; }
         `}</style>
       </section>
     </div>
