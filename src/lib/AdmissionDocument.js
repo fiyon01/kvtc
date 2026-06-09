@@ -1,4 +1,5 @@
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import PdfLetterhead from './PdfLetterhead';
 
 const green = '#1a6e2e';
 const navyBlue = '#1a3a6e';
@@ -62,7 +63,7 @@ const s = StyleSheet.create({
   fieldGhost: { borderBottomWidth: 1, borderBottomColor: '#bbb', borderBottomStyle: 'dotted', minHeight: 14, flex: 1, minWidth: 40 },
 
   // ── DECLARATION ──
-  declarationText: { fontFamily: 'Times-Roman', fontSize: 9.5, color: dark, lineHeight: 1.9, marginBottom: 4 },
+  declarationText: { fontFamily: 'Times-Roman', fontSize: 9.5, color: dark, lineHeight: 14, marginBottom: 4 },
   declarationName: { borderBottomWidth: 1, borderBottomColor: '#444', borderBottomStyle: 'dotted', minWidth: 140, paddingBottom: 1 },
   declarationNameText: { fontFamily: 'Times-Roman', fontSize: 9.5, color: dark },
 
@@ -85,8 +86,22 @@ const s = StyleSheet.create({
   },
   footerGrid: { flexDirection: 'row' },
   footerLabel: { fontFamily: 'Times-Bold', fontSize: 8.5 },
-  footerText: { fontFamily: 'Times-Roman', fontSize: 8.5, color: mid, flex: 1, lineHeight: 1.5 },
+  footerText: { fontFamily: 'Times-Roman', fontSize: 8.5, color: mid, flex: 1, lineHeight: 11 },
   footerRow: { flexDirection: 'row', marginBottom: 3 },
+  paymentBox: {
+    marginTop: 10,
+    paddingTop: 7,
+    paddingBottom: 7,
+    paddingLeft: 9,
+    paddingRight: 9,
+    backgroundColor: '#eef5f0',
+    borderLeftWidth: 3,
+    borderLeftColor: green,
+  },
+  paymentTitle: { fontFamily: 'Times-Bold', fontSize: 9, color: green, marginBottom: 4 },
+  paymentRow: { flexDirection: 'row' },
+  paymentLabel: { width: 82, fontFamily: 'Times-Bold', fontSize: 8.5, lineHeight: 11 },
+  paymentValue: { flex: 1, fontSize: 8.5, lineHeight: 11 },
 
 });
 
@@ -123,12 +138,22 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
     course, duration, examBody, startDate,
     signatureData, signDate,
     paymentAmount = 500,
+    paymentReference = '',
+    paymentDate = '',
+    paymentPhone = '',
     email = '',
     submittedAt,
   } = formData;
 
   const now = submittedAt ? new Date(submittedAt) : new Date();
   const dateStr = now.toLocaleDateString('en-KE', { day: '2-digit', month: 'long', year: 'numeric' });
+  const paymentDateStr = paymentDate
+    ? new Date(paymentDate).toLocaleString('en-KE', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'Africa/Nairobi',
+      })
+    : '';
 
   return (
     <Document
@@ -139,22 +164,7 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
       <Page size="A4" style={s.page}>
 
         {/* ── HEADER ── */}
-        <View style={s.header}>
-          {kvtcLogoUrl
-            ? <Image src={kvtcLogoUrl} style={s.logo} />
-            : <View style={[s.logo, { backgroundColor: green, alignItems: 'center', justifyContent: 'center' }]}><Text style={{ color: white, fontSize: 18, fontFamily: 'Times-Bold' }}>KV</Text></View>
-          }
-          <View style={s.headerCenter}>
-            <Text style={s.deptText}>Department Of Education, Gender, Culture & Social Services</Text>
-            <Text style={s.instName}>KINOO VOCATIONAL TRAINING CENTRE</Text>
-            <Text style={s.contactText}>P.O BOX 351-00902, Kikuyu.   Tel: 0113582008</Text>
-            <Text style={s.contactText}>Email: kinoovtc@gmail.com   www.kinoovtc.ac.ke</Text>
-          </View>
-          {cgokLogoUrl
-            ? <Image src={cgokLogoUrl} style={s.logo} />
-            : <View style={[s.logo, { backgroundColor: '#c8a020', alignItems: 'center', justifyContent: 'center' }]}><Text style={{ color: white, fontSize: 10, fontFamily: 'Times-Bold', textAlign: 'center' }}>COUNTY{'\n'}GOVT</Text></View>
-          }
-        </View>
+        <PdfLetterhead kvtcLogoUrl={kvtcLogoUrl} cgokLogoUrl={cgokLogoUrl} />
 
         {/* ── BODY ── */}
         <View style={s.body}>
@@ -258,6 +268,24 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
               </View>
             </Row>
           </View>
+
+          {paymentReference ? (
+            <View style={s.paymentBox} wrap={false}>
+              <Text style={s.paymentTitle}>M-PESA PAYMENT CONFIRMATION</Text>
+              <View style={s.paymentRow}>
+                <Text style={s.paymentLabel}>Reference:</Text>
+                <Text style={s.paymentValue}>{paymentReference}</Text>
+                <Text style={s.paymentLabel}>Amount:</Text>
+                <Text style={s.paymentValue}>KSh {paymentAmount}</Text>
+              </View>
+              <View style={s.paymentRow}>
+                <Text style={s.paymentLabel}>Date & Time:</Text>
+                <Text style={s.paymentValue}>{paymentDateStr}</Text>
+                <Text style={s.paymentLabel}>Phone:</Text>
+                <Text style={s.paymentValue}>{paymentPhone || 'N/A'}</Text>
+              </View>
+            </View>
+          ) : null}
         </View>
 
         {/* ── FOOTER ── */}

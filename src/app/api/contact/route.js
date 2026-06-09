@@ -39,7 +39,7 @@ export async function POST(req) {
         
         <div style="background-color: #1a6e2e; padding: 20px; text-align: center;">
           <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 12px;">
-            <img src="${baseUrl}/logo.png" alt="KVTC Logo" style="height: 60px;" />
+            <img src="${baseUrl}/kvtc_logo.png" alt="KVTC Logo" style="height: 60px;" />
             <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="height: 60px;" />
           </div>
           <h1 style="color: #fff; margin: 0; font-size: 22px; letter-spacing: 1px;">NEW WEBSITE ENQUIRY</h1>

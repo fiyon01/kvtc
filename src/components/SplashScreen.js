@@ -17,7 +17,7 @@ export default function SplashScreen() {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9999,
-      background: '#fff',
+      background: 'radial-gradient(circle at 50% 30%, #edf6fc 0%, #ffffff 46%, #f7fbf9 100%)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexDirection: 'column', gap: '16px',
       opacity: fadeOut ? 0 : 1,
@@ -25,19 +25,7 @@ export default function SplashScreen() {
     }}>
       {/* Logos Row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <img src="/logo.png" alt="KVTC" style={{ height: '90px', objectFit: 'contain', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} onError={e => {
-          e.target.style.display = 'none';
-          e.target.nextSibling.style.display = 'flex';
-        }} />
-        <div style={{
-          width: '90px', height: '90px', borderRadius: '24px',
-          background: 'linear-gradient(135deg, #0F6E56, #1D9E75)',
-          display: 'none', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 20px 60px rgba(15,110,86,0.35)',
-          animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-        }}>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: '36px', fontWeight: 700, color: '#fff' }}>KV</span>
-        </div>
+        <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ height: '90px', width: '90px', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
 
         {/* Separator */}
         <div style={{ width: '1px', height: '50px', background: 'rgba(0,0,0,0.1)', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
@@ -52,7 +40,7 @@ export default function SplashScreen() {
           letterSpacing: '1px', margin: 0,
           animation: 'splash-up 0.6s 0.2s both',
         }}>
-          <span style={{ color: '#0F6E56' }}>Kinoo</span> VTC
+          <span style={{ color: '#0F6E56' }}>Kinoo</span> <span style={{ color: '#2F79B7' }}>VTC</span>
         </h1>
         <p style={{
           color: '#888', fontSize: '11px',
@@ -64,13 +52,13 @@ export default function SplashScreen() {
 
       {/* Loading bar */}
       <div style={{
-        width: '120px', height: '3px', background: '#E1F5EE',
+        width: '120px', height: '3px', background: '#DDECF6',
         borderRadius: '99px', overflow: 'hidden',
         marginTop: '8px',
         animation: 'splash-up 0.6s 0.5s both',
       }}>
         <div style={{
-          height: '100%', background: '#0F6E56',
+          height: '100%', background: 'linear-gradient(90deg, #0F6E56, #2F79B7)',
           borderRadius: '99px',
           animation: 'load-bar 2s ease forwards',
         }}></div>

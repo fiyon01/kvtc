@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(req) {
   try {
+    const download = new URL(req.url).searchParams.get('download') === '1';
     const host = req.headers.get('host') || 'localhost:3000';
     const protocol = req.headers.get('x-forwarded-proto') || 'http';
     const baseUrl = `${protocol}://${host}`;
@@ -13,7 +14,7 @@ export async function GET(req) {
       <FeeStructureDocument 
         courses={db.courses} 
         feeStructure={db.feeStructure} 
-        kvtcLogoUrl={`${baseUrl}/logo.png`}
+        kvtcLogoUrl={`${baseUrl}/kvtc_logo.png`}
         cgokLogoUrl={`${baseUrl}/cgok-logo.png`}
       />
     );
@@ -30,7 +31,8 @@ export async function GET(req) {
     return new NextResponse(readableStream, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename="Kinoo_VTC_Fee_Structure_2026.pdf"',
+        'Content-Disposition': `${download ? 'attachment' : 'inline'}; filename="Kinoo_VTC_Fee_Structure_2026.pdf"`,
+        'Cache-Control': 'no-store',
       },
     });
   } catch (error) {

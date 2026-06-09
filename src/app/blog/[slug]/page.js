@@ -42,7 +42,7 @@ export default function BlogPost() {
         <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: '#1a1a1a', marginBottom: '24px', lineHeight: 1.1 }}>{post.title}</h1>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#0F6E56', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>KV</div>
+          <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ width: '40px', height: '40px' }} />
           <div>
             <strong style={{ display: 'block', fontSize: '14px', color: '#1a1a1a' }}>Kinoo VTC Administration</strong>
             <span style={{ fontSize: '12px', color: '#888' }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>

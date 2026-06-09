@@ -10,7 +10,7 @@ export default function IntakeBanner() {
 
   return (
     <div style={{
-      background: 'linear-gradient(90deg, #0F6E56, #1D9E75)',
+      background: 'linear-gradient(90deg, #0F6E56, #2F79B7)',
       color: '#fff',
       padding: '10px 5%',
       display: 'flex',

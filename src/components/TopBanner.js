@@ -58,7 +58,7 @@ export default function TopBanner() {
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 102,
       height: `${BANNER_HEIGHT}px`,
-      background: 'linear-gradient(90deg, #085041 0%, #0F6E56 60%, #1a6648 100%)',
+      background: 'linear-gradient(90deg, #085041 0%, #0F6E56 52%, #245A87 100%)',
       display: 'flex', alignItems: 'center',
       padding: '0 4%', gap: '12px',
       fontSize: '12px', color: '#fff',

@@ -2,25 +2,25 @@
 import { useState } from "react";
 
 const CGOK_LOGO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23e8f4ee' stroke='%23aaa' stroke-width='1.5'/%3E%3Ctext x='50' y='42' font-size='8' fill='%23555' text-anchor='middle' font-family='serif'%3ECounty%3C/text%3E%3Ctext x='50' y='54' font-size='8' fill='%23555' text-anchor='middle' font-family='serif'%3EGovt%3C/text%3E%3Ctext x='50' y='66' font-size='8' fill='%23555' text-anchor='middle' font-family='serif'%3ELogo%3C/text%3E%3C/svg%3E";
-const KVTC_LOGO_PLACEHOLDER  = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23fdf4e3' stroke='%23aaa' stroke-width='1.5'/%3E%3Ctext x='50' y='48' font-size='9' fill='%23555' text-anchor='middle' font-family='serif'%3EKVTC%3C/text%3E%3Ctext x='50' y='62' font-size='8' fill='%23555' text-anchor='middle' font-family='serif'%3ELogo%3C/text%3E%3C/svg%3E";
+const KVTC_LOGO_PLACEHOLDER = "/kvtc_logo.png";
 
 const ACCENT  = "#0F6E56";
 const GOLD    = "#BA7517";
 const ACCENT2 = "#0a5542";
 
 const ALL_COURSES = [
-  { name: "Food & Beverage Production & Service", cert: "ARTISAN", examBody: "KNEC",       duration: "1 YEAR"   },
-  { name: "Hair Dressing and Beauty Therapy",      cert: "GRADE 3", examBody: "NITA",       duration: "1 YEAR"   },
-  { name: "Electrical and Electronics",            cert: "GRADE 3", examBody: "NITA",       duration: "1 YEAR"   },
-  { name: "Electronic Mechanics",                  cert: "GRADE 3", examBody: "NITA",       duration: "1 YEAR"   },
+  { name: "Food & Beverage Production & Service", cert: "ARTISAN", examBody: "KNEC",       duration: "2 YEARS"  },
+  { name: "Hair Dressing and Beauty Therapy",      cert: "GRADE 3", examBody: "NITA",       duration: "2 YEARS"  },
+  { name: "Electrical and Electronics",            cert: "GRADE 3", examBody: "NITA",       duration: "2 YEARS"  },
+  { name: "Electronic Mechanics",                  cert: "GRADE 3", examBody: "NITA",       duration: "2 YEARS"  },
   { name: "Solar PV Installation",                 cert: "GRADE 3", examBody: "NITA",       duration: "6 MONTHS" },
   { name: "Security & Network Systems",            cert: "CERT",    examBody: "(INTERNAL)", duration: "3 MONTHS" },
-  { name: "Plumbing",                              cert: "GRADE 3", examBody: "NITA",       duration: "1 YEAR"   },
-  { name: "Masonry",                               cert: "GRADE 3", examBody: "NITA",       duration: "1 YEAR"   },
-  { name: "Fashion Design and Dressmaking",        cert: "GRADE 3", examBody: "NITA",       duration: "1 YEAR"   },
-  { name: "Motor Vehicle Mechanics",               cert: "GRADE 3", examBody: "NITA",       duration: "1 YEAR"   },
-  { name: "Welding & Fabrication",                 cert: "GRADE 3", examBody: "NITA",       duration: "1 YEAR"   },
-  { name: "Computer Operator",                     cert: "GRADE 3", examBody: "NITA",       duration: "1 YEAR"   },
+  { name: "Plumbing",                              cert: "GRADE 3", examBody: "NITA",       duration: "2 YEARS"  },
+  { name: "Masonry",                               cert: "GRADE 3", examBody: "NITA",       duration: "2 YEARS"  },
+  { name: "Fashion Design and Dressmaking",        cert: "GRADE 3", examBody: "NITA",       duration: "2 YEARS"  },
+  { name: "Motor Vehicle Mechanics",               cert: "GRADE 3", examBody: "NITA",       duration: "2 YEARS"  },
+  { name: "Welding & Fabrication",                 cert: "GRADE 3", examBody: "NITA",       duration: "2 YEARS"  },
+  { name: "Computer Operator",                     cert: "GRADE 3", examBody: "NITA",       duration: "2 YEARS"  },
   { name: "Computer Packages",                     cert: "CERT",    examBody: "INTERNAL",   duration: "2 MONTHS" },
 ];
 
@@ -120,7 +120,7 @@ export default function AdmissionLetterAdmin() {
   const addRule = () => { if(newRule.trim()){ setRules([...rules, newRule.trim()]); setNewRule(""); } };
   const saveCourse = (i, c) => { const r=[...courses]; r[i]=c; setCourses(r); setEditingCourse(null); };
   const deleteCourse = i => { if(window.confirm("Delete this course?")) setCourses(courses.filter((_,idx)=>idx!==i)); };
-  const addCourse = () => setCourses([...courses,{name:"New Course",cert:"GRADE 3",examBody:"NITA",duration:"1 YEAR"}]);
+  const addCourse = () => setCourses([...courses,{name:"New Course",cert:"GRADE 3",examBody:"NITA",duration:"2 YEARS"}]);
 
   const TABS = [["content","📝 Content"],["courses","📚 Courses"],["rules","📋 Rules"],["logos","🖼 Logos"]];
 
@@ -142,7 +142,7 @@ export default function AdmissionLetterAdmin() {
       {/* TOP BAR */}
       <div style={{background:ACCENT,color:"#fff",padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 12px rgba(0,0,0,0.2)"}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <div style={{width:34,height:34,borderRadius:8,background:"rgba(255,255,255,.18)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13}}>KV</div>
+          <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{width:42,height:42}} />
           <div>
             <div style={{fontSize:14,fontWeight:700,letterSpacing:.4}}>KVTC Admission Letter Generator</div>
             <div style={{fontSize:10,opacity:.7,marginTop:1}}>Edit any content · Upload logos · Download blank form for students</div>
@@ -430,23 +430,22 @@ function Page2({ d, rules }) {
 function LetterHeader({ d, cgokLogo, kvtcLogo, title }) {
   return (
     <>
-      <div style={{background:ACCENT,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <img src={cgokLogo} alt="County Logo" style={{width:66,height:66,objectFit:"contain",filter:"drop-shadow(0 1px 3px rgba(0,0,0,0.25))"}} />
+      <div style={{background:"#fff",padding:"10px 18px 8px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <img src={kvtcLogo} alt="KVTC Logo" style={{width:76,height:76,objectFit:"contain"}} />
         <div style={{textAlign:"center",flex:1,padding:"0 12px"}}>
-          <div style={{fontSize:"7.5pt",color:"rgba(255,255,255,0.82)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:2}}>{d.countyLabel}</div>
-          <div style={{fontSize:"7pt",color:"rgba(255,255,255,0.75)",marginBottom:5}}>{d.deptLabel}</div>
-          <div style={{fontSize:"15pt",fontWeight:800,color:"#fff",letterSpacing:1.2,textTransform:"uppercase",textDecoration:"underline",textDecorationColor:GOLD,fontFamily:"'Times New Roman',Times,serif"}}>
+          <div style={{fontSize:"8pt",fontWeight:700,color:"#b59b69",letterSpacing:1.2,textTransform:"uppercase",marginBottom:3}}>{d.countyLabel}</div>
+          <div style={{fontSize:"8pt",fontWeight:700,color:"#1f2f4d",marginBottom:4}}>{d.deptLabel}</div>
+          <div style={{fontSize:"13pt",fontWeight:800,color:"#4c9daa",letterSpacing:1.2,textTransform:"uppercase",fontFamily:"'Times New Roman',Times,serif"}}>
             {d.institutionName}
           </div>
-          <div style={{width:56,height:3,background:GOLD,margin:"7px auto 6px"}}/>
-          <div style={{fontSize:"7.5pt",color:"rgba(255,255,255,0.8)"}}>
+          <div style={{fontSize:"8pt",color:"#30364b",marginTop:5}}>
             {d.poBox} &nbsp;|&nbsp; {d.tel} &nbsp;|&nbsp; {d.website}
           </div>
-          <div style={{fontSize:"7.5pt",color:"rgba(255,255,255,0.72)"}}>{d.email}</div>
+          <div style={{fontSize:"8pt",color:"#30364b"}}>{d.email}</div>
         </div>
-        <img src={kvtcLogo} alt="KVTC Logo" style={{width:66,height:66,objectFit:"contain",filter:"drop-shadow(0 1px 3px rgba(0,0,0,0.25))"}} />
+        <img src={cgokLogo} alt="County Logo" style={{width:76,height:76,objectFit:"contain"}} />
       </div>
-      <div style={{height:4,background:`linear-gradient(to right,${ACCENT},${GOLD},${ACCENT})`}}/>
+      <div style={{height:4,background:"#2f79b7"}}/>
       <div style={{textAlign:"center",padding:"10px 0 6px"}}>
         <span style={{fontWeight:800,fontSize:"13pt",textTransform:"uppercase",letterSpacing:2,borderBottom:`2px solid ${ACCENT}`,paddingBottom:2,color:ACCENT,fontFamily:"'Times New Roman',Times,serif"}}>{title}</span>
       </div>

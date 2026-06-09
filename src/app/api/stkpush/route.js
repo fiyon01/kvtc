@@ -1,5 +1,14 @@
 export const runtime = 'nodejs';
 
+import { setTransactionStatus } from '@/lib/mpesaStore';
+import {
+  createMpesaPassword,
+  getDarajaToken,
+  mpesaTimestamp,
+  normalizeMpesaPhone,
+  readDarajaResponse,
+} from '@/lib/mpesaDaraja';
+
 /**
  * M-PESA STK Push API Route
  *
@@ -15,45 +24,20 @@ export const runtime = 'nodejs';
  * during development without credentials.
  */
 
-function timestamp() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  return (
-    d.getFullYear() +
-    pad(d.getMonth() + 1) +
-    pad(d.getDate()) +
-    pad(d.getHours()) +
-    pad(d.getMinutes()) +
-    pad(d.getSeconds())
-  );
-}
-
-async function getDarajaToken(consumerKey, consumerSecret, env) {
-  const base = env === 'production'
-    ? 'https://api.safaricom.co.ke'
-    : 'https://sandbox.safaricom.co.ke';
-
-  const creds = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
-  const res = await fetch(`${base}/oauth/v1/generate?grant_type=client_credentials`, {
-    method: 'GET',
-    headers: { Authorization: `Basic ${creds}` },
-  });
-
-  if (!res.ok) throw new Error(`Daraja token request failed: ${res.status}`);
-  const data = await res.json();
-  return { token: data.access_token, base };
-}
-
 export async function POST(req) {
   try {
     const { phone, amount } = await req.json();
+    const numericAmount = Number(amount);
+
+    if (!Number.isFinite(numericAmount) || numericAmount < 1) {
+      return Response.json({ error: 'Enter a valid payment amount of at least KSh 1' }, { status: 400 });
+    }
 
     const consumerKey    = process.env.MPESA_CONSUMER_KEY;
     const consumerSecret = process.env.MPESA_CONSUMER_SECRET;
     const shortcode      = process.env.MPESA_SHORTCODE;
     const passkey        = process.env.MPESA_PASSKEY;
     const callbackUrl    = process.env.MPESA_CALLBACK_URL || 'https://yourdomain.com/api/mpesa-callback';
-    const env            = process.env.MPESA_ENV || 'sandbox';
 
     // ── MOCK MODE ─────────────────────────────────────────────
     if (!consumerKey || !consumerSecret || !shortcode || !passkey) {
@@ -68,20 +52,19 @@ export async function POST(req) {
     }
 
     // ── REAL DARAJA FLOW ──────────────────────────────────────
-    const { token, base } = await getDarajaToken(consumerKey, consumerSecret, env);
+    const { token, base } = await getDarajaToken();
 
-    const ts       = timestamp();
-    const password = Buffer.from(`${shortcode}${passkey}${ts}`).toString('base64');
+    const ts = mpesaTimestamp();
+    const password = createMpesaPassword(shortcode, passkey, ts);
 
-    // Normalize phone: strip leading 0 / + / 254, then prefix with 254
-    const normalizedPhone = '254' + String(phone).replace(/^(\+?254|0)/, '');
+    const normalizedPhone = normalizeMpesaPhone(phone);
 
     const body = {
       BusinessShortCode: shortcode,
       Password: password,
       Timestamp: ts,
       TransactionType: 'CustomerPayBillOnline',
-      Amount: Number(amount),
+      Amount: numericAmount,
       PartyA: normalizedPhone,
       PartyB: shortcode,
       PhoneNumber: normalizedPhone,
@@ -99,7 +82,7 @@ export async function POST(req) {
       body: JSON.stringify(body),
     });
 
-    const stkData = await stkRes.json();
+    const stkData = await readDarajaResponse(stkRes);
 
     if (!stkRes.ok || stkData.ResponseCode !== '0') {
       return Response.json(
@@ -107,6 +90,19 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
+    setTransactionStatus(
+      stkData.CheckoutRequestID,
+      'pending',
+      'STK push sent. Waiting for the customer to enter their M-PESA PIN.',
+      {
+        checkoutRequestId: stkData.CheckoutRequestID,
+        merchantRequestId: stkData.MerchantRequestID,
+        phone: normalizedPhone,
+        amount: numericAmount,
+        initiatedAt: new Date().toISOString(),
+      }
+    );
 
     return Response.json({
       message: 'STK Push sent. Please enter your M-PESA PIN.',
@@ -116,6 +112,12 @@ export async function POST(req) {
 
   } catch (err) {
     console.error('[STK Push] Error:', err);
-    return Response.json({ error: err.message }, { status: 500 });
+    const authFailure = err.code === 'MPESA_AUTH_FAILED' || err.code === 'MPESA_NOT_CONFIGURED';
+    return Response.json({
+      error: authFailure
+        ? 'M-PESA is temporarily unavailable because the Daraja credentials could not be authenticated.'
+        : err.message,
+      code: err.code || 'MPESA_REQUEST_FAILED',
+    }, { status: authFailure ? 503 : 500 });
   }
 }

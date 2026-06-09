@@ -6,13 +6,20 @@ import { ProspectusDocument } from '@/lib/ProspectusDocument';
 import fs from 'fs';
 import path from 'path';
 
-export async function GET() {
+export async function GET(req) {
   try {
     const dbPath = path.join(process.cwd(), 'src/data/db.json');
     const dbData = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
     
     // renderToBuffer returns a proper Node.js Buffer — no stream conversion needed
-    const buffer = await renderToBuffer(React.createElement(ProspectusDocument, { dbData }));
+    const host = req.headers.get('host') || 'localhost:3000';
+    const protocol = req.headers.get('x-forwarded-proto') || 'http';
+    const baseUrl = `${protocol}://${host}`;
+    const buffer = await renderToBuffer(React.createElement(ProspectusDocument, {
+      dbData,
+      kvtcLogoUrl: `${baseUrl}/kvtc_logo.png`,
+      cgokLogoUrl: `${baseUrl}/cgok-logo.png`,
+    }));
 
     return new Response(buffer, {
       status: 200,

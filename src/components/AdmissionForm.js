@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-const KVTC_LOGO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23fdf4e3' stroke='%23aaa' stroke-width='1.5'/%3E%3Ctext x='50' y='48' font-size='9' fill='%23555' text-anchor='middle' font-family='serif'%3EKVTC%3C/text%3E%3Ctext x='50' y='62' font-size='8' fill='%23555' text-anchor='middle' font-family='serif'%3ELogo%3C/text%3E%3C/svg%3E";
+const KVTC_LOGO = "/kvtc_logo.png";
 
 // ── Signature Modal ────────────────────────────────────────────
 function SignatureModal({ onSave, onClose }) {
@@ -25,32 +25,49 @@ function SignatureModal({ onSave, onClose }) {
   const getPos = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const src = e.touches ? e.touches[0] : e;
     return {
-      x: (src.clientX - rect.left) * (canvas.width / rect.width),
-      y: (src.clientY - rect.top) * (canvas.height / rect.height),
+      x: (e.clientX - rect.left) * (canvas.width / rect.width),
+      y: (e.clientY - rect.top) * (canvas.height / rect.height),
     };
   };
 
-  const startDraw = (e) => { e.preventDefault(); drawing.current = true; lastPos.current = getPos(e); };
-  const moveDraw = (e) => {
+  const startDraw = (e) => {
+    if (mode !== "draw") return;
     e.preventDefault();
-    if (!drawing.current) return;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    drawing.current = true;
+    const pos = getPos(e);
+    lastPos.current = pos;
+    const ctx = canvasRef.current.getContext("2d");
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#111";
+    ctx.fill();
+    setIsEmpty(false);
+  };
+  const moveDraw = (e) => {
+    if (mode !== "draw" || !drawing.current) return;
+    e.preventDefault();
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const pos = getPos(e);
     ctx.beginPath();
     ctx.moveTo(lastPos.current.x, lastPos.current.y);
     ctx.lineTo(pos.x, pos.y);
-    ctx.strokeStyle = "#000"; ctx.lineWidth = 2.2; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.strokeStyle = "#111"; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.lineJoin = "round";
     ctx.stroke();
     lastPos.current = pos;
     setIsEmpty(false);
   };
-  const endDraw = (e) => { e && e.preventDefault(); drawing.current = false; };
+  const endDraw = (e) => {
+    e?.preventDefault();
+    drawing.current = false;
+    lastPos.current = null;
+  };
 
   const clearCanvas = () => {
-    canvasRef.current.getContext("2d").clearRect(0, 0, 440, 140);
+    const canvas = canvasRef.current;
+    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
     setIsEmpty(true); setTyped("");
   };
 
@@ -59,9 +76,9 @@ function SignatureModal({ onSave, onClose }) {
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (val) {
-      ctx.font = "italic 36px 'Brush Script MT','Comic Sans MS',cursive";
+      ctx.font = "italic 72px 'Brush Script MT','Comic Sans MS',cursive";
       ctx.fillStyle = "#000";
-      ctx.fillText(val, 16, 80);
+      ctx.fillText(val, 32, 190);
     }
     setIsEmpty(!val);
   };
@@ -81,8 +98,8 @@ function SignatureModal({ onSave, onClose }) {
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
       style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.55)", zIndex:9999, display:"flex", alignItems:"center", justifyContent:"center", padding:16, backdropFilter: "blur(4px)" }}
     >
-      <div style={{ background:"#fff", borderRadius:12, width:"100%", maxWidth:460, boxShadow:"0 24px 80px rgba(0,0,0,0.35)", overflow:"hidden" }}>
-        <div style={{ background:"#1a6e2e", color:"#fff", padding:"13px 18px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+      <div style={{ background:"#fff", borderRadius:16, width:"100%", maxWidth:640, boxShadow:"0 24px 80px rgba(0,0,0,0.35)", overflow:"hidden" }}>
+        <div style={{ background:"linear-gradient(135deg, #0F6E56, #2F79B7)", color:"#fff", padding:"15px 20px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <span style={{ fontWeight:700, fontSize:14, fontFamily:"var(--sans)" }}>Signature</span>
           <button onClick={onClose} style={{ background:"none", border:"none", color:"#fff", fontSize:20, cursor:"pointer", lineHeight:1, padding:0 }}>✕</button>
         </div>
@@ -101,13 +118,13 @@ function SignatureModal({ onSave, onClose }) {
               style={{ width:"100%", marginBottom:10, padding:"9px 12px", border:"1.5px solid #ddd", borderRadius:7, fontSize:14, fontFamily:"inherit", boxSizing:"border-box" }} />
           )}
           <div style={{ border:"2px dashed #ccc", borderRadius:8, background:"#fafafa", position:"relative", overflow:"hidden" }}>
-            <canvas ref={canvasRef} width={440} height={140}
-              onMouseDown={startDraw} onMouseMove={moveDraw} onMouseUp={endDraw} onMouseLeave={endDraw}
-              onTouchStart={startDraw} onTouchMove={moveDraw} onTouchEnd={endDraw}
-              style={{ display:"block", width:"100%", height:140, cursor:mode==="draw"?"crosshair":"default", touchAction:"none" }} />
+            <canvas ref={canvasRef} width={1200} height={440}
+              onPointerDown={startDraw} onPointerMove={moveDraw} onPointerUp={endDraw}
+              onPointerCancel={endDraw} onPointerLeave={endDraw}
+              style={{ display:"block", width:"100%", height:"clamp(190px, 32vh, 250px)", cursor:mode==="draw"?"crosshair":"default", touchAction:"none" }} />
             {isEmpty && (
               <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", pointerEvents:"none", color:"#ccc", fontSize:13, fontStyle:"italic", fontFamily: "var(--sans)" }}>
-                {mode === "draw" ? "Draw your signature here" : "Type above to preview"}
+                {mode === "draw" ? "Use your finger or mouse to sign here" : "Type above to preview"}
               </div>
             )}
           </div>
@@ -133,6 +150,7 @@ function SignatureModal({ onSave, onClose }) {
 function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess }) {
   const [phone, setPhone] = useState(initialPhone);
   const [email, setEmail] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState(String(amount));
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("input"); // input -> loading -> success
   const [mounted, setMounted] = useState(false);
@@ -155,6 +173,10 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
     e.preventDefault();
     if (!email) return alert("Please enter your email address to receive the receipt and copy of your application.");
     if (!isValidPhone(phone)) return alert("Please enter a valid M-PESA phone number (e.g. 0712345678).");
+    const numericAmount = Number(paymentAmount);
+    if (!Number.isFinite(numericAmount) || numericAmount < 1) {
+      return alert("Please enter a valid payment amount of at least KSh 1.");
+    }
     
     setLoading(true);
     setStep("loading");
@@ -163,7 +185,7 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
       const res = await fetch("/api/stkpush", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, amount })
+        body: JSON.stringify({ phone, amount: numericAmount })
       });
       const data = await res.json();
       
@@ -175,44 +197,86 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
       if (data.mock) {
         setTimeout(() => {
           setStep("success");
-          setTimeout(() => onSuccess(email), 2000);
+          setTimeout(() => onSuccess(email, {
+            paymentReference: data.CheckoutRequestID,
+            paymentDate: new Date().toISOString(),
+            paymentPhone: phone,
+            amount: numericAmount,
+            checkoutRequestId: data.CheckoutRequestID,
+          }), 2000);
         }, 3000);
         return;
       }
       
       // Real mode — poll for callback confirmation
       const checkoutId = data.CheckoutRequestID;
-      const maxAttempts = 30;
+      const maxAttempts = 60;
       let attempts = 0;
       
-      pollRef.current = setInterval(async () => {
+      const pollStatus = async () => {
         attempts++;
         try {
           const statusRes = await fetch(`/api/mpesa-status?CheckoutRequestID=${checkoutId}`);
-          const statusData = await statusRes.json();
+          const statusText = await statusRes.text();
+          let statusData;
+          try {
+            statusData = JSON.parse(statusText);
+          } catch {
+            statusData = {
+              status: "service_error",
+              message: "M-PESA verification returned an invalid server response.",
+            };
+          }
           
           if (statusData.status === "success") {
-            clearInterval(pollRef.current);
+            clearTimeout(pollRef.current);
             pollRef.current = null;
             setStep("success");
-            setTimeout(() => onSuccess(email), 2000);
-          } else if (statusData.status === "failed" || attempts >= maxAttempts) {
-            clearInterval(pollRef.current);
+            setTimeout(() => onSuccess(email, statusData), 2000);
+            return;
+          }
+
+          if (statusData.status === "failed") {
+            clearTimeout(pollRef.current);
             pollRef.current = null;
-            alert(statusData.message || "Payment was not completed. Please try again.");
+            alert(statusData.message || "M-PESA did not complete the payment. Please try again.");
             setStep("input");
             setLoading(false);
+            return;
+          }
+
+          if (statusData.status === "configuration_error" || statusData.status === "service_error") {
+            clearTimeout(pollRef.current);
+            pollRef.current = null;
+            alert(statusData.message || "M-PESA verification is temporarily unavailable. Please try again later.");
+            setStep("input");
+            setLoading(false);
+            return;
+          }
+
+          if (attempts >= maxAttempts) {
+            clearTimeout(pollRef.current);
+            pollRef.current = null;
+            alert("Payment confirmation is taking longer than expected. If you completed the payment, please contact the institution with the M-PESA message.");
+            setStep("input");
+            setLoading(false);
+            return;
           }
         } catch {
           if (attempts >= maxAttempts) {
-            clearInterval(pollRef.current);
+            clearTimeout(pollRef.current);
             pollRef.current = null;
             alert("Payment confirmation timed out. If you paid, please contact the institution.");
             setStep("input");
             setLoading(false);
+            return;
           }
         }
-      }, 2000);
+
+        pollRef.current = setTimeout(pollStatus, 3000);
+      };
+
+      pollRef.current = setTimeout(pollStatus, 5000);
       
     } catch (err) {
       console.error(err);
@@ -230,7 +294,7 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
         {/* Header */}
         <div style={{ background:"linear-gradient(135deg, #0F6E56, #1D9E75)", color:"#fff", padding:"20px", textAlign: "center", position: "sticky", top: 0, zIndex: 10 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginBottom: "10px" }}>
-            <img src="/logo.png" alt="KVTC" style={{ height: "44px", objectFit: "contain" }} onError={(e) => e.target.style.display='none'} />
+            <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ height: "48px", width: "48px" }} onError={(e) => e.target.style.display='none'} />
             <img src="/cgok-logo.png" alt="CGOK" style={{ height: "44px", objectFit: "contain" }} onError={(e) => e.target.style.display='none'} />
           </div>
           <h3 style={{ margin: 0, fontFamily: "var(--sans)", fontSize: "1.1rem", fontWeight: 700 }}>Application Fee Payment</h3>
@@ -255,6 +319,21 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
                 <input type="tel" required value={phone} onChange={e => setPhone(e.target.value)} placeholder="e.g. 0712345678" style={{ width: "100%", padding: "12px", border: "1.5px solid #0F6E56", borderRadius: "8px", fontFamily: "var(--sans)", color: "#1a1a1a", boxSizing: "border-box", outline: "none" }} />
               </div>
 
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ display: "block", fontFamily: "var(--sans)", fontSize: "13px", fontWeight: 600, color: "#333", marginBottom: "6px" }}>Payment Amount (KSh) <span style={{color: "#e53e3e"}}>*</span></label>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  step="1"
+                  inputMode="numeric"
+                  value={paymentAmount}
+                  onChange={e => setPaymentAmount(e.target.value)}
+                  style={{ width: "100%", padding: "12px", border: "1.5px solid #0F6E56", borderRadius: "8px", fontFamily: "var(--sans)", color: "#1a1a1a", boxSizing: "border-box", outline: "none" }}
+                />
+                <p style={{ fontSize: "11px", color: "#b26a00", marginTop: "6px", fontFamily: "var(--sans)", lineHeight: 1.4 }}>Testing only: enter the amount to send in the STK prompt.</p>
+              </div>
+
               <div style={{ marginBottom: "24px" }}>
                 <label style={{ display: "block", fontFamily: "var(--sans)", fontSize: "13px", fontWeight: 600, color: "#333", marginBottom: "6px" }}>Email Address <span style={{color: "#e53e3e"}}>*</span></label>
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="yourname@example.com" style={{ width: "100%", padding: "12px", border: "1.5px solid #0F6E56", borderRadius: "8px", fontFamily: "var(--sans)", color: "#1a1a1a", boxSizing: "border-box", outline: "none" }} autoFocus />
@@ -265,7 +344,7 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
                 <button type="button" onClick={onClose} style={{ flex: 1, padding: "14px", background: "#fff", border: "1.5px solid #ddd", borderRadius: "10px", color: "#555", fontWeight: 600, fontFamily: "var(--sans)", cursor: "pointer", transition: "0.2s" }}>Cancel</button>
                 <button type="submit" style={{ flex: 2, padding: "14px", background: "#25D366", border: "none", borderRadius: "10px", color: "#fff", fontWeight: 700, fontFamily: "var(--sans)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 4px 14px rgba(37,211,102,0.3)", transition: "transform 0.2s" }} onMouseEnter={e => e.target.style.transform = "translateY(-2px)"} onMouseLeave={e => e.target.style.transform = "translateY(0)"}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
-                  Pay KSh {amount}
+                  Pay KSh {paymentAmount || 0}
                 </button>
               </div>
             </form>
@@ -275,7 +354,7 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div className="spinner" style={{ width: "48px", height: "48px", border: "4px solid rgba(15,110,86,0.2)", borderTopColor: "#0F6E56", borderRadius: "50%", margin: "0 auto 20px", animation: "spin 1s linear infinite" }}></div>
               <h4 style={{ fontFamily: "var(--sans)", fontSize: "1.1rem", color: "#1a1a1a", marginBottom: "8px" }}>Awaiting M-PESA PIN...</h4>
-              <p style={{ fontFamily: "var(--sans)", fontSize: "14px", color: "#666", lineHeight: 1.5 }}>Please check your phone and enter your M-PESA PIN to complete the payment of KSh {amount}.</p>
+              <p style={{ fontFamily: "var(--sans)", fontSize: "14px", color: "#666", lineHeight: 1.5 }}>Please check your phone and enter your M-PESA PIN to complete the payment of KSh {paymentAmount}.</p>
               <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
           )}
@@ -300,7 +379,7 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
 
 
 // ── Date Field ────────────────────────────────────────────────
-function DateField({ value, onChange, flex=1, maxWidth=180 }) {
+function DateField({ value, onChange, flex=1, maxWidth=180, required=false }) {
   const ref = useRef();
   const fmt = (v) => {
     if (!v) return "";
@@ -322,7 +401,7 @@ function DateField({ value, onChange, flex=1, maxWidth=180 }) {
         {value ? fmt(value) : "dd mmm yyyy"}
         <span style={{ position:"absolute", right:2, top:"50%", transform:"translateY(-50%)", fontSize:11, color:"#999", pointerEvents:"none" }}>▼</span>
       </span>
-      <input ref={ref} type="date" value={value} onChange={e=>onChange(e.target.value)}
+      <input ref={ref} type="date" value={value} onChange={e=>onChange(e.target.value)} required={required} aria-required={required}
         style={{ position:"absolute", inset:0, opacity:0, width:"100%", height:"100%", cursor:"pointer", zIndex:1 }} />
     </div>
   );
@@ -371,10 +450,14 @@ const Row = ({children, mt=0}) => (
     {children}
   </div>
 );
-const L = ({t}) => <span style={{whiteSpace:"nowrap", flexShrink:0, fontFamily:"'Times New Roman',serif"}}>{t}</span>;
-const GI = ({ value, onChange, max=400, min=60, type="text", placeholder="" }) => (
+const L = ({t, required=false}) => (
+  <span style={{whiteSpace:"nowrap", flexShrink:0, fontFamily:"'Times New Roman',serif"}}>
+    {t}{required ? <span style={{ color:"#c62828", fontWeight:700 }}>*</span> : null}
+  </span>
+);
+const GI = ({ value, onChange, max=400, min=60, type="text", placeholder="", required=false }) => (
   <div style={{flex:"1 1 auto", maxWidth:max, minWidth:min}}>
-    <input type={type} placeholder={placeholder} value={value || ""} onChange={e => onChange(e.target.value)} style={F} />
+    <input type={type} placeholder={placeholder} value={value || ""} onChange={e => onChange(e.target.value)} required={required} aria-required={required} style={F} />
   </div>
 );
 const Sec = ({t}) => (
@@ -421,10 +504,27 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
   }, [set]);
 
   const validateForm = () => {
-    const req = ['name', 'tel', 'course', 'signatureData'];
-    for (let r of req) {
-      if (!form[r]) {
-        alert(`Please fill in your ${r === 'signatureData' ? 'signature' : r} before proceeding.`);
+    const requiredFields = [
+      ['name', 'full name'],
+      ['idNo', 'ID or birth certificate number'],
+      ['dob', 'date of birth'],
+      ['tel', 'telephone number'],
+      ['homeAddress', 'home address'],
+      ['residentialArea', 'residential area'],
+      ['kinName', 'next of kin name'],
+      ['kinIdNo', 'next of kin ID number'],
+      ['kinTel', 'next of kin telephone number'],
+      ['relationship', 'relationship to trainee'],
+      ['course', 'course'],
+      ['duration', 'course duration'],
+      ['examBody', 'exam body'],
+      ['startDate', 'start date'],
+      ['signatureData', 'signature'],
+      ['signDate', 'signature date'],
+    ];
+    for (const [field, label] of requiredFields) {
+      if (!String(form[field] || '').trim()) {
+        alert(`Please fill in the required ${label} field before proceeding.`);
         return false;
       }
     }
@@ -436,17 +536,25 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
     setPaymentModal(true);
   };
 
-  const handlePaymentSuccess = async (userEmail) => {
+  const handlePaymentSuccess = async (userEmail, payment = {}) => {
     setPaymentModal(false);
     setSubmitting(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    const paidAmount = payment.amount || admissionAmount;
     
     try {
       // 1a. Generate the filled Admission Form PDF for the admin
       const formRes = await fetch('/api/admission-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, paymentAmount: admissionAmount, email: userEmail, pdfType: 'form' })
+        body: JSON.stringify({
+          ...form,
+          ...payment,
+          paymentAmount: paidAmount,
+          paymentPhone: payment.paymentPhone || payment.phone || form.tel,
+          email: userEmail,
+          pdfType: 'form',
+        })
       });
       if (!formRes.ok) throw new Error("Failed to generate Form PDF");
       const formBlob = await formRes.blob();
@@ -455,7 +563,14 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       const letterRes = await fetch('/api/admission-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, paymentAmount: admissionAmount, email: userEmail, pdfType: 'letter' })
+        body: JSON.stringify({
+          ...form,
+          ...payment,
+          paymentAmount: paidAmount,
+          paymentPhone: payment.paymentPhone || payment.phone || form.tel,
+          email: userEmail,
+          pdfType: 'letter',
+        })
       });
       if (!letterRes.ok) throw new Error("Failed to generate Letter PDF");
       const letterBlob = await letterRes.blob();
@@ -470,7 +585,10 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       fd.append("homeAddress", form.homeAddress);
       fd.append("kinName", form.kinName);
       fd.append("kinTel", form.kinTel);
-      fd.append("admissionAmount", admissionAmount);
+      fd.append("admissionAmount", paidAmount);
+      fd.append("paymentReference", payment.paymentReference || payment.checkoutRequestId || "N/A");
+      fd.append("paymentDate", payment.paymentDate || new Date().toISOString());
+      fd.append("paymentPhone", payment.paymentPhone || payment.phone || form.tel);
       
       // Attach both PDF files
       const formFile = new File([formBlob], `AdmissionForm_${form.name.replace(/\s+/g, '_')}.pdf`, { type: 'application/pdf' });
@@ -539,8 +657,9 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
         <div className="hdr" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px 8px",borderBottom:"3px solid #1a3a6e"}}>
           <img src={kvtcLogo} alt="KVTC" style={{width:76,height:76,objectFit:"contain",flexShrink:0}}/>
           <div style={{flex:1,textAlign:"center",padding:"0 10px"}}>
+            <div style={{fontSize:"9pt",fontWeight:700,color:"#b59b69",letterSpacing:.8,marginBottom:2}}>COUNTY GOVERNMENT OF KIAMBU</div>
             <div className="dept" style={{fontSize:"9.5pt",fontWeight:700,color:"#1a1a1a",marginBottom:1}}>Department Of Education, Gender, Culture &amp; Social Services</div>
-            <div className="inst" style={{fontSize:"12pt",fontWeight:900,color:"#1a6e2e",letterSpacing:.8,textTransform:"uppercase",marginBottom:2}}>KINOO VOCATIONAL TRAINING CENTRE</div>
+            <div className="inst" style={{fontSize:"12pt",fontWeight:900,color:"#4c9daa",letterSpacing:.8,textTransform:"uppercase",marginBottom:2}}>KINOO VOCATIONAL TRAINING CENTRE</div>
             <div className="cntc" style={{fontSize:"8.5pt",color:"#333",marginBottom:1}}>P.O B0X 351-00902, Kikuyu.&nbsp;&nbsp; Tel: 0113582008</div>
             <div className="cntc" style={{fontSize:"8.5pt",color:"#333"}}>Email: <span style={{color:"#0044cc",textDecoration:"underline"}}>kinoovtc@gmail.com</span>&nbsp;&nbsp; www.kinoovtc.ac.ke</div>
           </div>
@@ -551,7 +670,7 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
         <div className="fbody" style={{padding:"12px 22px 16px"}}>
           <div style={{textAlign:"center",fontWeight:900,fontSize:"12pt",textDecoration:"underline",marginBottom:10}}>ADMISSION FORM</div>
           <p style={{fontSize:"10px", color:"#e53e3e", marginBottom: "8px", fontStyle:"italic", textAlign:"center", fontFamily:"var(--sans)"}}>
-            Note: Fields with a gray background are locked for official use only.
+            All fields marked * are required. Fields with a gray background are locked for official use only.
           </p>
 
           {/* PERSONAL DETAILS */}
@@ -563,75 +682,75 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
             <Locked flex={1} maxWidth={110}/>
           </Row>
           <Row>
-            <L t="NAME (as per ID/Cert)&nbsp;"/>
-            <GI value={form.name} onChange={v => set("name", v)} max={800} min={100}/>
+            <L t="NAME (as per ID/Cert)&nbsp;" required/>
+            <GI value={form.name} onChange={v => set("name", v)} max={800} min={100} required/>
           </Row>
           <Row>
-            <L t="ID NO/BIRTH CERT NO&nbsp;"/>
-            <GI value={form.idNo} onChange={v => set("idNo", v)} max={180}/>
-            <L t="&nbsp;&nbsp;DATE OF BIRTH&nbsp;"/>
-            <DateField value={form.dob} onChange={v=>set("dob",v)} flex={1}/>
+            <L t="ID NO/BIRTH CERT NO&nbsp;" required/>
+            <GI value={form.idNo} onChange={v => set("idNo", v)} max={180} required/>
+            <L t="&nbsp;&nbsp;DATE OF BIRTH&nbsp;" required/>
+            <DateField value={form.dob} onChange={v=>set("dob",v)} flex={1} required/>
           </Row>
           <Row>
-            <L t="TEL NUMBER&nbsp;"/>
-            <GI value={form.tel} onChange={v => set("tel", v)} type="tel" max={250}/>
+            <L t="TEL NUMBER&nbsp;" required/>
+            <GI value={form.tel} onChange={v => set("tel", v)} type="tel" max={250} required/>
           </Row>
           <Row>
-            <L t="HOME ADDRESS&nbsp;"/>
-            <GI value={form.homeAddress} onChange={v => set("homeAddress", v)} max={220}/>
-            <L t="&nbsp;&nbsp;RESIDENTIAL AREA&nbsp;"/>
-            <GI value={form.residentialArea} onChange={v => set("residentialArea", v)} max={300}/>
+            <L t="HOME ADDRESS&nbsp;" required/>
+            <GI value={form.homeAddress} onChange={v => set("homeAddress", v)} max={220} required/>
+            <L t="&nbsp;&nbsp;RESIDENTIAL AREA&nbsp;" required/>
+            <GI value={form.residentialArea} onChange={v => set("residentialArea", v)} max={300} required/>
           </Row>
 
           {/* NEXT OF KIN */}
           <Sec t="PART II: NEXT OF KIN"/>
           <Row>
-            <L t="NAME&nbsp;"/>
-            <GI value={form.kinName} onChange={v => set("kinName", v)} max={800} min={100}/>
+            <L t="NAME&nbsp;" required/>
+            <GI value={form.kinName} onChange={v => set("kinName", v)} max={800} min={100} required/>
           </Row>
           <Row>
-            <L t="ID NO&nbsp;"/>
-            <GI value={form.kinIdNo} onChange={v => set("kinIdNo", v)} max={180}/>
-            <L t="&nbsp;&nbsp;TEL NUMBER&nbsp;"/>
-            <GI value={form.kinTel} onChange={v => set("kinTel", v)} type="tel" max={220}/>
+            <L t="ID NO&nbsp;" required/>
+            <GI value={form.kinIdNo} onChange={v => set("kinIdNo", v)} max={180} required/>
+            <L t="&nbsp;&nbsp;TEL NUMBER&nbsp;" required/>
+            <GI value={form.kinTel} onChange={v => set("kinTel", v)} type="tel" max={220} required/>
           </Row>
           <Row>
-            <L t="RELATIONSHIP TO TRAINEE&nbsp;"/>
-            <GI value={form.relationship} onChange={v => set("relationship", v)} max={400}/>
+            <L t="RELATIONSHIP TO TRAINEE&nbsp;" required/>
+            <GI value={form.relationship} onChange={v => set("relationship", v)} max={400} required/>
           </Row>
 
           {/* ADMISSION DETAILS */}
           <Sec t="ADMISSION DETAILS"/>
           <Row>
-            <L t="COURSE&nbsp;"/>
+            <L t="COURSE&nbsp;" required/>
             <div style={{flex:"1 1 auto",minWidth:80, maxWidth:"none"}}>
-              <select value={form.course} onChange={e=>set("course",e.target.value)} style={{...S, whiteSpace:"normal", overflow:"visible"}}>
+              <select value={form.course} onChange={e=>set("course",e.target.value)} required aria-required="true" style={{...S, whiteSpace:"normal", overflow:"visible"}}>
                 <option value="">{"............................................."}</option>
                 {courseList.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}
               </select>
             </div>
           </Row>
           <Row>
-            <L t="DURATION&nbsp;"/>
+            <L t="DURATION&nbsp;" required/>
             <div style={{flex:"1 1 auto",maxWidth:340,minWidth:80}}>
-              <select value={form.duration} onChange={e=>set("duration",e.target.value)} style={S}>
+              <select value={form.duration} onChange={e=>set("duration",e.target.value)} required aria-required="true" style={S}>
                 <option value="">{"............................................."}</option>
                 {DURATIONS.map(d=><option key={d} value={d}>{d}</option>)}
               </select>
             </div>
           </Row>
           <Row>
-            <L t="EXAM BODY&nbsp;"/>
+            <L t="EXAM BODY&nbsp;" required/>
             <div style={{flex:"1 1 auto",maxWidth:300,minWidth:80}}>
-              <select value={form.examBody} onChange={e=>set("examBody",e.target.value)} style={S}>
+              <select value={form.examBody} onChange={e=>set("examBody",e.target.value)} required aria-required="true" style={S}>
                 <option value="">{"............................................."}</option>
                 {EXAM_BODIES.map(b=><option key={b} value={b}>{b}</option>)}
               </select>
             </div>
           </Row>
           <Row>
-            <L t="START DATE&nbsp;"/>
-            <DateField value={form.startDate} onChange={v=>set("startDate",v)} flex={1} maxWidth={260}/>
+            <L t="START DATE&nbsp;" required/>
+            <DateField value={form.startDate} onChange={v=>set("startDate",v)} flex={1} maxWidth={260} required/>
           </Row>
 
           {/* DECLARATION */}
@@ -648,10 +767,10 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
           </div>
 
           <Row>
-            <L t="SIGN&nbsp;"/>
+            <L t="SIGN&nbsp;" required/>
             <SigDisplay value={form.signatureData} onClick={()=>setSigModal(true)}/>
-            <L t="&nbsp;&nbsp;DATE&nbsp;"/>
-            <DateField value={form.signDate} onChange={v=>set("signDate",v)} flex={1} maxWidth={180}/>
+            <L t="&nbsp;&nbsp;DATE&nbsp;" required/>
+            <DateField value={form.signDate} onChange={v=>set("signDate",v)} flex={1} maxWidth={180} required/>
           </Row>
 
           {/* OFFICIAL USE */}

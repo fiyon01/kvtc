@@ -662,7 +662,7 @@ export default function Home() {
       </section>
 
       {/* ── WHY KINOO ── */}
-      <section style={{ padding: '96px 8%', background: 'linear-gradient(135deg, #0F6E56 0%, #085041 100%)', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ padding: '96px 8%', background: 'linear-gradient(135deg, #0F6E56 0%, #245A87 100%)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '600px', height: '600px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', pointerEvents: 'none' }} />
         <FadeIn>
           <span style={{ display: 'inline-block', fontSize: '11px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.9)', background: 'rgba(255,255,255,0.15)', padding: '6px 14px', borderRadius: '100px', marginBottom: '16px' }}>Why Choose Us</span>
@@ -706,11 +706,11 @@ export default function Home() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
           {[
-            { tag: 'Hospitality', name: 'Food & Beverage Production', img: '/food.png', cert: 'KNEC', dur: '1 Year', slug: 'food-and-beverage-production' },
-            { tag: 'Cosmetology', name: 'Hair Dressing & Beauty Therapy', img: '/hair.png', cert: 'NITA', dur: '1 Year', slug: 'hair-dressing-and-beauty-therapy' },
-            { tag: 'Engineering', name: 'Electrical & Electronics', img: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=800&auto=format&fit=crop', cert: 'NITA', dur: '1 Year', slug: 'electrical-and-electronics' },
-            { tag: 'Fashion', name: 'Fashion Design & Dressmaking', img: '/fashion.png', cert: 'NITA', dur: '1 Year', slug: 'fashion-design-and-dressmaking' },
-            { tag: 'Engineering', name: 'Motor Vehicle Mechanics', img: '/mechanic.png', cert: 'NITA', dur: '1 Year', slug: 'motor-vehicle-mechanics' },
+            { tag: 'Hospitality', name: 'Food & Beverage Production', img: '/food.png', cert: 'KNEC', dur: '2 Years', slug: 'food-and-beverage-production' },
+            { tag: 'Cosmetology', name: 'Hair Dressing & Beauty Therapy', img: '/hair.png', cert: 'NITA', dur: '2 Years', slug: 'hair-dressing-and-beauty-therapy' },
+            { tag: 'Engineering', name: 'Electrical & Electronics', img: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=800&auto=format&fit=crop', cert: 'NITA', dur: '2 Years', slug: 'electrical-and-electronics' },
+            { tag: 'Fashion', name: 'Fashion Design & Dressmaking', img: '/fashion.png', cert: 'NITA', dur: '2 Years', slug: 'fashion-design-and-dressmaking' },
+            { tag: 'Engineering', name: 'Motor Vehicle Mechanics', img: '/mechanic.png', cert: 'NITA', dur: '2 Years', slug: 'motor-vehicle-mechanics' },
             { tag: 'Short Course', name: 'Barista & Baking', img: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=600&auto=format&fit=crop', cert: 'INTERNAL', dur: '3 Months', slug: 'barista' },
           ].map((c, i) => (
             <FadeIn key={i} delay={i * 0.07}>

@@ -54,7 +54,7 @@ export default function Navbar() {
         position: 'fixed', top: navTop, left: 0, right: 0, zIndex: 100,
         background: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.95)',
         backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(0,0,0,0.08)',
+        borderBottom: '2px solid rgba(47,121,183,0.16)',
         padding: '0 5%',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         height: '70px',
@@ -63,12 +63,7 @@ export default function Navbar() {
       }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
           <img src="/cgok-logo.png" alt="CGOK" style={{ height: '42px', width: 'auto', objectFit: 'contain' }} />
-          <div style={{
-            width: '42px', height: '42px', borderRadius: '10px',
-            background: '#0F6E56',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontFamily: 'var(--serif)', fontSize: '18px', fontWeight: 700,
-          }}>KV</div>
+          <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ height: '42px', width: '42px' }} />
                 </Link>
 
         {/* Desktop Nav */}
@@ -143,10 +138,10 @@ export default function Navbar() {
             color: '#555', fontWeight: 500, fontSize: '13px', textDecoration: 'none',
             border: '1.5px solid rgba(0,0,0,0.12)', padding: '8px 14px', borderRadius: '8px',
           }}>Prospectus</a>
-          <a href="/api/fee-structure-pdf" download="Kinoo_VTC_Fee_Structure.pdf" style={{
+          <Link href="/fee-structure" style={{
             color: '#555', fontWeight: 500, fontSize: '13px', textDecoration: 'none',
             border: '1.5px solid rgba(0,0,0,0.12)', padding: '8px 14px', borderRadius: '8px',
-          }}>Fee Structure</a>
+          }}>Fee Structure</Link>
           <Link href="/apply" style={{
             background: '#0F6E56', color: '#fff',
             padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 500,
@@ -209,10 +204,10 @@ export default function Navbar() {
             color: '#0F6E56', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
             borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',
           }}>Download Prospectus</a>
-          <a href="/api/fee-structure-pdf" download="Kinoo_VTC_Fee_Structure.pdf" onClick={() => setMobileOpen(false)} style={{
+          <Link href="/fee-structure" onClick={() => setMobileOpen(false)} style={{
             color: '#0F6E56', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
             borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',
-          }}>Download Fee Structure</a>
+          }}>View Fee Structure</Link>
           <a href={`tel:${phoneNumber}`} style={{
             color: '#1a1a1a', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
             borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',

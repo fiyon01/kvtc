@@ -126,6 +126,23 @@ export default function ProspectusClient({ dbData }) {
 
       {/* Prospectus Content — this element is cloned for PDF export */}
       <div id="prospectus-content" className="print-page">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '12px 18px 10px',
+          borderBottom: '4px solid #2f79b7',
+          background: '#fff',
+        }}>
+          <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ width: 84, height: 84, flexShrink: 0 }} />
+          <div style={{ flex: 1, textAlign: 'center', padding: '0 14px', fontFamily: "'Times New Roman', serif" }}>
+            <div style={{ color: '#b59b69', fontWeight: 700, letterSpacing: 1.2, fontSize: 13 }}>COUNTY GOVERNMENT OF KIAMBU</div>
+            <div style={{ color: '#1f2f4d', fontWeight: 700, fontSize: 14, marginTop: 3 }}>Department Of Education, Gender, Culture &amp; Social Services</div>
+            <div style={{ color: '#4c9daa', fontWeight: 800, letterSpacing: 1, fontSize: 17, marginTop: 4 }}>KINOO VOCATIONAL TRAINING CENTRE</div>
+            <div style={{ color: '#30364b', fontSize: 12, marginTop: 5 }}>P.O BOX 351-00902, Kikuyu. &nbsp;&nbsp; Tel: 0113582008</div>
+            <div style={{ color: '#30364b', fontSize: 12 }}>Email: kinoovtc@gmail.com &nbsp;&nbsp; www.kinoovtc.ac.ke</div>
+          </div>
+          <img src="/cgok-logo.png" alt="County Government of Kiambu" style={{ width: 84, height: 84, objectFit: 'contain', flexShrink: 0 }} />
+        </div>
 
         {/* PAGE 1 — Cover */}
         <div className="prosp-cover" style={{
@@ -136,13 +153,7 @@ export default function ProspectusClient({ dbData }) {
 
           {/* Logo Row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '40px' }}>
-            <div style={{
-              width: '54px', height: '54px', borderRadius: '12px',
-              background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.3)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'var(--serif)', fontSize: '20px', fontWeight: 700,
-              flexShrink: 0,
-            }}>KV</div>
+            <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ width: '60px', height: '60px', flexShrink: 0 }} />
             <div>
               <div style={{ fontWeight: 700, fontSize: '17px' }}>Kinoo Vocational Training Centre</div>
               <div style={{ fontSize: '12px', opacity: 0.75 }}>County Government of Kiambu · Department of Education</div>

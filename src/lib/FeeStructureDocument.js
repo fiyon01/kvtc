@@ -1,8 +1,10 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import PdfLetterhead from './PdfLetterhead';
 
 const styles = StyleSheet.create({
-  page: { padding: 40, fontFamily: 'Times-Roman', fontSize: 12, backgroundColor: '#ffffff' },
+  page: { fontFamily: 'Times-Roman', fontSize: 12, backgroundColor: '#ffffff' },
+  body: { paddingTop: 18, paddingLeft: 40, paddingRight: 40, paddingBottom: 70 },
   header: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
   logo: { width: 60, height: 60, objectFit: 'contain' },
   headerText: { textAlign: 'center', flex: 1, paddingHorizontal: 10 },
@@ -20,7 +22,10 @@ const styles = StyleSheet.create({
   tableCell: { margin: 5, fontSize: 11 },
   footer: { position: 'absolute', bottom: 30, left: 40, right: 40, textAlign: 'center', fontSize: 10, color: '#888', borderTopWidth: 1, borderTopColor: '#eee', paddingTop: 10 },
   notesContainer: { marginTop: 20, padding: 10, border: '1pt solid #ccc', backgroundColor: '#fafafa' },
-  noteItem: { marginBottom: 5, fontSize: 10, fontFamily: 'Times-Italic' }
+  noteItem: { marginBottom: 5, fontSize: 10, fontFamily: 'Times-Italic' },
+  paymentBox: { marginTop: 10, padding: 10, borderWidth: 1.5, borderColor: '#2f79b7', backgroundColor: '#edf6fc' },
+  paymentLabel: { fontFamily: 'Times-Bold', fontSize: 10, color: '#245a87', marginBottom: 3 },
+  paymentText: { fontFamily: 'Times-Bold', fontSize: 11, color: '#172b3a' }
 });
 
 export default function FeeStructureDocument({ courses, feeStructure, kvtcLogoUrl, cgokLogoUrl }) {
@@ -33,16 +38,8 @@ export default function FeeStructureDocument({ courses, feeStructure, kvtcLogoUr
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header */}
-        <View style={styles.header}>
-          {kvtcLogoUrl ? <Image src={kvtcLogoUrl} style={styles.logo} /> : <View style={styles.logo} />}
-          <View style={styles.headerText}>
-            <Text style={styles.title}>KINOO VOCATIONAL TRAINING CENTRE</Text>
-            <Text style={styles.subtitle}>COUNTY GOVERNMENT OF KIAMBU</Text>
-            <Text style={styles.address}>P.O Box 123 - 00902 Kikuyu, Kenya | Tel: +254 113 582 008 | Email: info@kinoovtc.ac.ke</Text>
-          </View>
-          {cgokLogoUrl ? <Image src={cgokLogoUrl} style={styles.logo} /> : <View style={styles.logo} />}
-        </View>
+        <PdfLetterhead kvtcLogoUrl={kvtcLogoUrl} cgokLogoUrl={cgokLogoUrl} />
+        <View style={styles.body}>
 
         <Text style={{ textAlign: 'center', fontSize: 16, fontFamily: 'Times-Bold', marginVertical: 10, textDecoration: 'underline' }}>
           OFFICIAL FEE STRUCTURE - 2026 INTAKE
@@ -88,6 +85,10 @@ export default function FeeStructureDocument({ courses, feeStructure, kvtcLogoUr
             <View style={{ width: '30%', borderStyle: 'solid', borderWidth: 1, borderLeftWidth: 0, borderTopWidth: 0 }}><Text style={styles.tableCellHeader}>{feeStructure?.admissionTotal?.toLocaleString() || 3450}</Text></View>
           </View>
         </View>
+        <View style={styles.paymentBox}>
+          <Text style={styles.paymentLabel}>REGISTRATION &amp; ADMISSION PAYMENT METHOD</Text>
+          <Text style={styles.paymentText}>Co-operative Bank Kangemi - Account No. 01141151624400</Text>
+        </View>
 
         {/* Short Courses Table */}
         <Text style={styles.sectionTitle}>Short Courses & Part-Time</Text>
@@ -125,6 +126,7 @@ export default function FeeStructureDocument({ courses, feeStructure, kvtcLogoUr
           <Text style={[styles.noteItem, { marginLeft: 10 }]}>• Registration & Admission: Co-operative Bank Kangemi (A/C: 01141151624400)</Text>
         </View>
 
+        </View>
         <Text style={styles.footer}>
           This fee structure is valid for the 2026 academic year. Kinoo VTC reserves the right to revise fees without prior notice.
         </Text>

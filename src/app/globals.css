@@ -2,6 +2,9 @@
   --green: #0F6E56;
   --green-light: #1D9E75;
   --green-pale: #E1F5EE;
+  --blue: #2F79B7;
+  --blue-deep: #245A87;
+  --blue-pale: #EDF6FC;
   --gold: #BA7517;
   --gold-light: #EF9F27;
   --gold-pale: #FAEEDA;
@@ -47,10 +50,15 @@ img { max-width: 100%; display: block; }
 
 /* Custom Text Selection */
 ::selection {
-  background: var(--green-pale);
-  color: var(--green);
+  background: var(--blue-pale);
+  color: var(--blue-deep);
 }
 ::-moz-selection {
-  background: var(--green-pale);
-  color: var(--green);
+  background: var(--blue-pale);
+  color: var(--blue-deep);
+}
+
+.kvtc-logo-crop {
+  object-fit: cover !important;
+  object-position: 50% 18% !important;
 }

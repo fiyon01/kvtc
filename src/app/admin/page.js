@@ -12,7 +12,7 @@ export default function AdminDashboard() {
   const [auth, setAuth] = useState({ authenticated: false, password: '', error: '', loading: false });
   const [coursePage, setCoursePage] = useState(1);
   const [courseModal, setCourseModal] = useState(null); // null | 'add' | {index}
-  const [newCourse, setNewCourse] = useState({ name: '', tag: '', cert: 'NITA', dur: '1 Year', fees: 'KSh 27,000/yr', img: '', description: '', outcomes: '', careers: '', intake: 'January & September' });
+  const [newCourse, setNewCourse] = useState({ name: '', tag: '', cert: 'NITA', dur: '2 Years', fees: 'KSh 27,000/yr', img: '', description: '', outcomes: '', careers: '', intake: 'January & September' });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
     return (
       <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg,#0F6E56,#085041)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <form onSubmit={handleLogin} style={{ background: '#fff', padding: '40px', borderRadius: '20px', boxShadow: '0 24px 80px rgba(0,0,0,0.2)', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-          <div style={{ width: '56px', height: '56px', background: '#0F6E56', color: '#fff', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', fontWeight: 700, margin: '0 auto 24px', fontFamily: 'var(--serif)' }}>KV</div>
+          <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ width: '64px', height: '64px', margin: '0 auto 24px' }} />
           <h1 style={{ fontFamily: 'var(--serif)', fontSize: '26px', marginBottom: '8px', color: '#1a1a1a' }}>Admin Login</h1>
           <p style={{ color: '#888', fontSize: '14px', marginBottom: '28px' }}>Enter your administrator password to manage the website.</p>
           <input type="password" placeholder="Password" value={auth.password} onChange={e => setAuth({...auth, password: e.target.value})}
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
       ]
     });
     setCourseModal(null);
-    setNewCourse({ name: '', tag: '', cert: 'NITA', dur: '1 Year', fees: 'KSh 27,000/yr', img: '', description: '', outcomes: '', careers: '', intake: 'January & September' });
+    setNewCourse({ name: '', tag: '', cert: 'NITA', dur: '2 Years', fees: 'KSh 27,000/yr', img: '', description: '', outcomes: '', careers: '', intake: 'January & September' });
     setCoursePage(Math.ceil((db.courses.length + 1) / COURSES_PER_PAGE));
   };
 
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1300px', margin: '0 auto', height: '64px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', fontSize: '22px' }} className="menu-btn">☰</button>
-            <div style={{ width: '36px', height: '36px', background: '#0F6E56', color: '#fff', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--serif)', fontWeight: 700, fontSize: '14px' }}>KV</div>
+            <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ width: '40px', height: '40px' }} />
             <h1 className="admin-header-title" style={{ fontFamily: 'var(--serif)', fontSize: '20px', margin: 0, color: '#1a1a1a' }}>Admin Dashboard</h1>
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -880,7 +880,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <label style={labelStyle}>Duration</label>
-                <input type="text" value={newCourse.dur} onChange={e => setNewCourse({...newCourse, dur: e.target.value})} style={inputStyle} placeholder="e.g. 1 Year" />
+                <input type="text" value={newCourse.dur} onChange={e => setNewCourse({...newCourse, dur: e.target.value})} style={inputStyle} placeholder="e.g. 2 Years" />
               </div>
               <div>
                 <label style={labelStyle}>Fees</label>

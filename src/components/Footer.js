@@ -34,12 +34,7 @@ export default function Footer() {
         {/* Brand */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <div style={{
-              width: '40px', height: '40px', borderRadius: '8px',
-              background: '#0F6E56',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontFamily: 'var(--serif)', fontSize: '16px', fontWeight: 700,
-            }}>KV</div>
+            <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ width: '44px', height: '44px' }} />
             <div>
               <strong style={{ display: 'block', color: '#fff', fontSize: '14px' }}>Kinoo VTC</strong>
               <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>Kiambu County</span>
@@ -112,7 +107,7 @@ export default function Footer() {
       {/* Admission CTA Banner */}
       {isActive && (
         <div style={{
-          background: 'linear-gradient(135deg, #0F6E56, #085041)',
+          background: 'linear-gradient(135deg, #0F6E56, #245A87)',
           borderRadius: '16px',
           padding: '40px',
           textAlign: 'center',

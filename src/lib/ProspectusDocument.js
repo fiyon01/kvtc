@@ -1,4 +1,5 @@
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import PdfLetterhead from './PdfLetterhead';
 
 const green = '#0F6E56';
 const gold = '#EF9F27';
@@ -15,13 +16,7 @@ const s = StyleSheet.create({
   // ── COVER ──────────────────────────────────────────────
   cover: { backgroundColor: green, padding: 52, flex: 1 },
   logoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 48 },
-  logoBox: {
-    width: 52, height: 52,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderRadius: 10,
-    alignItems: 'center', justifyContent: 'center', marginRight: 14,
-  },
-  logoText: { color: white, fontSize: 20, fontFamily: 'Helvetica-Bold' },
+  logoImage: { width: 58, height: 58, objectFit: 'contain', marginRight: 14 },
   logoName: { color: white, fontSize: 16, fontFamily: 'Helvetica-Bold' },
   logoSub: { color: 'rgba(255,255,255,0.72)', fontSize: 10, marginTop: 2 },
   badge: {
@@ -116,7 +111,7 @@ const s = StyleSheet.create({
   footerText: { color: 'rgba(255,255,255,0.75)', fontSize: 8 },
 });
 
-export function ProspectusDocument({ dbData = {} }) {
+export function ProspectusDocument({ dbData = {}, kvtcLogoUrl, cgokLogoUrl }) {
   const { 
     contact = {}, 
     feeStructure = {}, 
@@ -130,7 +125,7 @@ export function ProspectusDocument({ dbData = {} }) {
   // Transform courses to array format
   const allCourses = courses.map(c => [
     c.name, 
-    c.dur || '1 Year', 
+    c.dur || '2 Years',
     c.cert || 'NITA', 
     c.fees || 'KSh 27,000/yr'
   ]);
@@ -167,9 +162,10 @@ const CourseRows = ({ rows, startIdx = 0 }) =>
           PAGE 1 — COVER
       ══════════════════════════════════════════════════ */}
       <Page size="A4" style={s.page}>
+        <PdfLetterhead kvtcLogoUrl={kvtcLogoUrl} cgokLogoUrl={cgokLogoUrl} />
         <View style={s.cover}>
           <View style={s.logoRow}>
-            <View style={s.logoBox}><Text style={s.logoText}>KV</Text></View>
+            {kvtcLogoUrl ? <Image src={kvtcLogoUrl} style={s.logoImage} /> : null}
             <View>
               <Text style={s.logoName}>Kinoo Vocational Training Centre</Text>
               <Text style={s.logoSub}>County Government of Kiambu · Department of Education</Text>

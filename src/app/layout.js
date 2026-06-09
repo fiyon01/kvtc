@@ -17,7 +17,7 @@ export const metadata = {
     siteName: "Kinoo VTC",
     images: [
       {
-        url: "/logo.png",
+        url: "/kvtc_logo.png",
         width: 800,
         height: 600,
       },

@@ -16,6 +16,9 @@ export async function POST(req) {
     const kinName = formData.get('kinName') || 'N/A';
     const kinTel = formData.get('kinTel') || 'N/A';
     const admissionAmount = formData.get('admissionAmount') || '500';
+    const paymentReference = formData.get('paymentReference') || 'N/A';
+    const paymentDate = formData.get('paymentDate') || new Date().toISOString();
+    const paymentPhone = formData.get('paymentPhone') || phone;
     const formPdfFile = formData.get('formPdf');
     const letterPdfFile = formData.get('letterPdf');
 
@@ -31,6 +34,9 @@ export async function POST(req) {
           id: 'app-' + Date.now(),
           name, email, phone, course, idNo,
           amount: admissionAmount,
+          paymentReference,
+          paymentDate,
+          paymentPhone,
           date: new Date().toISOString(),
           status: 'Paid via M-PESA'
         });
@@ -61,7 +67,7 @@ export async function POST(req) {
         
         <div style="background-color: #1a6e2e; padding: 20px; text-align: center;">
           <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 12px;">
-            <img src="${baseUrl}/logo.png" alt="KVTC Logo" style="height: 60px;" />
+            <img src="${baseUrl}/kvtc_logo.png" alt="KVTC Logo" style="height: 60px;" />
             <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="height: 60px;" />
           </div>
           <h1 style="color: #fff; margin: 0; font-size: 22px; letter-spacing: 1px;">ADMISSION APPLICATION SUCCESSFUL</h1>
@@ -81,6 +87,8 @@ export async function POST(req) {
             <p style="margin: 4px 0;"><strong>Course:</strong> ${course}</p>
             <p style="margin: 4px 0;"><strong>Applicant Name:</strong> ${name}</p>
             <p style="margin: 4px 0;"><strong>Phone:</strong> ${phone}</p>
+            <p style="margin: 4px 0;"><strong>M-PESA Reference:</strong> ${paymentReference}</p>
+            <p style="margin: 4px 0;"><strong>Payment Date:</strong> ${new Date(paymentDate).toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' })}</p>
           </div>
 
           <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
@@ -132,7 +140,7 @@ export async function POST(req) {
       <div style="font-family: 'Times New Roman', Times, serif; color: #333; max-width: 600px; width: 100%; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-sizing: border-box;">
         <div style="background-color: #1a3a6e; padding: 20px; text-align: center;">
           <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 12px;">
-            <img src="${baseUrl}/logo.png" alt="KVTC Logo" style="height: 60px;" />
+            <img src="${baseUrl}/kvtc_logo.png" alt="KVTC Logo" style="height: 60px;" />
             <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="height: 60px;" />
           </div>
           <h1 style="color: #fff; margin: 0; font-size: 22px; letter-spacing: 1px;">NEW ADMISSION RECEIVED</h1>
@@ -148,6 +156,9 @@ export async function POST(req) {
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Email</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${email || 'N/A'}</td></tr>
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>ID No</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${idNo}</td></tr>
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Fee Paid</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; color: #16a34a; font-weight: bold;">KSh ${admissionAmount} (M-PESA)</td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>M-PESA Ref</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word; font-weight: bold;">${paymentReference}</td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Payment Time</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${new Date(paymentDate).toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' })}</td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Payment Phone</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${paymentPhone}</td></tr>
           </table>
 
           <p style="font-size: 15px; color: #555; background: #f0fdf4; padding: 12px; border-radius: 6px; border: 1px solid #bbf7d0; line-height: 1.5; margin: 0;">
@@ -186,6 +197,9 @@ export async function POST(req) {
         id: 'app-' + Date.now(),
         name, email, phone, course, idNo,
         amount: admissionAmount,
+        paymentReference,
+        paymentDate,
+        paymentPhone,
         date: new Date().toISOString(),
         status: 'Paid via M-PESA'
       });

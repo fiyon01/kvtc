@@ -19,7 +19,7 @@ export async function POST(req) {
     const buffer = await renderToBuffer(
       React.createElement(PdfComponent, {
         formData,
-        kvtcLogoUrl: `${baseUrl}/logo.png`,
+        kvtcLogoUrl: `${baseUrl}/kvtc_logo.png`,
         cgokLogoUrl: `${baseUrl}/cgok-logo.png`,
       })
     );
