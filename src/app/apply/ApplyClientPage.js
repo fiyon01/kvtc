@@ -277,22 +277,62 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
       </FadeIn>
       {/* Styles */}
       <style>{`
-        .step-circle { width: 36px; height: 36px; font-size: 14px; }
-        .step-label { font-size: 11px; white-space: nowrap; }
-        .step-line { width: 48px; height: 2px; margin: 0 8px; margin-bottom: 22px; }
+        .application-steps {
+          width: min(100%, 560px);
+          margin: 0 auto 28px;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          position: relative;
+          padding: 0 18px;
+        }
+        .application-steps::before {
+          content: '';
+          position: absolute;
+          top: 18px;
+          left: calc(16.666% + 18px);
+          right: calc(16.666% + 18px);
+          height: 2px;
+          background: rgba(0,0,0,0.1);
+        }
+        .step-item {
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+          z-index: 1;
+        }
+        .step-circle {
+          width: 36px;
+          height: 36px;
+          font-size: 14px;
+          border: 4px solid #f8fbfa;
+          box-sizing: content-box;
+        }
+        .step-label {
+          width: 100%;
+          max-width: 130px;
+          font-size: 11px;
+          line-height: 1.25;
+          text-align: center;
+          white-space: normal;
+        }
 
         @media (max-width: 650px) {
           .pre-app-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
         }
         @media (max-width: 580px) {
-          .step-circle { width: 28px !important; height: 28px !important; font-size: 12px !important; }
-          .step-line { width: 20px !important; margin: 0 6px !important; margin-bottom: 26px !important; }
-          .step-label { font-size: 10px !important; white-space: normal !important; text-align: center; max-width: 70px; line-height: 1.2; }
+          .application-steps { padding: 0 2px; margin-bottom: 24px; }
+          .application-steps::before {
+            top: 15px;
+            left: calc(16.666% + 4px);
+            right: calc(16.666% + 4px);
+          }
+          .step-circle { width: 30px; height: 30px; font-size: 12px; border-width: 3px; }
+          .step-label { font-size: 10px; max-width: 94px; margin-top: 5px !important; }
         }
         @media (max-width: 380px) {
-          .step-circle { width: 24px !important; height: 24px !important; font-size: 11px !important; }
-          .step-line { width: 12px !important; margin: 0 4px !important; margin-bottom: 28px !important; }
-          .step-label { font-size: 9px !important; max-width: 54px; }
+          .step-label { font-size: 9px; max-width: 82px; }
         }
       `}</style>
     </div>
@@ -322,6 +362,70 @@ function ApplyInner({ dbData }) {
 
   return (
     <>
+      <style>{`
+        .application-steps {
+          width: min(100%, 560px);
+          margin: 0 auto 28px;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          position: relative;
+          padding: 0 18px;
+        }
+        .application-steps::before {
+          content: '';
+          position: absolute;
+          top: 22px;
+          left: calc(16.666% + 18px);
+          right: calc(16.666% + 18px);
+          height: 2px;
+          background: rgba(0,0,0,0.1);
+        }
+        .application-step-item {
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+          z-index: 1;
+        }
+        .application-step-circle {
+          width: 36px !important;
+          height: 36px !important;
+          min-width: 36px;
+          flex: 0 0 36px;
+          font-size: 14px;
+          border: 4px solid #f8fbfa;
+          box-sizing: content-box !important;
+        }
+        .application-step-label {
+          width: 100%;
+          max-width: 130px;
+          font-size: 11px;
+          line-height: 1.25;
+          text-align: center;
+          white-space: normal;
+        }
+        @media (max-width: 580px) {
+          .application-steps { padding: 0 2px; margin-bottom: 24px; }
+          .application-steps::before {
+            top: 18px;
+            left: calc(16.666% + 4px);
+            right: calc(16.666% + 4px);
+          }
+          .application-step-circle {
+            width: 30px !important;
+            height: 30px !important;
+            min-width: 30px;
+            flex-basis: 30px;
+            font-size: 12px;
+            border-width: 3px;
+          }
+          .application-step-label { font-size: 10px; max-width: 94px; margin-top: 5px !important; }
+        }
+        @media (max-width: 380px) {
+          .application-step-label { font-size: 9px; max-width: 82px; }
+        }
+      `}</style>
       {/* ── Page Header ── */}
       <div style={{
         padding: '130px 8% 56px',
@@ -332,7 +436,7 @@ function ApplyInner({ dbData }) {
         <FadeIn>
           {/* Step Indicator */}
           {step !== 'success' && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 0, marginBottom: 28 }}>
+            <div className="application-steps">
               {[
                 { label: 'Review Requirements', num: 1 },
                 { label: 'Fill Application Form', num: 2 },
@@ -341,26 +445,21 @@ function ApplyInner({ dbData }) {
                 const isActive = (step === 'pre' && i === 0) || (step === 'form' && i >= 1);
                 const isDone = (step === 'form' && i === 0);
                 return (
-                  <div key={s.num} style={{ display: 'flex', alignItems: 'center' }} className="step-item">
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div className="step-circle" style={{
-                        borderRadius: '50%',
-                        background: isDone ? '#0F6E56' : isActive ? '#0F6E56' : 'rgba(0,0,0,0.1)',
-                        color: '#fff',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontFamily: 'var(--sans)', fontWeight: 700,
-                        transition: 'background 0.4s',
-                        boxShadow: isActive ? '0 4px 16px rgba(15,110,86,0.35)' : 'none',
-                      }}>
-                        {isDone ? '✓' : s.num}
-                      </div>
-                      <span style={{ fontFamily: 'var(--sans)', color: isActive ? '#0F6E56' : '#aaa', marginTop: 6, fontWeight: isActive ? 700 : 400, transition: 'color 0.4s' }} className="step-label">
-                        {s.label}
-                      </span>
+                  <div key={s.num} className="application-step-item">
+                    <div className="application-step-circle" style={{
+                      borderRadius: '50%',
+                      background: isDone ? '#0F6E56' : isActive ? '#0F6E56' : '#d7dcda',
+                      color: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontFamily: 'var(--sans)', fontWeight: 700,
+                      transition: 'background 0.4s',
+                      boxShadow: isActive ? '0 4px 16px rgba(15,110,86,0.35)' : 'none',
+                    }}>
+                      {isDone ? '✓' : s.num}
                     </div>
-                    {i < 2 && (
-                      <div style={{ background: isDone ? '#0F6E56' : 'rgba(0,0,0,0.1)', transition: 'background 0.4s' }} className="step-line" />
-                    )}
+                    <span style={{ fontFamily: 'var(--sans)', color: isActive ? '#0F6E56' : '#888', marginTop: 6, fontWeight: isActive ? 700 : 500, transition: 'color 0.4s' }} className="application-step-label">
+                      {s.label}
+                    </span>
                   </div>
                 );
               })}

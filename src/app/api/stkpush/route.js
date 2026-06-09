@@ -9,6 +9,9 @@ import {
   readDarajaResponse,
 } from '@/lib/mpesaDaraja';
 
+const stkRequests = globalThis.__kvtcStkRequests || new Map();
+globalThis.__kvtcStkRequests = stkRequests;
+
 /**
  * M-PESA STK Push API Route
  *
@@ -26,11 +29,31 @@ import {
 
 export async function POST(req) {
   try {
-    const { phone, amount } = await req.json();
+    const { phone, amount, idempotencyKey, application } = await req.json();
     const numericAmount = Number(amount);
+
+    if (
+      !idempotencyKey ||
+      !application?.name?.trim() ||
+      !application?.idNo?.trim() ||
+      !application?.course?.trim()
+    ) {
+      return Response.json({
+        error: 'Complete and validate the admission form before requesting payment.',
+      }, { status: 400 });
+    }
 
     if (!Number.isFinite(numericAmount) || numericAmount < 1) {
       return Response.json({ error: 'Enter a valid payment amount of at least KSh 1' }, { status: 400 });
+    }
+
+    const previousRequest = stkRequests.get(idempotencyKey);
+    if (previousRequest && Date.now() - previousRequest.createdAt < 10 * 60 * 1000) {
+      return Response.json({
+        ...previousRequest.response,
+        duplicate: true,
+        message: 'An STK prompt was already sent for this payment attempt.',
+      });
     }
 
     const consumerKey    = process.env.MPESA_CONSUMER_KEY;
@@ -104,11 +127,17 @@ export async function POST(req) {
       }
     );
 
-    return Response.json({
+    const responsePayload = {
       message: 'STK Push sent. Please enter your M-PESA PIN.',
       CheckoutRequestID: stkData.CheckoutRequestID,
       MerchantRequestID: stkData.MerchantRequestID,
+    };
+    stkRequests.set(idempotencyKey, {
+      createdAt: Date.now(),
+      response: responsePayload,
     });
+
+    return Response.json(responsePayload);
 
   } catch (err) {
     console.error('[STK Push] Error:', err);

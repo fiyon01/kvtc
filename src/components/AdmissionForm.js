@@ -147,7 +147,7 @@ function SignatureModal({ onSave, onClose }) {
 }
 
 // ── Payment Modal ───────────────────────────────────────────────
-function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess }) {
+function PaymentModal({ name, phone: initialPhone, amount, application, onClose, onSuccess }) {
   const [phone, setPhone] = useState(initialPhone);
   const [email, setEmail] = useState("");
   const [paymentAmount, setPaymentAmount] = useState(String(amount));
@@ -155,6 +155,7 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
   const [step, setStep] = useState("input"); // input -> loading -> success
   const [mounted, setMounted] = useState(false);
   const pollRef = useRef(null);
+  const idempotencyKeyRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
@@ -162,7 +163,7 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prev;
-      if (pollRef.current) clearInterval(pollRef.current);
+      if (pollRef.current) clearTimeout(pollRef.current);
     };
   }, []);
 
@@ -171,6 +172,7 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
 
   const handlePay = async (e) => {
     e.preventDefault();
+    if (loading) return;
     if (!email) return alert("Please enter your email address to receive the receipt and copy of your application.");
     if (!isValidPhone(phone)) return alert("Please enter a valid M-PESA phone number (e.g. 0712345678).");
     const numericAmount = Number(paymentAmount);
@@ -180,12 +182,20 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
     
     setLoading(true);
     setStep("loading");
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current = crypto.randomUUID();
+    }
     
     try {
       const res = await fetch("/api/stkpush", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, amount: numericAmount })
+        body: JSON.stringify({
+          phone,
+          amount: numericAmount,
+          idempotencyKey: idempotencyKeyRef.current,
+          application,
+        })
       });
       const data = await res.json();
       
@@ -210,7 +220,7 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
       
       // Real mode — poll for callback confirmation
       const checkoutId = data.CheckoutRequestID;
-      const maxAttempts = 60;
+      const maxAttempts = 20;
       let attempts = 0;
       
       const pollStatus = async () => {
@@ -273,10 +283,10 @@ function PaymentModal({ name, phone: initialPhone, amount, onClose, onSuccess })
           }
         }
 
-        pollRef.current = setTimeout(pollStatus, 3000);
+        pollRef.current = setTimeout(pollStatus, 15000);
       };
 
-      pollRef.current = setTimeout(pollStatus, 5000);
+      pollRef.current = setTimeout(pollStatus, 12000);
       
     } catch (err) {
       console.error(err);
@@ -624,18 +634,38 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
         input:focus,select:focus{outline:none!important;box-shadow:none!important;}
         input::placeholder{color:rgba(0,0,0,0.2);}
         @media(max-width:580px){
-          .hdr img{width:52px!important;height:52px!important;}
+          .form-kvtc-logo{width:58px!important;height:58px!important;}
+          .form-cgok-logo{width:52px!important;height:52px!important;}
+          .form-letterhead{padding:8px 10px 7px!important;}
+          .form-letterhead-center{padding:0 5px!important;}
+          .county{font-size:6.6pt!important;letter-spacing:.35px!important;}
           .inst{font-size:9pt!important;}
           .dept{font-size:7.5pt!important;}
           .cntc{font-size:7pt!important;}
           .fbody{padding:10px 12px 14px!important;}
           .ftg{grid-template-columns:58px 1fr!important;}
         }
-        @media(max-width:380px){.hdr img{width:40px!important;height:40px!important;}}
+        @media(max-width:380px){
+          .form-kvtc-logo{width:48px!important;height:48px!important;}
+          .form-cgok-logo{width:43px!important;height:43px!important;}
+          .county{font-size:5.8pt!important;}
+          .dept{font-size:6.6pt!important;}
+          .inst{font-size:7.8pt!important;}
+          .cntc{font-size:6pt!important;}
+        }
       `}</style>
 
       {sigModal && <SignatureModal onSave={v=>set("signatureData",v)} onClose={()=>setSigModal(false)} />}
-      {paymentModal && <PaymentModal name={form.name} phone={form.tel} amount={admissionAmount} onClose={()=>setPaymentModal(false)} onSuccess={handlePaymentSuccess} />}
+      {paymentModal && (
+        <PaymentModal
+          name={form.name}
+          phone={form.tel}
+          amount={admissionAmount}
+          application={{ name: form.name, idNo: form.idNo, course: form.course }}
+          onClose={()=>setPaymentModal(false)}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
       
       {submitting && (
         <div style={{ position:"fixed", inset:0, background:"rgba(255,255,255,0.9)", zIndex:9999, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", backdropFilter: "blur(8px)" }}>
@@ -654,16 +684,21 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       <div ref={formRef} style={{width:"100%",maxWidth:760,background:"#f4f2ee",border:"1px solid #ccc",boxShadow:"0 4px 32px rgba(0,0,0,0.18)",fontSize:"10.5pt",color:"#000", marginBottom: "24px"}}>
 
         {/* HEADER */}
-        <div className="hdr" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px 8px",borderBottom:"3px solid #1a3a6e"}}>
-          <img src={kvtcLogo} alt="KVTC" style={{width:76,height:76,objectFit:"contain",flexShrink:0}}/>
-          <div style={{flex:1,textAlign:"center",padding:"0 10px"}}>
-            <div style={{fontSize:"9pt",fontWeight:700,color:"#b59b69",letterSpacing:.8,marginBottom:2}}>COUNTY GOVERNMENT OF KIAMBU</div>
+        <div className="form-letterhead" style={{display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:92,padding:"8px 18px",borderBottom:"3px solid #2f79b7",background:"#fff"}}>
+          <img
+            src={kvtcLogo}
+            alt="KVTC"
+            className="form-kvtc-logo"
+            style={{width:86,height:86,objectFit:"cover",objectPosition:"50% 18%",flexShrink:0,marginLeft:-5,marginRight:-5}}
+          />
+          <div className="form-letterhead-center" style={{flex:1,textAlign:"center",padding:"0 10px"}}>
+            <div className="county" style={{fontSize:"10pt",fontWeight:700,color:"#b59b69",letterSpacing:.7,marginBottom:3}}>COUNTY GOVERNMENT OF KIAMBU</div>
             <div className="dept" style={{fontSize:"9.5pt",fontWeight:700,color:"#1a1a1a",marginBottom:1}}>Department Of Education, Gender, Culture &amp; Social Services</div>
-            <div className="inst" style={{fontSize:"12pt",fontWeight:900,color:"#4c9daa",letterSpacing:.8,textTransform:"uppercase",marginBottom:2}}>KINOO VOCATIONAL TRAINING CENTRE</div>
+            <div className="inst" style={{fontSize:"11pt",fontWeight:900,color:"#4c9daa",letterSpacing:.7,textTransform:"uppercase",marginBottom:5}}>KINOO VOCATIONAL TRAINING CENTRE</div>
             <div className="cntc" style={{fontSize:"8.5pt",color:"#333",marginBottom:1}}>P.O B0X 351-00902, Kikuyu.&nbsp;&nbsp; Tel: 0113582008</div>
             <div className="cntc" style={{fontSize:"8.5pt",color:"#333"}}>Email: <span style={{color:"#0044cc",textDecoration:"underline"}}>kinoovtc@gmail.com</span>&nbsp;&nbsp; www.kinoovtc.ac.ke</div>
           </div>
-          <img src={cgokLogo} alt="CGOK" style={{width:76,height:76,objectFit:"contain",flexShrink:0}}/>
+          <img src={cgokLogo} alt="CGOK" className="form-cgok-logo" style={{width:76,height:76,objectFit:"contain",flexShrink:0}}/>
         </div>
 
         {/* BODY */}
