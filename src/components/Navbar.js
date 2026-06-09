@@ -58,7 +58,7 @@ export default function Navbar() {
       sublinks: [
         { name: 'Blog', href: '/blog' },
         { name: 'FAQs', href: '/faqs' },
-        { name: 'Prospectus', href: '/api/prospectus-pdf' },
+        { name: 'Prospectus', href: '/prospectus' },
       ],
     },
   ];
@@ -78,17 +78,26 @@ export default function Navbar() {
         boxShadow: scrolled ? '0 2px 24px rgba(0,0,0,0.1)' : 'none',
         transition: 'box-shadow 0.3s, top 0.3s',
       }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', height: '52px' }}>
+        <Link href="/" aria-label="Kinoo Vocational Training Centre home" className="nav-brand-lockup" style={{
+          display: 'flex', alignItems: 'center', gap: '9px', textDecoration: 'none',
+          height: '54px', padding: '4px 10px 4px 7px', borderRadius: '14px',
+          border: '1px solid rgba(47,121,183,0.13)',
+          background: 'linear-gradient(135deg, rgba(47,121,183,0.06), rgba(15,110,86,0.035))',
+        }}>
           <span style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <img
               src="/kvtc_logo.png"
               alt="KVTC"
               className="kvtc-logo-crop"
-              style={{ height: '46px', width: '46px', transform: 'translateY(-3px) scale(1.1)' }}
+              style={{ height: '47px', width: '47px', transform: 'translateY(-2px) scale(1.08)' }}
             />
           </span>
-          <span style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <img src="/cgok-logo.png" alt="CGOK" style={{ height: '42px', width: '42px', objectFit: 'contain' }} />
+          <span aria-hidden="true" style={{
+            width: '1px', height: '32px', flexShrink: 0,
+            background: 'linear-gradient(180deg, transparent, rgba(47,121,183,0.42), rgba(15,110,86,0.42), transparent)',
+          }} />
+          <span style={{ width: '45px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <img src="/cgok-logo.png" alt="County Government of Kiambu" style={{ height: '43px', width: '43px', objectFit: 'contain' }} />
           </span>
         </Link>
 
@@ -151,6 +160,14 @@ export default function Navbar() {
           .dropdown-link:hover {
             background: #E1F5EE;
             color: #0F6E56 !important;
+          }
+          .nav-brand-lockup {
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+          }
+          .nav-brand-lockup:hover {
+            border-color: rgba(47,121,183,0.28) !important;
+            box-shadow: 0 6px 18px rgba(32,82,112,0.09);
+            background: linear-gradient(135deg, rgba(47,121,183,0.09), rgba(15,110,86,0.055)) !important;
           }
         `}</style>
 
@@ -218,10 +235,10 @@ export default function Navbar() {
               )}
             </div>
           ))}
-          <a href="/api/prospectus-pdf" download="Kinoo_VTC_Prospectus.pdf" onClick={() => setMobileOpen(false)} style={{
+          <Link href="/prospectus" onClick={() => setMobileOpen(false)} style={{
             color: '#0F6E56', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
             borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',
-          }}>Download Prospectus</a>
+          }}>View Prospectus</Link>
           <Link href="/fee-structure" onClick={() => setMobileOpen(false)} style={{
             color: '#0F6E56', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
             borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',

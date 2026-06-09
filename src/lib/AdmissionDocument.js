@@ -101,26 +101,51 @@ const s = StyleSheet.create({
   footerText: { fontFamily: 'Times-Roman', fontSize: 8.5, color: mid, flex: 1, lineHeight: 1.3 }, // FIX: lineHeight 11 → 1.3 (relative)
   footerRow: { flexDirection: 'row', marginBottom: 1 }, // FIX: marginBottom 3 → 1
 
-  // ── PAYMENT BOX ──
-  // FIX: tighter padding, smaller row gap, cleaner grid layout
+  // ── PAYMENT CONFIRMATION ──
   paymentBox: {
-    marginTop: 10,          // FIX: was 10
-    paddingTop: 5,         // FIX: was 7
-    paddingBottom: 5,      // FIX: was 7
-    paddingLeft: 8,        // FIX: was 9
-    paddingRight: 8,       // FIX: was 9
-    backgroundColor: '#eef5f0',
-    borderLeftWidth: 3,
-    borderLeftColor: green,
+    marginTop: 22,
+    borderWidth: 1,
+    borderColor: '#b8d8cc',
+    borderRadius: 4,
+    backgroundColor: '#fbfdfc',
+    overflow: 'hidden',
   },
-  paymentTitle: { fontFamily: 'Times-Bold', fontSize: 9, color: green, marginBottom: 3 }, // FIX: marginBottom 4 → 3
-  paymentGrid: {           // FIX: replace separate paymentRow calls with a 4-column grid
+  paymentHeader: {
     flexDirection: 'row',
-    flexWrap: 'nowrap',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 6,
+    paddingBottom: 6,
+    paddingLeft: 9,
+    paddingRight: 9,
+    backgroundColor: '#e7f3ee',
+    borderBottomWidth: 1,
+    borderBottomColor: '#c9e1d8',
   },
-  paymentLabel: { width: 72, fontFamily: 'Times-Bold', fontSize: 8.5, lineHeight: 1.3 }, // FIX: width 82→72, lineHeight relative
-  paymentValue: { flex: 1, fontSize: 8.5, lineHeight: 1.3, marginRight: 6 },             // FIX: lineHeight relative, add marginRight
+  paymentTitle: { fontFamily: 'Times-Bold', fontSize: 9, color: '#174f3c', letterSpacing: 0.4 },
+  paymentStatus: {
+    fontFamily: 'Times-Bold',
+    fontSize: 7.5,
+    color: white,
+    backgroundColor: green,
+    paddingTop: 3,
+    paddingBottom: 3,
+    paddingLeft: 7,
+    paddingRight: 7,
+    borderRadius: 8,
+  },
+  paymentDetails: {
+    flexDirection: 'row',
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 9,
+    paddingRight: 9,
+  },
+  paymentItem: { flex: 1, paddingRight: 8 },
+  paymentItemLast: { flex: 1 },
+  paymentLabel: { fontFamily: 'Times-Bold', fontSize: 7, color: '#65756f', letterSpacing: 0.35, marginBottom: 3 },
+  paymentValue: { fontFamily: 'Times-Roman', fontSize: 8.7, color: '#1b2924', lineHeight: 1.2 },
+  paymentReceipt: { fontFamily: 'Times-Bold', fontSize: 9.2, color: '#0f6e56', lineHeight: 1.2 },
 });
 
 // Thin helper: label + dotted field value
@@ -291,24 +316,30 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
             </Row>
           </View>
 
-          {/* ── PAYMENT BOX ──
-              FIX: Replaced two separate paymentRow Views (each with two label+value pairs
-              side by side) with a single 4-column grid row. This eliminates the extra
-              vertical gap between the two data rows and keeps everything compact. */}
+          {/* ── PAYMENT CONFIRMATION ── */}
           {paymentReference ? (
             <View style={s.paymentBox} wrap={false}>
-              <Text style={s.paymentTitle}>M-PESA PAYMENT CONFIRMATION</Text>
-              <View style={s.paymentGrid}>
-                <Text style={s.paymentLabel}>Receipt:</Text>
-                <Text style={s.paymentValue}>{paymentReference}</Text>
-                <Text style={s.paymentLabel}>Amount:</Text>
-                <Text style={[s.paymentValue, { marginRight: 0 }]}>KSh {paymentAmount}</Text>
+              <View style={s.paymentHeader}>
+                <Text style={s.paymentTitle}>M-PESA PAYMENT CONFIRMATION</Text>
+                <Text style={s.paymentStatus}>PAID</Text>
               </View>
-              <View style={s.paymentGrid}>
-                <Text style={s.paymentLabel}>Date &amp; Time:</Text>
-                <Text style={s.paymentValue}>{paymentDateStr}</Text>
-                <Text style={s.paymentLabel}>Phone:</Text>
-                <Text style={[s.paymentValue, { marginRight: 0 }]}>{paymentPhone || 'N/A'}</Text>
+              <View style={s.paymentDetails}>
+                <View style={s.paymentItem}>
+                  <Text style={s.paymentLabel}>M-PESA RECEIPT</Text>
+                  <Text style={s.paymentReceipt}>{paymentReference}</Text>
+                </View>
+                <View style={s.paymentItem}>
+                  <Text style={s.paymentLabel}>AMOUNT PAID</Text>
+                  <Text style={s.paymentValue}>KSh {paymentAmount}</Text>
+                </View>
+                <View style={s.paymentItem}>
+                  <Text style={s.paymentLabel}>DATE &amp; TIME</Text>
+                  <Text style={s.paymentValue}>{paymentDateStr}</Text>
+                </View>
+                <View style={s.paymentItemLast}>
+                  <Text style={s.paymentLabel}>M-PESA PHONE</Text>
+                  <Text style={s.paymentValue}>{paymentPhone || 'N/A'}</Text>
+                </View>
               </View>
             </View>
           ) : null}

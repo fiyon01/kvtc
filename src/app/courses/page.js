@@ -45,7 +45,7 @@ export default function Courses() {
             background: '#0F6E56', color: '#fff', padding: '12px 24px',
             borderRadius: '10px', fontWeight: 600, fontSize: '14px', textDecoration: 'none',
           }}>
-            ⬇ Download Course Prospectus
+            View Course Prospectus
           </Link>
         </FadeIn>
       </div>
@@ -116,7 +116,7 @@ export default function Courses() {
           <p style={{ color: '#888', marginBottom: '24px' }}>View fees, requirements, and payment details on our admissions page.</p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/admissions" style={{ background: '#0F6E56', color: '#fff', padding: '14px 32px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none' }}>View Fees & Admissions</Link>
-            <Link href="/prospectus" style={{ color: '#0F6E56', padding: '14px 32px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1.5px solid #0F6E56', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>⬇ Download Prospectus</Link>
+            <Link href="/prospectus" style={{ color: '#0F6E56', padding: '14px 32px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1.5px solid #0F6E56', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>View Prospectus</Link>
             <a href="tel:+254113582008" style={{ color: '#555', padding: '14px 32px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1.5px solid rgba(0,0,0,0.12)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>📞 Call Us</a>
           </div>
         </FadeIn>

@@ -61,7 +61,7 @@ export default function Footer() {
         <div>
           <h4 style={colHeaderStyle}>Quick Links</h4>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {[['/', 'Home'], ['/about', 'About Us'], ['/courses', 'Programmes'], ['/admissions', 'Fees & Admissions'], ['/faqs', 'FAQs'], ['/blog', 'Blog'], ['/contact', 'Contact'], ['/prospectus', '⬇ Prospectus']].map(([href, label]) => (
+            {[['/', 'Home'], ['/about', 'About Us'], ['/courses', 'Programmes'], ['/admissions', 'Fees & Admissions'], ['/faqs', 'FAQs'], ['/blog', 'Blog'], ['/contact', 'Contact'], ['/prospectus', 'View Prospectus']].map(([href, label]) => (
               <li key={href}><Link href={href} style={footerLinkStyle} onMouseEnter={e=>e.target.style.color='#fff'} onMouseLeave={e=>e.target.style.color='rgba(255,255,255,0.6)'}>{label}</Link></li>
             ))}
           </ul>

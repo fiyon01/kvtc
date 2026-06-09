@@ -24,13 +24,23 @@ export default function SplashScreen() {
       transition: 'opacity 0.5s ease',
     }}>
       {/* Logos Row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ height: '104px', width: '104px', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+      <div className="splash-brand-lockup" style={{
+        display: 'flex', alignItems: 'center', gap: '22px',
+        padding: '18px 26px', borderRadius: '24px',
+        border: '1px solid rgba(47,121,183,0.14)',
+        background: 'rgba(255,255,255,0.72)',
+        boxShadow: '0 18px 50px rgba(37,86,115,0.1)',
+        backdropFilter: 'blur(8px)',
+      }}>
+        <div style={{ width: '104px', height: '104px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src="/kvtc_logo.png" alt="Kinoo Vocational Training Centre" className="kvtc-logo-crop" style={{ height: '104px', width: '104px', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+        </div>
 
-        {/* Separator */}
-        <div style={{ width: '1px', height: '50px', background: 'rgba(0,0,0,0.1)', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+        <div aria-hidden="true" style={{ width: '1px', height: '68px', background: 'linear-gradient(180deg, transparent, #2F79B7, #0F6E56, transparent)', opacity: 0.55, animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
 
-        <img src="/cgok-logo.png" alt="CGOK" style={{ height: '90px', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+        <div style={{ width: '104px', height: '104px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src="/cgok-logo.png" alt="County Government of Kiambu" style={{ width: '94px', height: '94px', objectFit: 'contain', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+        </div>
       </div>
 
       <div style={{ textAlign: 'center' }}>
@@ -76,6 +86,13 @@ export default function SplashScreen() {
         @keyframes load-bar {
           from { width: 0; }
           to { width: 100%; }
+        }
+        @media (max-width: 480px) {
+          .splash-brand-lockup {
+            gap: 14px !important;
+            padding: 14px 18px !important;
+            transform: scale(0.88);
+          }
         }
       `}</style>
     </div>

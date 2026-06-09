@@ -270,7 +270,7 @@ export default function Contact() {
                   const lname = fd.get('lname');
                   const phone = fd.get('phone');
                   const email = fd.get('email');
-                  const course = fd.get('course');
+                  const course = fd.get('course') || 'General enquiry';
                   const msg = fd.get('msg');
 
                   const waText = `Hello Kinoo VTC, I have an enquiry.\n\n*Name:* ${fname} ${lname}\n*Phone:* ${phone}\n*Email:* ${email || 'N/A'}\n*Course:* ${course}\n*Message:* ${msg || 'N/A'}`;
@@ -303,22 +303,22 @@ export default function Contact() {
                   </div>
 
                   <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#444', marginBottom: '8px' }}>Course of Interest <span style={{ color: '#c00' }}>*</span></label>
-                    <select name="course" required style={focusStyle('course')} onFocus={() => setFocused('course')} onBlur={() => setFocused(null)} defaultValue="">
-                      <option value="" disabled>Select a course...</option>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#444', marginBottom: '8px' }}>Course of Interest <span style={{ fontSize: '12px', color: '#aaa', fontWeight: 400 }}>(Optional)</span></label>
+                    <select name="course" style={focusStyle('course')} onFocus={() => setFocused('course')} onBlur={() => setFocused(null)} defaultValue="">
+                      <option value="">General enquiry / not course-specific</option>
                       {[
                         'Food & Beverage Production', 'Hair Dressing & Beauty Therapy', 'Electrical & Electronics',
                         'Plumbing', 'Masonry', 'Fashion Design & Dressmaking', 'Motor Vehicle Mechanics',
                         'Welding & Fabrication', 'Computer Operator', 'Solar PV Installation',
                         'Barista', 'Baking & Pastry', 'CNA – Care Givers', 'Driving Classes',
-                        'Computer Packages', 'General Inquiry',
+                        'Computer Packages',
                       ].map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
 
                   <div style={{ marginBottom: '28px' }}>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#444', marginBottom: '8px' }}>Message <span style={{ fontSize: '12px', color: '#aaa', fontWeight: 400 }}>(Optional)</span></label>
-                    <textarea name="msg" placeholder="Tell us about your background or any specific questions..." rows={4} style={{ ...focusStyle('msg'), resize: 'vertical', minHeight: '120px' }} onFocus={() => setFocused('msg')} onBlur={() => setFocused(null)} />
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#444', marginBottom: '8px' }}>How can we help? <span style={{ color: '#c00' }}>*</span></label>
+                    <textarea name="msg" required placeholder="Ask about admissions, fees, reporting dates, courses, facilities, or anything else..." rows={4} style={{ ...focusStyle('msg'), resize: 'vertical', minHeight: '120px' }} onFocus={() => setFocused('msg')} onBlur={() => setFocused(null)} />
                   </div>
 
                   <button type="submit" style={{
