@@ -123,28 +123,49 @@ export async function POST(req) {
     `;
 
     const htmlContent = `
-      <div style="margin:0;padding:28px 12px;background:#f3f6f8;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+      <!doctype html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta name="color-scheme" content="light only">
+        <meta name="supported-color-schemes" content="light only">
+        <title>Kinoo VTC Admission Confirmation</title>
+        <style>
+          :root { color-scheme: light only; supported-color-schemes: light only; }
+          body, table, td, div, p, h1 { color-scheme: light only !important; }
+          @media (prefers-color-scheme: dark) {
+            .email-page, .email-card, .email-section, .email-letterhead {
+              background-color: #ffffff !important;
+              background-image: linear-gradient(#ffffff, #ffffff) !important;
+            }
+            .email-copy { color: #405460 !important; }
+            .email-heading { color: #172b3a !important; }
+          }
+        </style>
+      </head>
+      <body class="email-page" bgcolor="#ffffff" style="margin:0;padding:0;background-color:#ffffff!important;background-image:linear-gradient(#ffffff,#ffffff)!important;color:#405460;">
+      <div class="email-page" bgcolor="#ffffff" style="margin:0;padding:24px 10px;background-color:#ffffff!important;background-image:linear-gradient(#ffffff,#ffffff)!important;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:100%;border-collapse:collapse;background-color:#ffffff!important;">
           <tr>
             <td align="center">
-              <table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:640px;border-collapse:separate;background:#ffffff;border:1px solid #dce5e9;border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(30,66,83,.08);">
+              <table class="email-card" role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:100%;max-width:640px;border-collapse:collapse;background-color:#ffffff!important;border:1px solid #dce5e9;">
                 <tr>
-                  <td style="height:5px;background:#2F79B7;font-size:0;line-height:0;">&nbsp;</td>
-                </tr>
-                <tr>
-                  <td style="padding:22px 22px 18px;background:#ffffff;border-bottom:1px solid #e4ecef;">
+                  <td class="email-letterhead" bgcolor="#ffffff" style="padding:10px 14px 9px;background-color:#ffffff!important;border-bottom:4px solid #2f79b7;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
                       <tr>
-                        <td width="94" align="center" valign="middle" style="width:94px;vertical-align:middle;">
-                          <img src="${baseUrl}/kvtc_logo.png" width="82" height="82" alt="Kinoo Vocational Training Centre" style="display:block;width:82px;height:82px;margin:0 auto;object-fit:cover;object-position:50% 18%;border:0;" />
+                        <td width="94" align="left" valign="middle" style="width:94px;vertical-align:middle;">
+                          <img src="${baseUrl}/kvtc_logo.png" width="88" height="88" alt="Kinoo Vocational Training Centre" style="display:block;width:88px;height:88px;margin:0;object-fit:cover;object-position:50% 18%;border:0;" />
                         </td>
-                        <td align="center" valign="middle" style="padding:0 14px;vertical-align:middle;font-family:Arial,Helvetica,sans-serif;">
-                          <p style="margin:0 0 5px;color:#a1803d;font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;">County Government of Kiambu</p>
-                          <p style="margin:0 0 5px;color:#25384a;font-size:12px;font-weight:600;line-height:1.35;">Department of Education, Gender, Culture &amp; Social Services</p>
-                          <p style="margin:0;color:#0F6E56;font-size:17px;font-weight:800;line-height:1.25;">Kinoo Vocational Training Centre</p>
+                        <td align="center" valign="middle" style="padding:0 9px;vertical-align:middle;font-family:'Times New Roman',Times,serif;">
+                          <p style="margin:0 0 4px;color:#b59b69!important;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;">COUNTY GOVERNMENT OF KIAMBU</p>
+                          <p style="margin:0 0 4px;color:#1f2f4d!important;font-size:11px;font-weight:700;line-height:1.25;">Department Of Education, Gender, Culture &amp; Social Services</p>
+                          <p style="margin:0 0 5px;color:#4c9daa!important;font-size:13px;font-weight:700;line-height:1.25;letter-spacing:.7px;">KINOO VOCATIONAL TRAINING CENTRE</p>
+                          <p style="margin:0 0 2px;color:#30364b!important;font-size:10px;line-height:1.35;">P.O BOX 351-00902, Kikuyu. &nbsp;&nbsp; Tel: 0113582008</p>
+                          <p style="margin:0;color:#30364b!important;font-size:10px;line-height:1.35;">Email: kinoovtc@gmail.com &nbsp;&nbsp; www.kinoovtc.ac.ke</p>
                         </td>
-                        <td width="94" align="center" valign="middle" style="width:94px;vertical-align:middle;border-left:1px solid #e6edf0;">
-                          <img src="${baseUrl}/cgok-logo.png" width="76" height="76" alt="County Government of Kiambu" style="display:block;width:76px;height:76px;margin:3px auto;object-fit:contain;border:0;" />
+                        <td width="82" align="right" valign="middle" style="width:82px;vertical-align:middle;">
+                          <img src="${baseUrl}/cgok-logo.png" width="76" height="76" alt="County Government of Kiambu" style="display:block;width:76px;height:76px;margin:0 0 0 auto;object-fit:contain;border:0;" />
                         </td>
                       </tr>
                     </table>
@@ -152,15 +173,15 @@ export async function POST(req) {
                 </tr>
 
                 <tr>
-                  <td style="padding:34px 38px 14px;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+                  <td class="email-section" bgcolor="#ffffff" style="padding:34px 38px 14px;background-color:#ffffff!important;font-family:Arial,Helvetica,sans-serif;">
                     <span style="display:inline-block;padding:6px 11px;background:#eaf6f2;color:#0F6E56;border:1px solid #cce8df;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;">Application confirmed</span>
-                    <h1 style="margin:14px 0 8px;color:#172b3a;font-size:26px;line-height:1.25;font-weight:750;letter-spacing:-.3px;">Welcome to Kinoo VTC, ${name}</h1>
-                    <p style="margin:0;color:#60717d;font-size:15px;line-height:1.7;">Your application has been received successfully and your admission payment has been verified.</p>
+                    <h1 class="email-heading" style="margin:14px 0 8px;color:#172b3a!important;font-size:26px;line-height:1.25;font-weight:750;letter-spacing:-.3px;">Welcome to Kinoo VTC, ${name}</h1>
+                    <p class="email-copy" style="margin:0;color:#60717d!important;font-size:15px;line-height:1.7;">Your application has been received successfully and your admission payment has been verified.</p>
                   </td>
                 </tr>
 
                 <tr>
-                  <td style="padding:14px 38px 7px;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+                  <td class="email-section" bgcolor="#ffffff" style="padding:14px 38px 7px;background-color:#ffffff!important;font-family:Arial,Helvetica,sans-serif;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate;background:#f8fafb;border:1px solid #dfe8ec;border-radius:12px;">
                       <tr><td colspan="2" style="padding:15px 18px 10px;color:#25384a;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid #e3eaed;">Application summary</td></tr>
                       <tr>
@@ -180,7 +201,7 @@ export async function POST(req) {
                 </tr>
 
                 <tr>
-                  <td style="padding:12px 38px 8px;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+                  <td class="email-section" bgcolor="#ffffff" style="padding:12px 38px 8px;background-color:#ffffff!important;font-family:Arial,Helvetica,sans-serif;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate;background:#fbfdfc;border:1px solid #cfe6dc;border-radius:12px;">
                       <tr>
                         <td style="padding:14px 18px;border-bottom:1px solid #dcebe5;color:#173f32;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;">M-PESA payment confirmation</td>
@@ -211,7 +232,7 @@ export async function POST(req) {
                 </tr>
 
                 <tr>
-                  <td style="padding:20px 38px 34px;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+                  <td class="email-section" bgcolor="#ffffff" style="padding:20px 38px 34px;background-color:#ffffff!important;font-family:Arial,Helvetica,sans-serif;">
                     <p style="margin:0 0 16px;color:#405460;font-size:14px;line-height:1.75;">Your official <strong style="color:#223744;">Admission Letter</strong>, including the Rules &amp; Regulations, is attached to this email. Please review it carefully, print it, sign the required sections, and bring it with you on your admission day.</p>
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate;background:#f5f8fa;border-radius:10px;">
                       <tr>
@@ -225,7 +246,7 @@ export async function POST(req) {
                 </tr>
 
                 <tr>
-                  <td style="padding:20px 28px;background:#f7f9fa;border-top:1px solid #e2e9ec;text-align:center;font-family:Arial,Helvetica,sans-serif;">
+                  <td bgcolor="#f7f9fa" style="padding:20px 28px;background-color:#f7f9fa!important;border-top:1px solid #e2e9ec;text-align:center;font-family:Arial,Helvetica,sans-serif;">
                     <p style="margin:0 0 6px;color:#0F6E56;font-size:11px;font-weight:800;letter-spacing:.5px;">TECHNOLOGY FOR EMPOWERMENT</p>
                     <p style="margin:0;color:#7b8991;font-size:11px;line-height:1.6;">P.O. Box 351-00902, Kikuyu &nbsp;|&nbsp; Tel: 0113 582 008<br/>kinoovtc@gmail.com &nbsp;|&nbsp; www.kinoovtc.ac.ke</p>
                     <p style="margin:10px 0 0;color:#9aa5ab;font-size:10px;">&copy; ${new Date().getFullYear()} Kinoo Vocational Training Centre, Kiambu County</p>
@@ -236,6 +257,8 @@ export async function POST(req) {
           </tr>
         </table>
       </div>
+      </body>
+      </html>
     `;
 
     // Convert PDFs to buffers
