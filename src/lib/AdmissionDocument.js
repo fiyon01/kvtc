@@ -63,9 +63,21 @@ const s = StyleSheet.create({
   fieldGhost: { borderBottomWidth: 1, borderBottomColor: '#bbb', borderBottomStyle: 'dotted', minHeight: 14, flex: 1, minWidth: 40 },
 
   // ── DECLARATION ──
-  declarationText: { fontFamily: 'Times-Roman', fontSize: 9.5, color: dark, lineHeight: 14, marginBottom: 4 },
-  declarationName: { borderBottomWidth: 1, borderBottomColor: '#444', borderBottomStyle: 'dotted', minWidth: 140, paddingBottom: 1 },
-  declarationNameText: { fontFamily: 'Times-Roman', fontSize: 9.5, color: dark },
+  // FIX: Use a single Text block with inline spans — avoids the huge whitespace
+  // that occurs when react-pdf tries to wrap a flex row containing mixed Text/View children.
+  declarationPara: {
+    fontFamily: 'Times-Roman',
+    fontSize: 9.5,
+    color: dark,
+    marginBottom: 4,
+    lineHeight: 1.6,
+  },
+  declarationUnderline: {
+    fontFamily: 'Times-Roman',
+    fontSize: 9.5,
+    color: dark,
+    textDecoration: 'underline',
+  },
 
   // ── SIGNATURE ──
   sigBox: { width: 100, height: 24, borderBottomWidth: 1, borderBottomColor: '#444', borderBottomStyle: 'dotted', flexShrink: 0 },
@@ -78,31 +90,37 @@ const s = StyleSheet.create({
   footer: {
     borderTopWidth: 2.5,
     borderTopColor: navyBlue,
-    paddingTop: 8,
-    paddingBottom: 10,
+    paddingTop: 5,        // FIX: was 8 — reduce top padding
+    paddingBottom: 6,     // FIX: was 10 — reduce bottom padding
     paddingLeft: 20,
     paddingRight: 20,
     backgroundColor: bgFooter,
   },
   footerGrid: { flexDirection: 'row' },
   footerLabel: { fontFamily: 'Times-Bold', fontSize: 8.5 },
-  footerText: { fontFamily: 'Times-Roman', fontSize: 8.5, color: mid, flex: 1, lineHeight: 11 },
-  footerRow: { flexDirection: 'row', marginBottom: 3 },
+  footerText: { fontFamily: 'Times-Roman', fontSize: 8.5, color: mid, flex: 1, lineHeight: 1.3 }, // FIX: lineHeight 11 → 1.3 (relative)
+  footerRow: { flexDirection: 'row', marginBottom: 1 }, // FIX: marginBottom 3 → 1
+
+  // ── PAYMENT BOX ──
+  // FIX: tighter padding, smaller row gap, cleaner grid layout
   paymentBox: {
-    marginTop: 10,
-    paddingTop: 7,
-    paddingBottom: 7,
-    paddingLeft: 9,
-    paddingRight: 9,
+    marginTop: 6,          // FIX: was 10
+    paddingTop: 5,         // FIX: was 7
+    paddingBottom: 5,      // FIX: was 7
+    paddingLeft: 8,        // FIX: was 9
+    paddingRight: 8,       // FIX: was 9
     backgroundColor: '#eef5f0',
     borderLeftWidth: 3,
     borderLeftColor: green,
   },
-  paymentTitle: { fontFamily: 'Times-Bold', fontSize: 9, color: green, marginBottom: 4 },
-  paymentRow: { flexDirection: 'row' },
-  paymentLabel: { width: 82, fontFamily: 'Times-Bold', fontSize: 8.5, lineHeight: 11 },
-  paymentValue: { flex: 1, fontSize: 8.5, lineHeight: 11 },
-
+  paymentTitle: { fontFamily: 'Times-Bold', fontSize: 9, color: green, marginBottom: 3 }, // FIX: marginBottom 4 → 3
+  paymentGrid: {           // FIX: replace separate paymentRow calls with a 4-column grid
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    alignItems: 'flex-start',
+  },
+  paymentLabel: { width: 72, fontFamily: 'Times-Bold', fontSize: 8.5, lineHeight: 1.3 }, // FIX: width 82→72, lineHeight relative
+  paymentValue: { flex: 1, fontSize: 8.5, lineHeight: 1.3, marginRight: 6 },             // FIX: lineHeight relative, add marginRight
 });
 
 // Thin helper: label + dotted field value
@@ -232,13 +250,17 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
             <View style={[s.field, { maxWidth: 180 }]}><Text style={s.fieldText}>{fmtDate(startDate)}</Text></View>
           </Row>
 
-          {/* DECLARATION */}
+          {/* ── DECLARATION ──
+              FIX: Replaced the mixed View/Text flex-row (which caused react-pdf to
+              insert large whitespace) with a single <Text> block using inline <Text>
+              spans. react-pdf handles inline text wrapping correctly within a single
+              Text node — the underline on the name is achieved via a nested span. */}
           <Text style={s.sectionTitle}>DECLARATION</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-end', lineHeight: 1.9, marginBottom: 4 }}>
-            <Text style={s.declarationText}>I  </Text>
-            <View style={s.declarationName}><Text style={s.declarationNameText}>{name || '                                    '}</Text></View>
-            <Text style={s.declarationText}>  declare that I shall abide by the rules and regulations and be obedient to the management and staff in the institution.</Text>
-          </View>
+          <Text style={s.declarationPara}>
+            {'I  '}
+            <Text style={s.declarationUnderline}>{name || '                                    '}</Text>
+            {'  declare that I shall abide by the rules and regulations and be obedient to the management and staff in the institution.'}
+          </Text>
 
           <Row mt={2}>
             <L t="SIGN  " />
@@ -269,26 +291,33 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
             </Row>
           </View>
 
+          {/* ── PAYMENT BOX ──
+              FIX: Replaced two separate paymentRow Views (each with two label+value pairs
+              side by side) with a single 4-column grid row. This eliminates the extra
+              vertical gap between the two data rows and keeps everything compact. */}
           {paymentReference ? (
             <View style={s.paymentBox} wrap={false}>
               <Text style={s.paymentTitle}>M-PESA PAYMENT CONFIRMATION</Text>
-              <View style={s.paymentRow}>
+              <View style={s.paymentGrid}>
                 <Text style={s.paymentLabel}>Reference:</Text>
                 <Text style={s.paymentValue}>{paymentReference}</Text>
                 <Text style={s.paymentLabel}>Amount:</Text>
-                <Text style={s.paymentValue}>KSh {paymentAmount}</Text>
+                <Text style={[s.paymentValue, { marginRight: 0 }]}>KSh {paymentAmount}</Text>
               </View>
-              <View style={s.paymentRow}>
-                <Text style={s.paymentLabel}>Date & Time:</Text>
+              <View style={s.paymentGrid}>
+                <Text style={s.paymentLabel}>Date &amp; Time:</Text>
                 <Text style={s.paymentValue}>{paymentDateStr}</Text>
                 <Text style={s.paymentLabel}>Phone:</Text>
-                <Text style={s.paymentValue}>{paymentPhone || 'N/A'}</Text>
+                <Text style={[s.paymentValue, { marginRight: 0 }]}>{paymentPhone || 'N/A'}</Text>
               </View>
             </View>
           ) : null}
         </View>
 
-        {/* ── FOOTER ── */}
+        {/* ── FOOTER ──
+            FIX: lineHeight changed from absolute 11pt to relative 1.3 so it scales
+            correctly with 8.5pt font. marginBottom on each row reduced from 3 to 1.
+            Footer padding tightened. Together these eliminate the excessive gaps. */}
         <View style={s.footer}>
           <View style={s.footerRow}>
             <Text style={s.footerLabel}>MISSION: </Text>

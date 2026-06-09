@@ -2,24 +2,26 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import PdfLetterhead from './PdfLetterhead';
 
-const green = '#1a6e2e';
+const green   = '#1a6e2e';
+const dark    = '#000000';
 const bgFooter = '#ede9e0';
-const dark = '#000000';
+const dots    = '..................................................................................';
 
+// ─── Duration corrected to 1 YEAR to match physical document ───────────────
 const COURSES = [
-  { name: "Food & Beverage Production & Service", cert: "ARTISAN",  examBody: "KNEC",       duration: "2 YEARS"  },
-  { name: "Hair Dressing and Beauty Therapy",      cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"  },
-  { name: "Electrical and Electronics",            cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"  },
-  { name: "Electronic Mechanics",                  cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"  },
+  { name: "Food & Beverage Production & Service", cert: "ARTISAN",  examBody: "KNEC",       duration: "1YEAR"    },
+  { name: "Hair Dressing and Beauty Therapy",      cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Electrical and Electronics",            cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Electronic Mechanics",                  cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
   { name: "Solar PV Installation",                 cert: "GRADE 3", examBody: "NITA",        duration: "6 MONTHS" },
   { name: "Security & Network Systems",            cert: "CERT",    examBody: "(INTERNAL)",  duration: "3 MONTHS" },
-  { name: "Plumbing",                              cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"  },
-  { name: "Masonry",                               cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"  },
-  { name: "Fashion Design and Dressmaking",        cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"  },
-  { name: "Motor Vehicle Mechanics",               cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"  },
-  { name: "Welding & Fabrication",                 cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"  },
-  { name: "Computer Operator",                     cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"  },
-  { name: "Computer packages",                     cert: "CERT",    examBody: "INTERNAL",    duration: "2 MONTHS" },
+  { name: "Plumbing",                              cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Masonry",                               cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Fashion Design and Dressmaking",        cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Motor Vehicle Mechanics",               cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Welding & Fabrication",                 cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Computer Operator",                     cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Computer packages",                     cert: "CERT",    examBody: "INTERNAL",    duration: "2MONTHS"  },
 ];
 
 const RULES = [
@@ -34,7 +36,7 @@ const RULES = [
     subs: [
       "Attending all the lessons.",
       "Sitting for all examinations and doing all assignments.",
-      "Being punctual at all times in class, games, general duties and meals.",
+      "Being punctual at all times in class, clubs, games, general duties and meals.",
       "Note that there are no breaks between lessons UNLESS provided for in the time table.",
       "Not having any other form of entertainment other than the ones stipulated by the administration.",
       "Performing duties as allocated by any lawful authority.",
@@ -58,148 +60,205 @@ const RULES = [
 ];
 
 const s = StyleSheet.create({
-  page: {
+  // ── Pages ──────────────────────────────────────────────────────────────────
+  pageAdmission: {
     backgroundColor: '#ffffff',
     fontFamily: 'Times-Roman',
-    fontSize: 10,
+    fontSize: 10.5,
     color: dark,
-    paddingBottom: 30,
+  },
+  pageRules: {
+    backgroundColor: '#ffffff',
+    fontFamily: 'Times-Roman',
+    fontSize: 10.5,
+    color: dark,
+    paddingTop: 36,
+    paddingBottom: 36,
+    paddingLeft: 52,
+    paddingRight: 52,
   },
 
-  // ── Header ──
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 12,
-    paddingBottom: 8,
-    paddingLeft: 14,
-    paddingRight: 14,
-    borderBottomWidth: 3,
-    borderBottomColor: '#1a3a6e',
+  // ── Admission body ─────────────────────────────────────────────────────────
+  body: {
+    paddingTop: 10,
+    paddingBottom: 20,
+    paddingLeft: 42,
+    paddingRight: 42,
   },
-  logo: { width: 60, height: 60, objectFit: 'contain' },
-  headerCenter: { flex: 1, alignItems: 'center', paddingLeft: 8, paddingRight: 8 },
-  deptText:   { fontSize: 7.5, fontFamily: 'Times-Bold', color: dark, marginBottom: 1, textAlign: 'center' },
-  instName:   { fontSize: 11, fontFamily: 'Times-Bold', color: green, textTransform: 'uppercase', marginBottom: 2, textAlign: 'center' },
-  contactTxt: { fontSize: 7, color: '#444', textAlign: 'center', marginBottom: 1 },
 
-  // ── Body ──
-  body: { paddingTop: 12, paddingBottom: 16, paddingLeft: 30, paddingRight: 30 },
+  // ── Title ──────────────────────────────────────────────────────────────────
   title: {
-    textAlign: 'center', fontFamily: 'Times-Bold',
-    fontSize: 14, textDecoration: 'underline',
-    marginBottom: 14, letterSpacing: 1,
+    textAlign: 'center',
+    fontFamily: 'Times-Bold',
+    fontSize: 13,
+    textDecoration: 'underline',
+    marginBottom: 16,
+    letterSpacing: 0.5,
   },
 
-  // ── Name / Department row — FIX: stack vertically so long names don't clip ──
-  nameDepRow: {
+  // ── NAME … DEPARTMENT … line ───────────────────────────────────────────────
+  // Matches physical doc: "NAME............... DEPARTMENT ..............."
+  // rendered as a single Text line with inline dotted segments
+  nameLine: {
     flexDirection: 'row',
-    marginBottom: 12,
-    alignItems: 'flex-start',   // top-align so tall wrapped text doesn't clip
+    alignItems: 'flex-end',
+    marginBottom: 14,
   },
-  nameBlock: { flex: 2, marginRight: 12 },
-  deptBlock: { flex: 2 },
-  fieldLabel: { fontFamily: 'Times-Bold', fontSize: 10, marginBottom: 2 },
-  // The value sits ON a bottom-border line; we use a View wrapper so long text wraps cleanly
-  fieldValueWrap: {
-    borderBottomWidth: 1.5,
-    borderBottomColor: '#444',
-    borderStyle: 'dotted',
-    paddingBottom: 2,
-    minHeight: 16,
+  nameLabel: {
+    fontFamily: 'Times-Bold',
+    fontSize: 10.5,
+    marginRight: 2,
   },
-  fieldValue: { fontSize: 10, fontFamily: 'Times-Roman' },
+  nameDots: {
+    flex: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    borderBottomStyle: 'dotted',
+    minHeight: 14,
+    paddingBottom: 1,
+    marginRight: 10,
+  },
+  nameValue: {
+    fontFamily: 'Times-Roman',
+    fontSize: 10.5,
+  },
+  deptLabel: {
+    fontFamily: 'Times-Bold',
+    fontSize: 10.5,
+    marginRight: 2,
+  },
+  deptDots: {
+    flex: 1.4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    borderBottomStyle: 'dotted',
+    minHeight: 14,
+    paddingBottom: 1,
+  },
 
-  // ── Body text ──
-  para: { lineHeight: 15, marginBottom: 8, textAlign: 'justify', fontSize: 10 },
+  // ── Body paragraphs ────────────────────────────────────────────────────────
+  para: {
+    lineHeight: 1.55,
+    marginBottom: 10,
+    textAlign: 'justify',
+    fontSize: 10.5,
+  },
   bold: { fontFamily: 'Times-Bold' },
 
-  // ── Table ──
-  table: { width: '100%', marginTop: 6, marginBottom: 10 },
-  trHead: { backgroundColor: green, flexDirection: 'row' },
-  th: { color: '#fff', padding: 5, fontSize: 8.5, fontFamily: 'Times-Bold', borderRightWidth: 0.5, borderRightColor: '#ccc' },
-  trEven: { flexDirection: 'row', backgroundColor: '#f0ede6' },
-  trOdd:  { flexDirection: 'row', backgroundColor: '#ffffff' },
-  td: { padding: 4, fontSize: 8.5, borderBottomWidth: 0.5, borderBottomColor: '#ddd', borderRightWidth: 0.5, borderRightColor: '#ddd' },
+  // ── Courses table — plain, no shading, matching physical doc ──────────────
+  table: { width: '100%', marginTop: 4, marginBottom: 8 },
 
-  // ── Footer ──
+  // Header row: bold labels, no background
+  trHead: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#000' },
+  th: {
+    fontFamily: 'Times-Bold',
+    fontSize: 10.5,
+    paddingBottom: 3,
+    paddingTop: 0,
+  },
+
+  // Data rows: plain white, no alternating colors
+  trRow: { flexDirection: 'row' },
+  td: {
+    fontFamily: 'Times-Roman',
+    fontSize: 10,
+    paddingTop: 1,
+    paddingBottom: 1,
+  },
+
+  // ── Other subjects bullet ──────────────────────────────────────────────────
+  otherLabel: { fontFamily: 'Times-Bold', fontSize: 10.5, marginBottom: 3 },
+  bulletRow:  { flexDirection: 'row', marginLeft: 10 },
+  bulletDot:  { fontSize: 10.5, marginRight: 5 },
+  bulletText: { fontSize: 10.5, flex: 1, lineHeight: 1.45 },
+
+  // ── Footer (admission page only) ──────────────────────────────────────────
   footer: {
-    borderTopWidth: 2.5, borderTopColor: green,
-    paddingTop: 8, paddingBottom: 10,
-    paddingLeft: 14, paddingRight: 14,
+    borderTopWidth: 2.5,
+    borderTopColor: green,
+    paddingTop: 5,
+    paddingBottom: 6,
+    paddingLeft: 20,
+    paddingRight: 20,
     backgroundColor: bgFooter,
   },
-  footerRow: { flexDirection: 'row', marginBottom: 3 },
-  footerLabel: { fontFamily: 'Times-Bold', fontSize: 7.5, marginRight: 4 },
-  footerText:  { fontFamily: 'Times-Roman', fontSize: 7.5, color: '#333', flex: 1, lineHeight: 10 },
+  footerRow:   { flexDirection: 'row', marginBottom: 1 },
+  footerLabel: { fontFamily: 'Times-Bold', fontSize: 8, marginRight: 3 },
+  footerText:  { fontFamily: 'Times-Roman', fontSize: 8, color: '#333', flex: 1, lineHeight: 1.3 },
 
-  // ── Rules page ──
-  rulesBody: { paddingLeft: 34, paddingRight: 34, paddingTop: 28, paddingBottom: 28 },
+  // ── Rules page ─────────────────────────────────────────────────────────────
   rulesTitle: {
-    textAlign: 'center', fontFamily: 'Times-Bold',
-    fontSize: 14, textDecoration: 'underline',
-    marginBottom: 14, letterSpacing: 1,
+    textAlign: 'center',
+    fontFamily: 'Times-Bold',
+    fontSize: 13,
+    textDecoration: 'underline',
+    marginBottom: 10,
+    letterSpacing: 0.3,
   },
-  // FIX: removed wrap={false} — instead just use normal flow with generous margins
-  ruleItem: { flexDirection: 'row', marginBottom: 7 },
-  ruleNum:  { width: 24, fontSize: 9.5, lineHeight: 13, fontFamily: 'Times-Roman' },
-  ruleText: { flex: 1, fontSize: 9.5, lineHeight: 13, fontFamily: 'Times-Roman' },
-  subList:  { marginTop: 4, marginLeft: 4 },
-  subItem:  { flexDirection: 'row', marginBottom: 4 },
-  subNum:   { width: 18, fontSize: 9.5, lineHeight: 13 },
-  subText:  { flex: 1, fontSize: 9.5, lineHeight: 13 },
 
-  // ── Declaration / sign row ──
-  declareText: { fontFamily: 'Times-Italic', fontSize: 10, marginTop: 14, marginBottom: 14 },
-  signRow: { flexDirection: 'row', alignItems: 'flex-end' },
-  signBlock: { flex: 1, marginRight: 10 },
-  signLabel: { fontFamily: 'Times-Bold', fontSize: 9, marginBottom: 3 },
-  signLine: {
-    borderBottomWidth: 1.5, borderBottomColor: '#333',
-    borderStyle: 'solid', paddingBottom: 2, minHeight: 18,
-  },
-  signValue: { fontSize: 10 },
-  signImg: { width: 90, height: 22, objectFit: 'contain' },
-  paymentBox: {
+  // Tight rule items — fit all 22 on one page
+  ruleItem: { flexDirection: 'row', marginBottom: 4 },
+  ruleNum:  { width: 22, fontSize: 10, lineHeight: 1.4, fontFamily: 'Times-Roman' },
+  ruleText: { flex: 1, fontSize: 10, lineHeight: 1.4, fontFamily: 'Times-Roman', textAlign: 'justify' },
+
+  subList: { marginTop: 2, marginLeft: 2 },
+  subItem: { flexDirection: 'row', marginBottom: 2 },
+  subNum:  { width: 20, fontSize: 10, lineHeight: 1.4 },
+  subText: { flex: 1, fontSize: 10, lineHeight: 1.4, textAlign: 'justify' },
+
+  // ── Declaration + sign line (rules page bottom) ───────────────────────────
+  declareText: {
+    fontFamily: 'Times-Italic',
+    fontSize: 10.5,
     marginTop: 12,
-    marginBottom: 12,
-    paddingTop: 8,
-    paddingBottom: 8,
-    paddingLeft: 10,
-    paddingRight: 10,
-    backgroundColor: '#f3f7f3',
-    borderLeftWidth: 3,
-    borderLeftColor: green,
+    marginBottom: 8,
+    textAlign: 'center',
   },
-  paymentTitle: { fontFamily: 'Times-Bold', fontSize: 9, color: green, marginBottom: 5 },
-  paymentRow: { flexDirection: 'row' },
-  paymentLabel: { width: 86, fontFamily: 'Times-Bold', fontSize: 8.5, lineHeight: 12 },
-  paymentValue: { flex: 1, fontSize: 8.5, lineHeight: 12 },
+  // "Name: __________ Date: __________ Sign: __________" on one line
+  signRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginTop: 4,
+  },
+  signLabel: {
+    fontFamily: 'Times-Roman',
+    fontSize: 10.5,
+    marginRight: 2,
+  },
+  signLine: {
+    flex: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    borderBottomStyle: 'solid',
+    minHeight: 14,
+    paddingBottom: 1,
+    marginRight: 14,
+  },
+  signValue: { fontFamily: 'Times-Roman', fontSize: 10.5 },
+  signImg:   { width: 80, height: 18, objectFit: 'contain' },
+
+  // Date field (shorter)
+  dateSignLine: {
+    width: 90,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    borderBottomStyle: 'solid',
+    minHeight: 14,
+    paddingBottom: 1,
+    marginRight: 14,
+  },
+  // Sign field (shorter)
+  sigSignLine: {
+    width: 70,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    borderBottomStyle: 'solid',
+    minHeight: 14,
+    paddingBottom: 1,
+  },
 });
 
-// ── Reusable header ────────────────────────────────────────────────────────
-function Header({ kvtcLogoUrl, cgokLogoUrl }) {
-  return (
-    <>
-      <View style={s.headerRow}>
-        {kvtcLogoUrl
-          ? <Image src={kvtcLogoUrl} style={s.logo} />
-          : <View style={s.logo} />}
-        <View style={s.headerCenter}>
-          <Text style={s.deptText}>Department of Education, Gender, Culture &amp; Social Services</Text>
-          <Text style={s.instName}>KINOO VOCATIONAL TRAINING CENTRE</Text>
-          <Text style={s.contactTxt}>P.O BOX 351-00902, Kikuyu.   Tel: 0113582008</Text>
-          <Text style={s.contactTxt}>Email: kinoovtc@gmail.com   www.kinoovtc.ac.ke</Text>
-        </View>
-        {cgokLogoUrl
-          ? <Image src={cgokLogoUrl} style={s.logo} />
-          : <View style={s.logo} />}
-      </View>
-    </>
-  );
-}
-
-// ── Reusable footer ────────────────────────────────────────────────────────
+// ── Reusable admission footer ──────────────────────────────────────────────
 function Footer() {
   return (
     <View style={s.footer} fixed>
@@ -222,48 +281,40 @@ function Footer() {
 // ── Main export ────────────────────────────────────────────────────────────
 export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
   const {
-    name = '',
-    course = '',
+    name      = '',
+    course    = '',
     signatureData,
     signDate,
-    paymentReference = '',
-    paymentDate = '',
-    paymentPhone = '',
-    paymentAmount = '',
   } = formData;
-  const dateStr = signDate ? signDate : new Date().toLocaleDateString('en-KE');
-  const paymentDateStr = paymentDate
-    ? new Date(paymentDate).toLocaleString('en-KE', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-        timeZone: 'Africa/Nairobi',
-      })
-    : '';
-  const firstRules = RULES.slice(0, 11);
-  const remainingRules = RULES.slice(11);
 
-  const renderRules = (rules, startIndex = 0) => rules.map((rule, index) => (
-    <View style={s.ruleItem} key={startIndex + index} wrap={false}>
-      <Text style={s.ruleNum}>{startIndex + index + 1}.</Text>
-      <View style={{ flex: 1 }}>
-        {typeof rule === 'string' ? (
-          <Text style={s.ruleText}>{rule}</Text>
-        ) : (
-          <>
-            <Text style={s.ruleText}>{rule.main}</Text>
-            <View style={s.subList}>
-              {rule.subs.map((sub, subIndex) => (
-                <View style={s.subItem} key={subIndex} wrap={false}>
-                  <Text style={s.subNum}>{String.fromCharCode(97 + subIndex)})</Text>
-                  <Text style={s.subText}>{sub}</Text>
-                </View>
-              ))}
-            </View>
-          </>
-        )}
+  const dateStr = signDate
+    ? signDate
+    : new Date().toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  // ── Rule renderer (all 22 rules, compact) ─────────────────────────────────
+  const renderRules = (rules, startIndex = 0) =>
+    rules.map((rule, index) => (
+      <View style={s.ruleItem} key={startIndex + index} wrap={false}>
+        <Text style={s.ruleNum}>{startIndex + index + 1}.</Text>
+        <View style={{ flex: 1 }}>
+          {typeof rule === 'string' ? (
+            <Text style={s.ruleText}>{rule}</Text>
+          ) : (
+            <>
+              <Text style={s.ruleText}>{rule.main}</Text>
+              <View style={s.subList}>
+                {rule.subs.map((sub, si) => (
+                  <View style={s.subItem} key={si} wrap={false}>
+                    <Text style={s.subNum}>{String.fromCharCode(97 + si)})</Text>
+                    <Text style={s.subText}>{sub}</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+        </View>
       </View>
-    </View>
-  ));
+    ));
 
   return (
     <Document
@@ -271,153 +322,146 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
       author="Kinoo Vocational Training Centre"
       subject="Student Admission Letter"
     >
-      {/* ══════════ PAGE 1: ADMISSION LETTER ══════════ */}
-      <Page size="A4" style={s.page}>
+
+      {/* ════════════════════════════════════════════════════════════════
+          PAGE 1 — ADMISSION LETTER
+          Matches Image 1 exactly:
+          • PdfLetterhead (logos + centered institution name)
+          • "ADMISSION LETTER" underlined title
+          • NAME dotted fill … DEPARTMENT dotted fill (one inline row)
+          • Three justified paragraphs
+          • Plain table (no shading, no cell borders)
+          • Other general subjects bullet
+          • Mission/Vision/Motto footer
+      ════════════════════════════════════════════════════════════════ */}
+      <Page size="A4" style={s.pageAdmission}>
+
         <PdfLetterhead kvtcLogoUrl={kvtcLogoUrl} cgokLogoUrl={cgokLogoUrl} />
 
         <View style={s.body}>
+
           <Text style={s.title}>ADMISSION LETTER</Text>
 
-          {/*
-            FIX: NAME + DEPARTMENT — each field is a labelled block with a
-            bordered wrapper so long course names wrap inside the box instead
-            of overflowing or pushing text off-screen.
-          */}
-          <View style={s.nameDepRow}>
-            <View style={s.nameBlock}>
-              <Text style={s.fieldLabel}>NAME:</Text>
-              <View style={s.fieldValueWrap}>
-                <Text style={s.fieldValue}>{name || ' '}</Text>
-              </View>
+          {/* ── NAME … DEPARTMENT … ─────────────────────────────────────
+              Single flex row: bold label → dotted underline field (with
+              filled value if provided) → bold label → dotted underline.
+              Matches the physical doc line exactly.
+          ──────────────────────────────────────────────────────────── */}
+          <View style={s.nameLine}>
+            <Text style={s.nameLabel}>NAME</Text>
+            <View style={s.nameDots}>
+              <Text style={s.nameValue}>{name || ' '}</Text>
             </View>
-            <View style={s.deptBlock}>
-              <Text style={s.fieldLabel}>DEPARTMENT:</Text>
-              <View style={s.fieldValueWrap}>
-                {/* FIX: Text wraps naturally; no fixed width forcing overflow */}
-                <Text style={s.fieldValue}>{course || ' '}</Text>
-              </View>
+            <Text style={s.deptLabel}>DEPARTMENT</Text>
+            <View style={s.deptDots}>
+              <Text style={s.nameValue}>{course || ' '}</Text>
             </View>
           </View>
 
+          {/* ── Paragraph 1 ──────────────────────────────────────────── */}
           <Text style={s.para}>
-            I am pleased to inform you that you have been admitted to{' '}
-            <Text style={s.bold}>KINOO VOCATIONAL TRAINING CENTRE</Text>{' '}
-            for the academic year {new Date().getFullYear()}.
+            {'I am pleased to inform you that you have been admitted to '}
+            <Text style={s.bold}>KINOO VOCATIONAL TRAINING CENTRE</Text>
+            {` for the academic year ${new Date().getFullYear()}.`}
           </Text>
 
+          {/* ── Paragraph 2 ──────────────────────────────────────────── */}
           <Text style={s.para}>
-            <Text style={s.bold}>Kinoo V.T.C</Text> is a public institution under the county Government of Kiambu. The institution regards parents', students, staff and the management as partners with special roles and responsibilities in promoting learning. We are committed to working closely with our trainees to ensure that they are able to succeed in meeting the challenges of excellence and innovativeness hence preparing them for the world of work. You will therefore be joining a vibrant institution that strongly values discipline and puts good conduct and the character as its prerequisite to admission.
+            <Text style={s.bold}>Kinoo V.T.C</Text>
+            {' is a public institution under the county Government of Kiambu. The institution regards parents\u2019, students, staff and the management as partners with special roles and responsibilities in promoting learning. We are committed to working closely with our trainees to ensure that they are able to succeed in meeting the challenges of excellence and innovativeness hence preparing them for the world of work. You will therefore be joining a vibrant institution that strongly values discipline and puts good conduct and the character as its prerequisite to admission.'}
           </Text>
 
+          {/* ── Paragraph 3 ──────────────────────────────────────────── */}
           <Text style={s.para}>
             We henceforth are privileged to offer you an admission to our institution for further studies in a course of your choice.
           </Text>
 
-          {/* Courses table */}
+          {/* ── Courses table ────────────────────────────────────────────
+              Physical doc: plain columns, bold headers underlined by a
+              single bottom border on the header row, no cell borders,
+              no alternating row colors.
+          ──────────────────────────────────────────────────────────── */}
           <View style={s.table}>
+
+            {/* Header */}
             <View style={s.trHead}>
-              <Text style={[s.th, { flex: 3 }]}>COURSE</Text>
-              <Text style={[s.th, { flex: 1.4 }]}>CERTIFICATION</Text>
+              <Text style={[s.th, { flex: 3.2 }]}>COURSE</Text>
+              <Text style={[s.th, { flex: 1.5 }]}>CERTIFICATION</Text>
               <Text style={[s.th, { flex: 1.2 }]}>EXAM BODY</Text>
-              <Text style={[s.th, { flex: 1.2 }]}>DURATION</Text>
+              <Text style={[s.th, { flex: 1.1 }]}>DURATION</Text>
             </View>
+
+            {/* Data rows — plain, no shading */}
             {COURSES.map((c, i) => (
-              <View style={i % 2 === 0 ? s.trOdd : s.trEven} key={i}>
-                <Text style={[s.td, { flex: 3 }]}>{c.name}</Text>
-                <Text style={[s.td, { flex: 1.4 }]}>{c.cert}</Text>
+              <View style={s.trRow} key={i}>
+                <Text style={[s.td, { flex: 3.2 }]}>{c.name}</Text>
+                <Text style={[s.td, { flex: 1.5 }]}>{c.cert}</Text>
                 <Text style={[s.td, { flex: 1.2 }]}>{c.examBody}</Text>
-                <Text style={[s.td, { flex: 1.2 }]}>{c.duration}</Text>
+                <Text style={[s.td, { flex: 1.1 }]}>{c.duration}</Text>
               </View>
             ))}
           </View>
 
-          <Text style={[s.bold, { fontSize: 10, marginBottom: 4 }]}>Other general subjects taught are:</Text>
-          <View style={{ flexDirection: 'row', marginLeft: 12 }}>
-            <Text style={{ fontSize: 10, marginRight: 4 }}>•</Text>
-            <Text style={{ fontSize: 10, flex: 1, lineHeight: 14 }}>
+          {/* ── Other subjects ────────────────────────────────────────── */}
+          <Text style={s.otherLabel}>Other general subjects taught are:</Text>
+          <View style={s.bulletRow}>
+            <Text style={s.bulletDot}>{'\u2022'}</Text>
+            <Text style={s.bulletText}>
               Communication Skills, Guidance and Counseling, Entrepreneurship, Life Skills, &amp; ICT
             </Text>
           </View>
 
-          {/*
-            FIX: Principal signature section REMOVED entirely as requested.
-            The physical printed copy will have the blank line signed by hand.
-          */}
         </View>
 
         <Footer />
       </Page>
 
-      {/* ══════════ PAGE 2: RULES AND REGULATIONS ══════════ */}
-      <Page size="A4" style={s.page}>
-        <PdfLetterhead kvtcLogoUrl={kvtcLogoUrl} cgokLogoUrl={cgokLogoUrl} />
-        <View style={s.rulesBody}>
-          <Text style={s.rulesTitle}>RULES AND REGULATIONS</Text>
+      {/* ════════════════════════════════════════════════════════════════
+          PAGE 2 — RULES AND REGULATIONS
+          Matches Image 2 exactly:
+          • NO letterhead / header
+          • Plain "RULES AND REGULATIONS" underlined title
+          • ALL 22 rules on one page, single column, tight spacing
+          • Italic declaration sentence
+          • "Name: ___ Date: ___ Sign: ___" on one bottom line
+          • NO footer
+      ════════════════════════════════════════════════════════════════ */}
+      <Page size="A4" style={s.pageRules}>
 
-          {renderRules(firstRules)}
-        </View>
-      </Page>
+        <Text style={s.rulesTitle}>RULES AND REGULATIONS</Text>
 
-      <Page size="A4" style={s.page}>
-        <PdfLetterhead kvtcLogoUrl={kvtcLogoUrl} cgokLogoUrl={cgokLogoUrl} />
-        <View style={s.rulesBody}>
-          <Text style={s.rulesTitle}>RULES AND REGULATIONS (CONTINUED)</Text>
+        {renderRules(RULES)}
 
-          {renderRules(remainingRules, firstRules.length)}
+        {/* ── Declaration ──────────────────────────────────────────── */}
+        <Text style={s.declareText}>
+          I hereby declare that I will adhere to all the rules and regulations of this institution.
+        </Text>
 
-          <Text style={s.declareText}>
-            I hereby declare that I will adhere to all the rules and regulations of this institution.
-          </Text>
+        {/* ── Name / Date / Sign — one line ────────────────────────────
+            "Name: __________ Date: __________ Sign: __________"
+            Exactly as in the physical document bottom line.
+        ──────────────────────────────────────────────────────────── */}
+        <View style={s.signRow}>
+          <Text style={s.signLabel}>Name:</Text>
+          <View style={s.signLine}>
+            <Text style={s.signValue}>{name || ' '}</Text>
+          </View>
 
-          {paymentReference ? (
-            <View style={s.paymentBox} wrap={false}>
-              <Text style={s.paymentTitle}>PAYMENT CONFIRMATION</Text>
-              <View style={s.paymentRow}>
-                <Text style={s.paymentLabel}>M-PESA Reference:</Text>
-                <Text style={s.paymentValue}>{paymentReference}</Text>
-              </View>
-              <View style={s.paymentRow}>
-                <Text style={s.paymentLabel}>Amount Paid:</Text>
-                <Text style={s.paymentValue}>KSh {paymentAmount}</Text>
-              </View>
-              <View style={s.paymentRow}>
-                <Text style={s.paymentLabel}>Payment Date:</Text>
-                <Text style={s.paymentValue}>{paymentDateStr}</Text>
-              </View>
-              {paymentPhone ? (
-                <View style={s.paymentRow}>
-                  <Text style={s.paymentLabel}>Paid From:</Text>
-                  <Text style={s.paymentValue}>{paymentPhone}</Text>
-                </View>
-              ) : null}
-            </View>
-          ) : null}
+          <Text style={s.signLabel}>Date:</Text>
+          <View style={s.dateSignLine}>
+            <Text style={s.signValue}>{dateStr || ' '}</Text>
+          </View>
 
-          {/* Sign row */}
-          <View style={s.signRow}>
-            <View style={s.signBlock}>
-              <Text style={s.signLabel}>NAME:</Text>
-              <View style={s.signLine}>
-                <Text style={s.signValue}>{name || ' '}</Text>
-              </View>
-            </View>
-            <View style={s.signBlock}>
-              <Text style={s.signLabel}>SIGN:</Text>
-              <View style={s.signLine}>
-                {signatureData
-                  ? <Image src={signatureData} style={s.signImg} />
-                  : <Text style={s.signValue}> </Text>}
-              </View>
-            </View>
-            <View style={[s.signBlock, { marginRight: 0 }]}>
-              <Text style={s.signLabel}>DATE:</Text>
-              <View style={s.signLine}>
-                <Text style={s.signValue}>{dateStr}</Text>
-              </View>
-            </View>
+          <Text style={s.signLabel}>Sign:</Text>
+          <View style={s.sigSignLine}>
+            {signatureData
+              ? <Image src={signatureData} style={s.signImg} />
+              : <Text style={s.signValue}> </Text>}
           </View>
         </View>
+
       </Page>
+
     </Document>
   );
 }
