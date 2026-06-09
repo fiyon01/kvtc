@@ -8,8 +8,8 @@ const dark = '#000000';
 const mid = '#333333';
 const soft = '#666666';
 const white = '#FFFFFF';
-const bgPage = '#f4f2ee';
-const bgFooter = '#ede9e0';
+const bgPage = '#ffffff';
+const bgFooter = '#ffffff';
 
 const s = StyleSheet.create({
   page: {
@@ -104,7 +104,7 @@ const s = StyleSheet.create({
   // ── PAYMENT BOX ──
   // FIX: tighter padding, smaller row gap, cleaner grid layout
   paymentBox: {
-    marginTop: 6,          // FIX: was 10
+    marginTop: 10,          // FIX: was 10
     paddingTop: 5,         // FIX: was 7
     paddingBottom: 5,      // FIX: was 7
     paddingLeft: 8,        // FIX: was 9

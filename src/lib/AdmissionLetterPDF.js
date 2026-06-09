@@ -9,18 +9,18 @@ const dots    = '...............................................................
 
 // ─── Duration corrected to 1 YEAR to match physical document ───────────────
 const COURSES = [
-  { name: "Food & Beverage Production & Service", cert: "ARTISAN",  examBody: "KNEC",       duration: "2YEARS"    },
-  { name: "Hair Dressing and Beauty Therapy",      cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
-  { name: "Electrical and Electronics",            cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
-  { name: "Electronic Mechanics",                  cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
+  { name: "Food & Beverage Production & Service", cert: "ARTISAN",  examBody: "KNEC",       duration: "1YEAR"    },
+  { name: "Hair Dressing and Beauty Therapy",      cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Electrical and Electronics",            cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Electronic Mechanics",                  cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
   { name: "Solar PV Installation",                 cert: "GRADE 3", examBody: "NITA",        duration: "6 MONTHS" },
   { name: "Security & Network Systems",            cert: "CERT",    examBody: "(INTERNAL)",  duration: "3 MONTHS" },
-  { name: "Plumbing",                              cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
-  { name: "Masonry",                               cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
-  { name: "Fashion Design and Dressmaking",        cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
-  { name: "Motor Vehicle Mechanics",               cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
-  { name: "Welding & Fabrication",                 cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
-  { name: "Computer Operator",                     cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
+  { name: "Plumbing",                              cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Masonry",                               cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Fashion Design and Dressmaking",        cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Motor Vehicle Mechanics",               cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Welding & Fabrication",                 cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Computer Operator",                     cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
   { name: "Computer packages",                     cert: "CERT",    examBody: "INTERNAL",    duration: "2MONTHS"  },
 ];
 
@@ -73,7 +73,7 @@ const s = StyleSheet.create({
     fontSize: 10.5,
     color: dark,
     paddingTop: 36,
-    paddingBottom: 36,
+    paddingBottom: 50,
     paddingLeft: 52,
     paddingRight: 52,
   },
@@ -196,15 +196,15 @@ const s = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // Tight rule items — fit all 22 on one page
-  ruleItem: { flexDirection: 'row', marginBottom: 4 },
-  ruleNum:  { width: 22, fontSize: 10, lineHeight: 1.4, fontFamily: 'Times-Roman' },
-  ruleText: { flex: 1, fontSize: 10, lineHeight: 1.4, fontFamily: 'Times-Roman', textAlign: 'justify' },
+  // Rule items — natural page flow, no forced single-page compression
+  ruleItem: { flexDirection: 'row', marginBottom: 7 },
+  ruleNum:  { width: 24, fontSize: 9.5, lineHeight: 1.55, fontFamily: 'Times-Roman' },
+  ruleText: { flex: 1, fontSize: 9.5, lineHeight: 1.55, fontFamily: 'Times-Roman', textAlign: 'justify' },
 
-  subList: { marginTop: 2, marginLeft: 2 },
-  subItem: { flexDirection: 'row', marginBottom: 2 },
-  subNum:  { width: 20, fontSize: 10, lineHeight: 1.4 },
-  subText: { flex: 1, fontSize: 10, lineHeight: 1.4, textAlign: 'justify' },
+  subList: { marginTop: 3, marginLeft: 2 },
+  subItem: { flexDirection: 'row', marginBottom: 3 },
+  subNum:  { width: 20, fontSize: 9.5, lineHeight: 1.5 },
+  subText: { flex: 1, fontSize: 9.5, lineHeight: 1.5, textAlign: 'justify' },
 
   // ── Declaration + sign line (rules page bottom) ───────────────────────────
   declareText: {
@@ -294,7 +294,7 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
   // ── Rule renderer (all 22 rules, compact) ─────────────────────────────────
   const renderRules = (rules, startIndex = 0) =>
     rules.map((rule, index) => (
-      <View style={s.ruleItem} key={startIndex + index} wrap={false}>
+      <View style={s.ruleItem} key={startIndex + index}>
         <Text style={s.ruleNum}>{startIndex + index + 1}.</Text>
         <View style={{ flex: 1 }}>
           {typeof rule === 'string' ? (
@@ -304,7 +304,7 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
               <Text style={s.ruleText}>{rule.main}</Text>
               <View style={s.subList}>
                 {rule.subs.map((sub, si) => (
-                  <View style={s.subItem} key={si} wrap={false}>
+                  <View style={s.subItem} key={si}>
                     <Text style={s.subNum}>{String.fromCharCode(97 + si)})</Text>
                     <Text style={s.subText}>{sub}</Text>
                   </View>
@@ -432,31 +432,29 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
 
         {renderRules(RULES)}
 
-        {/* ── Declaration ──────────────────────────────────────────── */}
-        <Text style={s.declareText}>
-          I hereby declare that I will adhere to all the rules and regulations of this institution.
-        </Text>
+        {/* ── Declaration + sign — kept together, won't split across pages ── */}
+        <View wrap={false}>
+          <Text style={s.declareText}>
+            I hereby declare that I will adhere to all the rules and regulations of this institution.
+          </Text>
 
-        {/* ── Name / Date / Sign — one line ────────────────────────────
-            "Name: __________ Date: __________ Sign: __________"
-            Exactly as in the physical document bottom line.
-        ──────────────────────────────────────────────────────────── */}
-        <View style={s.signRow}>
-          <Text style={s.signLabel}>Name:</Text>
-          <View style={s.signLine}>
-            <Text style={s.signValue}>{name || ' '}</Text>
-          </View>
+          <View style={s.signRow}>
+            <Text style={s.signLabel}>Name:</Text>
+            <View style={s.signLine}>
+              <Text style={s.signValue}>{name || ' '}</Text>
+            </View>
 
-          <Text style={s.signLabel}>Date:</Text>
-          <View style={s.dateSignLine}>
-            <Text style={s.signValue}>{dateStr || ' '}</Text>
-          </View>
+            <Text style={s.signLabel}>Date:</Text>
+            <View style={s.dateSignLine}>
+              <Text style={s.signValue}>{dateStr || ' '}</Text>
+            </View>
 
-          <Text style={s.signLabel}>Sign:</Text>
-          <View style={s.sigSignLine}>
-            {signatureData
-              ? <Image src={signatureData} style={s.signImg} />
-              : <Text style={s.signValue}> </Text>}
+            <Text style={s.signLabel}>Sign:</Text>
+            <View style={s.sigSignLine}>
+              {signatureData
+                ? <Image src={signatureData} style={s.signImg} />
+                : <Text style={s.signValue}> </Text>}
+            </View>
           </View>
         </View>
 
