@@ -279,7 +279,7 @@ function Footer() {
 }
 
 // ── Main export ────────────────────────────────────────────────────────────
-export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
+export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
   const {
     name      = '',
     course    = '',
