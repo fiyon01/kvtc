@@ -9,18 +9,18 @@ const dots    = '...............................................................
 
 // ─── Duration corrected to 1 YEAR to match physical document ───────────────
 const COURSES = [
-  { name: "Food & Beverage Production & Service", cert: "ARTISAN",  examBody: "KNEC",       duration: "1YEAR"    },
-  { name: "Hair Dressing and Beauty Therapy",      cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
-  { name: "Electrical and Electronics",            cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
-  { name: "Electronic Mechanics",                  cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Food & Beverage Production & Service", cert: "ARTISAN",  examBody: "KNEC",       duration: "2YEARS"    },
+  { name: "Hair Dressing and Beauty Therapy",      cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
+  { name: "Electrical and Electronics",            cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
+  { name: "Electronic Mechanics",                  cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
   { name: "Solar PV Installation",                 cert: "GRADE 3", examBody: "NITA",        duration: "6 MONTHS" },
   { name: "Security & Network Systems",            cert: "CERT",    examBody: "(INTERNAL)",  duration: "3 MONTHS" },
-  { name: "Plumbing",                              cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
-  { name: "Masonry",                               cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
-  { name: "Fashion Design and Dressmaking",        cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
-  { name: "Motor Vehicle Mechanics",               cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
-  { name: "Welding & Fabrication",                 cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
-  { name: "Computer Operator",                     cert: "GRADE 3", examBody: "NITA",        duration: "1 YEAR"   },
+  { name: "Plumbing",                              cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
+  { name: "Masonry",                               cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
+  { name: "Fashion Design and Dressmaking",        cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
+  { name: "Motor Vehicle Mechanics",               cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
+  { name: "Welding & Fabrication",                 cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
+  { name: "Computer Operator",                     cert: "GRADE 3", examBody: "NITA",        duration: "2 YEARS"   },
   { name: "Computer packages",                     cert: "CERT",    examBody: "INTERNAL",    duration: "2MONTHS"  },
 ];
 
