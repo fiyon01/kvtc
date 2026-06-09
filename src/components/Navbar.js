@@ -104,45 +104,49 @@ export default function Navbar() {
         {/* Desktop Nav */}
         <ul style={{ display: 'flex', gap: 'clamp(16px, 1.7vw, 26px)', listStyle: 'none', margin: 0, padding: 0, alignItems: 'center' }} className="nav-desktop-ul">
           {desktopLinks.map(l => (
-            <li key={l.name} style={{ position: 'relative' }} className={l.isDropdown ? 'nav-dropdown-wrapper' : ''}>
+            <li key={l.name} style={{ position: 'relative', display: 'flex', alignItems: 'center' }} className={l.isDropdown ? 'nav-dropdown-wrapper' : ''}>
               {l.isDropdown ? (
-                <div style={{
+                <div className="nav-item nav-dropdown-trigger" style={{
                   cursor: 'pointer',
                   color: '#555',
                   fontSize: '14px', fontWeight: 500,
-                  paddingBottom: '4px',
                   display: 'flex', alignItems: 'center', gap: '4px',
                   transition: 'color 0.2s',
                 }}>
                   {l.name}
-                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                  <svg className="nav-dropdown-chevron" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
                 </div>
               ) : (
-                <Link href={l.href} style={{
+                <Link href={l.href} className="nav-item" style={{
                   textDecoration: 'none',
                   color: pathname === l.href ? '#0F6E56' : '#555',
                   fontSize: '14px', fontWeight: 500,
                   borderBottom: pathname === l.href ? '2px solid #0F6E56' : '2px solid transparent',
-                  paddingBottom: '4px',
                   transition: 'color 0.2s',
                 }}>{l.name}</Link>
               )}
 
               {l.isDropdown && (
                 <div className="nav-dropdown-menu" style={{
-                  position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
-                  background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '12px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)', minWidth: '220px',
-                  padding: '12px', opacity: 0, visibility: 'hidden', transition: 'all 0.2s ease', zIndex: 10
+                  position: 'absolute', top: 'calc(100% + 10px)', left: '50%', transform: 'translateX(-50%) translateY(-4px)',
+                  background: 'rgba(255,255,255,0.99)', border: '1px solid rgba(47,121,183,0.16)', borderRadius: '16px',
+                  boxShadow: '0 18px 48px rgba(31,63,82,0.15)', minWidth: l.name === 'Departments' ? '246px' : '210px',
+                  padding: '9px', opacity: 0, visibility: 'hidden', transition: 'all 0.2s ease', zIndex: 10,
+                  overflow: 'hidden',
                 }}>
-                  <div style={{ position: 'absolute', top: '-6px', left: '50%', transform: 'translateX(-50%) rotate(45deg)', width: '12px', height: '12px', background: '#fff', borderTop: '1px solid rgba(0,0,0,0.08)', borderLeft: '1px solid rgba(0,0,0,0.08)' }} />
+                  <div aria-hidden="true" style={{ height: '3px', margin: '-9px -9px 7px', background: 'linear-gradient(90deg, #0F6E56, #2F79B7)' }} />
                   {l.sublinks.map(s => (
                     <Link key={s.href} href={s.href} style={{
-                      display: 'block', padding: '10px 16px', color: '#1a1a1a',
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px',
+                      padding: '11px 13px', color: '#263b47',
                       textDecoration: 'none', fontSize: '14px', fontWeight: 500,
-                      borderRadius: '8px', transition: 'background 0.2s',
+                      borderRadius: '10px', transition: 'background 0.2s, color 0.2s, transform 0.2s',
                     }} className="dropdown-link">
-                      {s.name}
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span aria-hidden="true" className="dropdown-dot" />
+                        {s.name}
+                      </span>
+                      <span aria-hidden="true" className="dropdown-arrow">→</span>
                     </Link>
                   ))}
                 </div>
@@ -152,14 +156,49 @@ export default function Navbar() {
         </ul>
 
         <style>{`
+          .nav-item {
+            height: 36px;
+            padding: 0 2px;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+          }
+          .nav-item:hover {
+            color: #0F6E56 !important;
+          }
           .nav-dropdown-wrapper:hover .nav-dropdown-menu {
             opacity: 1 !important;
             visibility: visible !important;
-            transform: translateX(-50%) translateY(8px) !important;
+            transform: translateX(-50%) translateY(0) !important;
+          }
+          .nav-dropdown-wrapper:hover .nav-dropdown-chevron {
+            transform: rotate(180deg);
+          }
+          .nav-dropdown-chevron {
+            transition: transform 0.2s ease;
           }
           .dropdown-link:hover {
-            background: #E1F5EE;
+            background: linear-gradient(90deg, #edf8f4, #eef6fb);
             color: #0F6E56 !important;
+            transform: translateX(2px);
+          }
+          .dropdown-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #2F79B7;
+            box-shadow: 0 0 0 3px rgba(47,121,183,0.1);
+            flex-shrink: 0;
+          }
+          .dropdown-arrow {
+            color: #7b96a5;
+            font-size: 14px;
+            transition: transform 0.2s ease, color 0.2s ease;
+          }
+          .dropdown-link:hover .dropdown-arrow {
+            color: #0F6E56;
+            transform: translateX(2px);
           }
           .nav-brand-lockup {
             transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;

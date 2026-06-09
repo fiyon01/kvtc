@@ -50,6 +50,17 @@ export default function ProspectusClient({ dbData }) {
           .prosp-body  { padding: 28px 16px !important; }
           .two-col     { flex-direction: column !important; }
           .prosp-title { font-size: 2rem !important; }
+          .prospectus-actions {
+            top: auto !important;
+            left: 12px !important;
+            right: 12px !important;
+            bottom: 14px !important;
+            justify-content: space-between !important;
+          }
+          .prospectus-action {
+            padding: 12px 15px !important;
+            font-size: 13px !important;
+          }
         }
         .two-col {
           display: flex;
@@ -106,18 +117,37 @@ export default function ProspectusClient({ dbData }) {
       `}</style>
 
       {/* Floating Download Button — plain anchor = works on all devices */}
-      <div className="no-print" style={{
-        position: 'fixed', bottom: '32px', right: '32px', zIndex: 200,
+      <div className="no-print prospectus-actions" style={{
+        position: 'fixed', top: '28px', left: '28px', right: '28px', zIndex: 200,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        pointerEvents: 'none',
       }}>
+        <Link
+          href="/"
+          className="prospectus-action"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            background: '#fff', color: '#263b47',
+            padding: '13px 20px', borderRadius: '12px',
+            border: '1px solid rgba(47,121,183,0.2)',
+            fontWeight: 700, fontSize: '14px', textDecoration: 'none',
+            boxShadow: '0 8px 28px rgba(31,63,82,0.14)',
+            pointerEvents: 'auto',
+          }}
+        >
+          <span aria-hidden="true">←</span> Back to website
+        </Link>
         <a
           href="/api/prospectus-pdf"
           download={`Kinoo_VTC_Prospectus_${feeStructure?.year || '2026'}.pdf`}
+          className="prospectus-action"
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             background: '#0F6E56', color: '#fff',
-            padding: '14px 28px', borderRadius: '12px',
-            fontWeight: 700, fontSize: '15px', textDecoration: 'none',
+            padding: '13px 22px', borderRadius: '12px',
+            fontWeight: 700, fontSize: '14px', textDecoration: 'none',
             boxShadow: '0 8px 32px rgba(15,110,86,0.35)',
+            pointerEvents: 'auto',
           }}
         >
           ⬇ Download PDF

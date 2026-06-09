@@ -10,6 +10,11 @@ export const metadata = {
   title: "Kinoo Vocational Training Centre | Skills for Life",
   description: "Kiambu County's premier public vocational training centre. NITA & KNEC certified courses in Food & Beverage, Electronics, Hair Dressing, Plumbing, and more. Intake ongoing!",
   keywords: "Kinoo VTC, vocational training Kiambu, NITA courses Kenya, KNEC artisan, technical college Kikuyu, affordable vocational training",
+  icons: {
+    icon: [{ url: "/kvtc_logo.png", type: "image/png" }],
+    shortcut: "/kvtc_logo.png",
+    apple: "/kvtc_logo.png",
+  },
   openGraph: {
     title: "Kinoo VTC – Skills for Life | Kiambu County",
     description: "NITA & KNEC certified vocational training in Kikuyu, Kiambu. 13+ courses, subsidised fees. Apply today!",
