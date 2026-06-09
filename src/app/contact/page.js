@@ -37,7 +37,7 @@ export default function Contact() {
 
   const contactItems = [
     {
-      emoji: '📍',
+      emoji: 'MAP',
       bg: '#E1F5EE',
       label: 'Physical Address',
       value: 'Along Nairobi-Nakuru Highway, Kikuyu',
@@ -45,7 +45,7 @@ export default function Contact() {
       href: 'https://maps.google.com/?q=Kinoo+VTC+Kikuyu',
     },
     {
-      emoji: '📞',
+      emoji: 'TEL',
       bg: '#E1F5EE',
       label: 'Phone Numbers',
       value: '0113 582 008',
@@ -53,17 +53,17 @@ export default function Contact() {
       href: 'tel:+254113582008',
     },
     {
-      emoji: '✉️',
+      emoji: 'MAIL',
       bg: '#FFF8E8',
       label: 'Email Address',
       value: 'kinoovtc@gmail.com',
       href: 'mailto:kinoovtc@gmail.com',
     },
     {
-      emoji: '🕐',
+      emoji: 'HRS',
       bg: '#E1F5EE',
       label: 'Office Hours',
-      value: 'Mon – Fri: 8:00am – 5:00pm',
+      value: 'Mon - Fri: 8:00am - 5:00pm',
       sub: 'Closed weekends & public holidays',
     },
   ];
@@ -72,8 +72,8 @@ export default function Contact() {
     <>
       {/* ── HERO (matches site theme) ── */}
       <div style={{
-        padding: '150px 8% 80px',
-        background: 'linear-gradient(135deg, rgba(15,110,86,0.07) 0%, rgba(239,159,39,0.04) 100%)',
+        padding: '132px 8% 64px',
+        background: 'linear-gradient(135deg, rgba(15,110,86,0.09) 0%, rgba(47,121,183,0.07) 100%)',
         borderBottom: '1px solid rgba(0,0,0,0.06)',
         textAlign: 'center',
         position: 'relative',
@@ -94,7 +94,7 @@ export default function Contact() {
             <em style={{ fontStyle: 'normal', color: '#0F6E56' }}>From You</em>
           </h1>
           <p style={{ color: '#666', fontSize: '1.1rem', maxWidth: '560px', margin: '0 auto 36px', lineHeight: 1.7 }}>
-            Questions about courses, admission, or fees? Our team is ready to guide you — reach out through any channel below.
+            Questions about courses, admission, or fees? Our team is ready to guide you through the next step.
           </p>
 
           {/* Quick-action pills — themed */}
@@ -108,7 +108,7 @@ export default function Contact() {
             }}
               onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-              📞 Call Us Now
+              Call Us Now
             </a>
             <a href="https://wa.me/254113582008" target="_blank" rel="noreferrer" style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
@@ -128,13 +128,13 @@ export default function Contact() {
       </div>
 
       {/* ── MAIN SECTION ── */}
-      <section style={{ padding: '80px 8% 100px', background: '#f8f7f4' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '48px', alignItems: 'start', maxWidth: '1200px', margin: '0 auto' }} className="contact-grid">
+      <section className="contact-main" style={{ padding: '72px 8% 96px', background: '#f8f7f4' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.35fr', gap: '48px', alignItems: 'start', maxWidth: '1200px', margin: '0 auto' }} className="contact-grid">
 
           {/* LEFT: Contact info cards */}
-          <FadeIn>
+          <FadeIn style={{ order: 1 }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.6rem', color: '#1a1a1a', marginBottom: '8px' }}>Contact Information</h3>
-            <p style={{ color: '#888', fontSize: '14px', marginBottom: '28px', lineHeight: 1.6 }}>Visit us Monday to Friday, 8am–5pm. We respond to all enquiries promptly.</p>
+            <p style={{ color: '#888', fontSize: '14px', marginBottom: '28px', lineHeight: 1.6 }}>Visit us Monday to Friday, 8am-5pm. We respond to all enquiries promptly.</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '24px' }}>
               {contactItems.map((item, i) => (
@@ -150,7 +150,8 @@ export default function Contact() {
                   <div style={{
                     width: '46px', height: '46px', borderRadius: '12px',
                     background: item.bg, display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', flexShrink: 0, fontSize: '20px',
+                    justifyContent: 'center', flexShrink: 0, fontSize: '10px',
+                    fontWeight: 800, letterSpacing: '0.5px', color: '#0F6E56',
                   }}>
                     {item.emoji}
                   </div>
@@ -182,10 +183,10 @@ export default function Contact() {
             }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(15,110,86,0.3)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(15,110,86,0.22)'; }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '22px' }}>🗺️</div>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '11px', fontWeight: 800, letterSpacing: '0.5px' }}>MAP</div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '2px' }}>Get Directions</div>
-                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)' }}>Open in Google Maps →</div>
+                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)' }}>Open in Google Maps</div>
               </div>
             </a>
 
@@ -214,7 +215,7 @@ export default function Contact() {
           </FadeIn>
 
           {/* RIGHT: Enquiry Form */}
-          <FadeIn delay={0.15}>
+          <FadeIn delay={0.15} style={{ order: 2 }}>
             {submitted ? (
               <div style={{ background: '#fff', borderRadius: '24px', padding: '64px 40px', textAlign: 'center', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', border: '1px solid rgba(0,0,0,0.06)' }}>
                 <div style={{
@@ -251,14 +252,14 @@ export default function Contact() {
                 <style>{`@keyframes popIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }`}</style>
               </div>
             ) : (
-              <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.07)', borderRadius: '24px', padding: '44px', boxShadow: '0 8px 40px rgba(0,0,0,0.07)' }}>
+              <div className="contact-form-card" style={{ background: '#fff', border: '1px solid rgba(15,110,86,0.12)', borderRadius: '24px', padding: '44px', boxShadow: '0 18px 55px rgba(24,55,47,0.1)' }}>
                 <div style={{ marginBottom: '32px' }}>
                   <span style={{ display: 'inline-block', fontSize: '11px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#0F6E56', background: '#E1F5EE', padding: '5px 14px', borderRadius: '100px', marginBottom: '12px' }}>
                     Enquiry Form
                   </span>
                   <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.9rem', color: '#1a1a1a', marginBottom: '8px' }}>Send a Message</h3>
                   <p style={{ fontFamily: 'var(--sans)', fontSize: '14px', color: '#888', lineHeight: 1.6 }}>
-                    Fill out the form below. We'll respond within 24 hours — or reach us directly on WhatsApp for an instant reply.
+                    Fill out the form below. We'll respond within 24 hours, or reach us directly on WhatsApp for an instant reply.
                   </p>
                 </div>
 
@@ -331,11 +332,11 @@ export default function Contact() {
                     onMouseEnter={e => { e.currentTarget.style.background = '#0a523f'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(15,110,86,0.3)'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = '#0F6E56'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(15,110,86,0.25)'; }}
                     onMouseDown={e => e.currentTarget.style.transform = 'translateY(1px)'}>
-                    Send Enquiry →
+                    Send Enquiry
                   </button>
 
                   <p style={{ textAlign: 'center', fontSize: '13px', color: '#bbb', marginTop: '16px' }}>
-                    🔒 Your details are private and will never be shared.
+                    Your details are private and used only to respond to this enquiry.
                   </p>
                 </form>
               </div>
@@ -344,25 +345,14 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Floating WhatsApp button */}
-      <a href="https://wa.me/254113582008" target="_blank" rel="noreferrer"
-        style={{
-          position: 'fixed', bottom: '28px', right: '28px',
-          width: '58px', height: '58px', borderRadius: '50%',
-          background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 8px 28px rgba(37,211,102,0.4)', zIndex: 9999,
-          transition: 'transform 0.2s, box-shadow 0.2s', textDecoration: 'none',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.12)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(37,211,102,0.5)'; }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(37,211,102,0.4)'; }}
-        title="Chat on WhatsApp">
-        <svg viewBox="0 0 24 24" fill="white" width="28" height="28"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      </a>
-
       <style>{`
         @media (max-width: 900px) {
           .contact-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+          .contact-grid > div:first-child { order: 2 !important; }
+          .contact-grid > div:last-child { order: 1 !important; }
           .form-2col { grid-template-columns: 1fr !important; }
+          .contact-main { padding: 44px 18px 72px !important; }
+          .contact-form-card { padding: 28px 20px !important; border-radius: 18px !important; }
         }
       `}</style>
     </>

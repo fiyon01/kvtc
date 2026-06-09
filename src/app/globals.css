@@ -61,4 +61,6 @@ img { max-width: 100%; display: block; }
 .kvtc-logo-crop {
   object-fit: cover !important;
   object-position: 50% 18% !important;
+  transform: scale(1.12);
+  transform-origin: center;
 }

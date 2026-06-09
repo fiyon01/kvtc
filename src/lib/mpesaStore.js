@@ -1,4 +1,5 @@
-const transactions = new Map();
+const transactions = globalThis.__kvtcMpesaTransactions || new Map();
+globalThis.__kvtcMpesaTransactions = transactions;
 
 export function setTransactionStatus(checkoutId, status, message, details = {}) {
   const previous = transactions.get(checkoutId) || {};

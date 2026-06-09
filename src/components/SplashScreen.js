@@ -25,7 +25,7 @@ export default function SplashScreen() {
     }}>
       {/* Logos Row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ height: '90px', width: '90px', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+        <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ height: '104px', width: '104px', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />
 
         {/* Separator */}
         <div style={{ width: '1px', height: '50px', background: 'rgba(0,0,0,0.1)', animation: 'splash-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }} />

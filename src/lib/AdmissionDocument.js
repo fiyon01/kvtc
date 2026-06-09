@@ -299,7 +299,7 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
             <View style={s.paymentBox} wrap={false}>
               <Text style={s.paymentTitle}>M-PESA PAYMENT CONFIRMATION</Text>
               <View style={s.paymentGrid}>
-                <Text style={s.paymentLabel}>Reference:</Text>
+                <Text style={s.paymentLabel}>Receipt:</Text>
                 <Text style={s.paymentValue}>{paymentReference}</Text>
                 <Text style={s.paymentLabel}>Amount:</Text>
                 <Text style={[s.paymentValue, { marginRight: 0 }]}>KSh {paymentAmount}</Text>

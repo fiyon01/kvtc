@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   logo: { width: 76, height: 76, objectFit: 'contain' },
-  kvtcLogo: { width: 76, height: 76, objectFit: 'cover', objectPosition: '50% 18%' },
+  kvtcLogo: { width: 86, height: 86, objectFit: 'cover', objectPosition: '50% 18%', marginLeft: -5, marginRight: -5 },
   center: { flex: 1, alignItems: 'center', paddingLeft: 10, paddingRight: 10 },
   county: { fontFamily: 'Times-Bold', fontSize: 10, color: '#b59b69', letterSpacing: 0.7, marginBottom: 3, textAlign: 'center' },
   department: { fontFamily: 'Times-Bold', fontSize: 9.5, color: '#1f2f4d', marginBottom: 4, textAlign: 'center' },

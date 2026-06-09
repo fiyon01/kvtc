@@ -7,11 +7,9 @@ export async function POST(req) {
     const fname = formData.get('fname') || '';
     const lname = formData.get('lname') || '';
     const phone = formData.get('phone') || '';
+    const email = formData.get('email') || '';
     const course = formData.get('course') || 'General Inquiry';
     const msg = formData.get('msg') || 'N/A';
-    // The contact form currently doesn't ask for email, but let's see if it does.
-    // Wait, the form in page.js does not have an email field!
-    // I will check the form fields in page.js: fname, lname, phone, course, msg.
     
     // Check if email credentials are provided
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -39,8 +37,8 @@ export async function POST(req) {
         
         <div style="background-color: #1a6e2e; padding: 20px; text-align: center;">
           <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 12px;">
-            <img src="${baseUrl}/kvtc_logo.png" alt="KVTC Logo" style="height: 60px;" />
-            <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="height: 60px;" />
+            <img src="${baseUrl}/kvtc_logo.png" alt="KVTC Logo" style="width: 78px; height: 78px; object-fit: cover; object-position: 50% 18%;" />
+            <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="width: 64px; height: 64px; object-fit: contain;" />
           </div>
           <h1 style="color: #fff; margin: 0; font-size: 22px; letter-spacing: 1px;">NEW WEBSITE ENQUIRY</h1>
           <p style="color: #f0c040; margin: 6px 0 0; font-size: 14px; font-weight: bold;">Kinoo Vocational Training Centre</p>
@@ -55,6 +53,7 @@ export async function POST(req) {
             <p style="margin: 4px 0;"><strong>First Name:</strong> ${fname}</p>
             <p style="margin: 4px 0;"><strong>Last Name:</strong> ${lname}</p>
             <p style="margin: 4px 0;"><strong>Phone:</strong> ${phone}</p>
+            <p style="margin: 4px 0;"><strong>Email:</strong> ${email || 'N/A'}</p>
             <p style="margin: 4px 0;"><strong>Course of Interest:</strong> ${course}</p>
           </div>
 

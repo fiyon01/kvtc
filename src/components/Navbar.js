@@ -45,6 +45,23 @@ export default function Navbar() {
     { name: 'Admissions', href: '/admissions' },
     { name: 'Contact', href: '/contact' },
   ];
+  const desktopLinks = [
+    { name: 'About', href: '/about' },
+    links.find(link => link.name === 'Departments'),
+    { name: 'Courses', href: '/courses' },
+    { name: 'Admissions', href: '/admissions' },
+    { name: 'Contact', href: '/contact' },
+    {
+      name: 'More',
+      href: '#',
+      isDropdown: true,
+      sublinks: [
+        { name: 'Blog', href: '/blog' },
+        { name: 'FAQs', href: '/faqs' },
+        { name: 'Prospectus', href: '/api/prospectus-pdf' },
+      ],
+    },
+  ];
 
   const phoneNumber = '+254113582008';
 
@@ -55,20 +72,29 @@ export default function Navbar() {
         background: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.95)',
         backdropFilter: 'blur(12px)',
         borderBottom: '2px solid rgba(47,121,183,0.16)',
-        padding: '0 5%',
+        padding: '0 clamp(24px, 4vw, 64px)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         height: '70px',
         boxShadow: scrolled ? '0 2px 24px rgba(0,0,0,0.1)' : 'none',
         transition: 'box-shadow 0.3s, top 0.3s',
       }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-          <img src="/cgok-logo.png" alt="CGOK" style={{ height: '42px', width: 'auto', objectFit: 'contain' }} />
-          <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ height: '42px', width: '42px' }} />
-                </Link>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', height: '52px' }}>
+          <span style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <img
+              src="/kvtc_logo.png"
+              alt="KVTC"
+              className="kvtc-logo-crop"
+              style={{ height: '46px', width: '46px', transform: 'translateY(-3px) scale(1.1)' }}
+            />
+          </span>
+          <span style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <img src="/cgok-logo.png" alt="CGOK" style={{ height: '42px', width: '42px', objectFit: 'contain' }} />
+          </span>
+        </Link>
 
         {/* Desktop Nav */}
-        <ul style={{ display: 'flex', gap: '28px', listStyle: 'none', margin: 0, padding: 0 }} className="nav-desktop-ul">
-          {links.map(l => (
+        <ul style={{ display: 'flex', gap: 'clamp(16px, 1.7vw, 26px)', listStyle: 'none', margin: 0, padding: 0, alignItems: 'center' }} className="nav-desktop-ul">
+          {desktopLinks.map(l => (
             <li key={l.name} style={{ position: 'relative' }} className={l.isDropdown ? 'nav-dropdown-wrapper' : ''}>
               {l.isDropdown ? (
                 <div style={{
@@ -129,23 +155,15 @@ export default function Navbar() {
         `}</style>
 
         <div className="nav-cta-btn" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <a href={`tel:${phoneNumber}`} style={{
-            display: 'flex', alignItems: 'center', gap: '6px',
-            color: '#0F6E56', fontWeight: 600, fontSize: '13px', textDecoration: 'none',
-            border: '1.5px solid #0F6E56', padding: '8px 14px', borderRadius: '8px',
-          }}>Call Us</a>
-          <a href="/api/prospectus-pdf" download="Kinoo_VTC_Prospectus.pdf" style={{
-            color: '#555', fontWeight: 500, fontSize: '13px', textDecoration: 'none',
-            border: '1.5px solid rgba(0,0,0,0.12)', padding: '8px 14px', borderRadius: '8px',
-          }}>Prospectus</a>
           <Link href="/fee-structure" style={{
             color: '#555', fontWeight: 500, fontSize: '13px', textDecoration: 'none',
             border: '1.5px solid rgba(0,0,0,0.12)', padding: '8px 14px', borderRadius: '8px',
+            whiteSpace: 'nowrap',
           }}>Fee Structure</Link>
           <Link href="/apply" style={{
             background: '#0F6E56', color: '#fff',
             padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 500,
-            textDecoration: 'none',
+            textDecoration: 'none', whiteSpace: 'nowrap',
           }}>Apply Now</Link>
         </div>
 

@@ -16,7 +16,16 @@ export async function POST(req) {
     const kinName = formData.get('kinName') || 'N/A';
     const kinTel = formData.get('kinTel') || 'N/A';
     const admissionAmount = formData.get('admissionAmount') || '500';
-    const paymentReference = formData.get('paymentReference') || 'N/A';
+    const rawPaymentReference = String(formData.get('paymentReference') || '').trim();
+    const paymentReference = /^[A-Z0-9]{8,16}$/i.test(rawPaymentReference)
+      ? rawPaymentReference.toUpperCase()
+      : '';
+    if (!paymentReference) {
+      return NextResponse.json({
+        success: false,
+        message: 'A valid M-PESA receipt number is required before an application can be submitted.',
+      }, { status: 400 });
+    }
     const paymentDate = formData.get('paymentDate') || new Date().toISOString();
     const paymentPhone = formData.get('paymentPhone') || phone;
     const formPdfFile = formData.get('formPdf');
@@ -67,8 +76,8 @@ export async function POST(req) {
         
         <div style="background-color: #1a6e2e; padding: 20px; text-align: center;">
           <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 12px;">
-            <img src="${baseUrl}/kvtc_logo.png" alt="KVTC Logo" style="height: 60px;" />
-            <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="height: 60px;" />
+            <img src="${baseUrl}/kvtc_logo.png" alt="KVTC Logo" style="width: 78px; height: 78px; object-fit: cover; object-position: 50% 18%;" />
+            <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="width: 64px; height: 64px; object-fit: contain;" />
           </div>
           <h1 style="color: #fff; margin: 0; font-size: 22px; letter-spacing: 1px;">ADMISSION APPLICATION SUCCESSFUL</h1>
           <p style="color: #f0c040; margin: 6px 0 0; font-size: 14px; font-weight: bold;">Kinoo Vocational Training Centre</p>
@@ -87,7 +96,7 @@ export async function POST(req) {
             <p style="margin: 4px 0;"><strong>Course:</strong> ${course}</p>
             <p style="margin: 4px 0;"><strong>Applicant Name:</strong> ${name}</p>
             <p style="margin: 4px 0;"><strong>Phone:</strong> ${phone}</p>
-            <p style="margin: 4px 0;"><strong>M-PESA Reference:</strong> ${paymentReference}</p>
+            <p style="margin: 4px 0;"><strong>M-PESA Receipt:</strong> ${paymentReference}</p>
             <p style="margin: 4px 0;"><strong>Payment Date:</strong> ${new Date(paymentDate).toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' })}</p>
           </div>
 
@@ -138,13 +147,19 @@ export async function POST(req) {
     // HTML Email body for Admin
     const adminHtmlContent = `
       <div style="font-family: 'Times New Roman', Times, serif; color: #333; max-width: 600px; width: 100%; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-sizing: border-box;">
-        <div style="background-color: #1a3a6e; padding: 20px; text-align: center;">
-          <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 12px;">
-            <img src="${baseUrl}/kvtc_logo.png" alt="KVTC Logo" style="height: 60px;" />
-            <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="height: 60px;" />
-          </div>
-          <h1 style="color: #fff; margin: 0; font-size: 22px; letter-spacing: 1px;">NEW ADMISSION RECEIVED</h1>
-          <p style="color: #60a5fa; margin: 6px 0 0; font-size: 14px; font-weight: bold;">Kinoo Vocational Training Centre</p>
+        <div style="background-color: #fffdf8; padding: 20px; text-align: center; border-top: 5px solid #0F6E56; border-bottom: 2px solid #d7e9e2;">
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 auto 12px;">
+            <tr>
+              <td style="padding: 0 14px; vertical-align: middle;">
+                <img src="${baseUrl}/kvtc_logo.png" alt="KVTC Logo" style="display: block; width: 78px; height: 78px; object-fit: cover; object-position: 50% 18%;" />
+              </td>
+              <td style="padding: 0 14px; vertical-align: middle;">
+                <img src="${baseUrl}/cgok-logo.png" alt="CGOK Logo" style="display: block; width: 64px; height: 64px; object-fit: contain;" />
+              </td>
+            </tr>
+          </table>
+          <h1 style="color: #17352c; margin: 0; font-size: 22px; letter-spacing: 1px;">NEW ADMISSION RECEIVED</h1>
+          <p style="color: #0F6E56; margin: 6px 0 0; font-size: 14px; font-weight: bold;">Kinoo Vocational Training Centre</p>
         </div>
         <div style="padding: 24px 20px; background-color: #fcfcfc;">
           <p style="font-size: 16px; margin-bottom: 20px; line-height: 1.5;">A new admission application has been submitted and paid via M-PESA.</p>
@@ -156,7 +171,7 @@ export async function POST(req) {
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Email</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${email || 'N/A'}</td></tr>
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>ID No</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${idNo}</td></tr>
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Fee Paid</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; color: #16a34a; font-weight: bold;">KSh ${admissionAmount} (M-PESA)</td></tr>
-            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>M-PESA Ref</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word; font-weight: bold;">${paymentReference}</td></tr>
+            <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>M-PESA Receipt</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word; font-weight: bold;">${paymentReference}</td></tr>
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Payment Time</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${new Date(paymentDate).toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' })}</td></tr>
             <tr><td style="padding: 10px; border-bottom: 1px solid #eee; color: #666; vertical-align: top;"><strong>Payment Phone</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee; word-break: break-word;">${paymentPhone}</td></tr>
           </table>

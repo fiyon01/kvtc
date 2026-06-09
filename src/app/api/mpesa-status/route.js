@@ -27,8 +27,20 @@ export async function GET(req) {
   }
 
   const stored = getTransactionStatus(checkoutId);
-  if (stored.status === 'success' || stored.status === 'failed') {
+  if (stored.status === 'failed') {
     return Response.json(stored);
+  }
+
+  if (stored.status === 'success') {
+    if (stored.paymentReference) {
+      return Response.json(stored);
+    }
+
+    return Response.json({
+      ...stored,
+      status: 'confirming_receipt',
+      message: 'Payment completed. Waiting for the M-PESA receipt number.',
+    });
   }
 
   const shortcode = process.env.MPESA_SHORTCODE;
@@ -79,13 +91,18 @@ export async function GET(req) {
     if (String(data.ResultCode) === '0') {
       const success = {
         checkoutRequestId: checkoutId,
-        paymentReference: stored.paymentReference || checkoutId,
+        paymentReference: stored.paymentReference || '',
         paymentDate: stored.paymentDate || new Date().toISOString(),
         paymentPhone: stored.phone || '',
         amount: stored.amount,
+        queryConfirmedAt: new Date().toISOString(),
       };
       setTransactionStatus(checkoutId, 'success', 'Payment completed successfully', success);
-      return Response.json({ ...success, status: 'success', message: 'Payment completed successfully' });
+      return Response.json({
+        ...success,
+        status: 'confirming_receipt',
+        message: 'Payment completed. Waiting for the M-PESA receipt number.',
+      });
     }
 
     if (data.ResultCode !== undefined) {

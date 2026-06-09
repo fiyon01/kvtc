@@ -586,7 +586,7 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       fd.append("kinName", form.kinName);
       fd.append("kinTel", form.kinTel);
       fd.append("admissionAmount", paidAmount);
-      fd.append("paymentReference", payment.paymentReference || payment.checkoutRequestId || "N/A");
+      fd.append("paymentReference", payment.paymentReference || "");
       fd.append("paymentDate", payment.paymentDate || new Date().toISOString());
       fd.append("paymentPhone", payment.paymentPhone || payment.phone || form.tel);
       
