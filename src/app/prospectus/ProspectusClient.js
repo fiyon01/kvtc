@@ -45,21 +45,68 @@ export default function ProspectusClient({ dbData }) {
           }
         }
         @media screen and (max-width: 700px) {
-          .print-page { margin: 100px 12px 60px !important; border-radius: 12px !important; }
+          .print-page { margin: 18px 10px 48px !important; border-radius: 12px !important; }
           .prosp-cover { padding: 36px 20px !important; }
           .prosp-body  { padding: 28px 16px !important; }
           .two-col     { flex-direction: column !important; }
           .prosp-title { font-size: 2rem !important; }
           .prospectus-actions {
-            top: auto !important;
-            left: 12px !important;
-            right: 12px !important;
-            bottom: 14px !important;
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
             justify-content: space-between !important;
+            padding: 10px 12px !important;
+            background: rgba(248,250,251,0.96) !important;
+            border-bottom: 1px solid rgba(47,121,183,0.14) !important;
+            backdrop-filter: blur(10px);
           }
           .prospectus-action {
-            padding: 12px 15px !important;
-            font-size: 13px !important;
+            padding: 10px 12px !important;
+            font-size: 12px !important;
+            box-shadow: none !important;
+          }
+          .prosp-letterhead {
+            padding: 9px 7px 8px !important;
+          }
+          .prosp-letterhead-logo {
+            width: 52px !important;
+            height: 52px !important;
+          }
+          .prosp-letterhead-center {
+            padding: 0 5px !important;
+            min-width: 0 !important;
+          }
+          .prosp-letterhead-county {
+            font-size: 8px !important;
+            letter-spacing: 0.45px !important;
+          }
+          .prosp-letterhead-department {
+            font-size: 8px !important;
+            line-height: 1.2 !important;
+            margin-top: 2px !important;
+          }
+          .prosp-letterhead-name {
+            font-size: 10px !important;
+            letter-spacing: 0.35px !important;
+            margin-top: 3px !important;
+          }
+          .prosp-letterhead-contact {
+            font-size: 7px !important;
+            line-height: 1.3 !important;
+            margin-top: 3px !important;
+          }
+          #prospectus-content {
+            max-width: calc(100vw - 20px) !important;
+          }
+          #prospectus-content table {
+            width: 100% !important;
+            table-layout: fixed;
+          }
+          #prospectus-content th,
+          #prospectus-content td {
+            overflow-wrap: anywhere;
           }
         }
         .two-col {
@@ -156,22 +203,22 @@ export default function ProspectusClient({ dbData }) {
 
       {/* Prospectus Content — this element is cloned for PDF export */}
       <div id="prospectus-content" className="print-page">
-        <div style={{
+        <div className="prosp-letterhead" style={{
           display: 'flex',
           alignItems: 'center',
           padding: '12px 18px 10px',
           borderBottom: '4px solid #2f79b7',
           background: '#fff',
         }}>
-          <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ width: 84, height: 84, flexShrink: 0 }} />
-          <div style={{ flex: 1, textAlign: 'center', padding: '0 14px', fontFamily: "'Times New Roman', serif" }}>
-            <div style={{ color: '#b59b69', fontWeight: 700, letterSpacing: 1.2, fontSize: 13 }}>COUNTY GOVERNMENT OF KIAMBU</div>
-            <div style={{ color: '#1f2f4d', fontWeight: 700, fontSize: 14, marginTop: 3 }}>Department Of Education, Gender, Culture &amp; Social Services</div>
-            <div style={{ color: '#4c9daa', fontWeight: 800, letterSpacing: 1, fontSize: 17, marginTop: 4 }}>KINOO VOCATIONAL TRAINING CENTRE</div>
-            <div style={{ color: '#30364b', fontSize: 12, marginTop: 5 }}>P.O BOX 351-00902, Kikuyu. &nbsp;&nbsp; Tel: 0113582008</div>
-            <div style={{ color: '#30364b', fontSize: 12 }}>Email: kinoovtc@gmail.com &nbsp;&nbsp; www.kinoovtc.ac.ke</div>
+          <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop prosp-letterhead-logo" style={{ width: 84, height: 84, flexShrink: 0 }} />
+          <div className="prosp-letterhead-center" style={{ flex: 1, textAlign: 'center', padding: '0 14px', fontFamily: "'Times New Roman', serif" }}>
+            <div className="prosp-letterhead-county" style={{ color: '#b59b69', fontWeight: 700, letterSpacing: 1.2, fontSize: 13 }}>COUNTY GOVERNMENT OF KIAMBU</div>
+            <div className="prosp-letterhead-department" style={{ color: '#1f2f4d', fontWeight: 700, fontSize: 14, marginTop: 3 }}>Department Of Education, Gender, Culture &amp; Social Services</div>
+            <div className="prosp-letterhead-name" style={{ color: '#4c9daa', fontWeight: 800, letterSpacing: 1, fontSize: 17, marginTop: 4 }}>KINOO VOCATIONAL TRAINING CENTRE</div>
+            <div className="prosp-letterhead-contact" style={{ color: '#30364b', fontSize: 12, marginTop: 5 }}>P.O BOX 351-00902, Kikuyu. &nbsp;&nbsp; Tel: 0113582008</div>
+            <div className="prosp-letterhead-contact" style={{ color: '#30364b', fontSize: 12 }}>Email: kinoovtc@gmail.com &nbsp;&nbsp; www.kinoovtc.ac.ke</div>
           </div>
-          <img src="/cgok-logo.png" alt="County Government of Kiambu" style={{ width: 84, height: 84, objectFit: 'contain', flexShrink: 0 }} />
+          <img src="/cgok-logo.png" alt="County Government of Kiambu" className="prosp-letterhead-logo" style={{ width: 84, height: 84, objectFit: 'contain', flexShrink: 0 }} />
         </div>
 
         {/* PAGE 1 — Cover */}
