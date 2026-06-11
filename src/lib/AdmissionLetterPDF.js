@@ -220,46 +220,45 @@ const s = StyleSheet.create({
 
   ruleItem: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 13,
+    marginBottom: 10,
   },
   ruleNum: {
     width: 34,
     fontSize: 10,
     fontFamily: 'Times-Roman',
-    paddingTop: 1,
+    lineHeight: 1.5,
+    paddingTop: 0,
   },
   ruleBody: {
     flex: 1,
   },
   ruleText: {
     fontSize: 10,
-    lineHeight: 16,
+    lineHeight: 1.5,
     fontFamily: 'Times-Roman',
-    textAlign: 'left',
+    textAlign: 'justify',
   },
 
   subList: {
-    marginTop: 7,
+    marginTop: 5,
     marginLeft: 8,
   },
   subItem: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 5,
   },
   subNum: {
     width: 28,
     fontSize: 10,
-    lineHeight: 16,
+    lineHeight: 1.5,
     fontFamily: 'Times-Roman',
   },
   subText: {
     flex: 1,
     fontSize: 10,
-    lineHeight: 16,
+    lineHeight: 1.5,
     fontFamily: 'Times-Roman',
-    textAlign: 'left',
+    textAlign: 'justify',
   },
 
   declareBlock: {

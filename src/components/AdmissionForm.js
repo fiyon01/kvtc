@@ -155,6 +155,7 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
   const [paymentAmount, setPaymentAmount] = useState(String(amount));
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("input"); // input -> loading -> success
+  const [loadingMsg, setLoadingMsg] = useState("Awaiting M-PESA PIN...");
   const [mounted, setMounted] = useState(false);
   const pollRef = useRef(null);
   const idempotencyKeyRef = useRef(null);
@@ -191,6 +192,7 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
     
     setLoading(true);
     setStep("loading");
+    setLoadingMsg("Awaiting M-PESA PIN...");
     if (!idempotencyKeyRef.current) {
       idempotencyKeyRef.current = crypto.randomUUID();
     }
@@ -231,6 +233,15 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
       const checkoutId = data.CheckoutRequestID;
       const maxAttempts = 20;
       let attempts = 0;
+
+      // Helper to cleanly stop polling and return to input
+      const stopPolling = (msg, type = "error") => {
+        clearTimeout(pollRef.current);
+        pollRef.current = null;
+        if (msg) showToast(msg, type);
+        setStep("input");
+        setLoading(false);
+      };
       
       const pollStatus = async () => {
         attempts++;
@@ -246,7 +257,8 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
               message: "M-PESA verification returned an invalid server response.",
             };
           }
-          
+
+          // ── Terminal success ──────────────────────────────────
           if (statusData.status === "success") {
             clearTimeout(pollRef.current);
             pollRef.current = null;
@@ -255,39 +267,58 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
             return;
           }
 
-          if (statusData.status === "failed") {
-            clearTimeout(pollRef.current);
-            pollRef.current = null;
-            showToast(statusData.message || "M-PESA did not complete the payment. Please try again.", "error");
-            setStep("input");
-            setLoading(false);
+          // ── Payment confirmed but waiting for M-Pesa receipt number ──
+          if (statusData.status === "confirming_receipt") {
+            setLoadingMsg("Payment confirmed! Waiting for M-PESA receipt...");
+            // Keep polling – receipt usually arrives within the next poll
+            pollRef.current = setTimeout(pollStatus, 8000);
             return;
           }
 
-          if (statusData.status === "configuration_error" || statusData.status === "service_error") {
-            clearTimeout(pollRef.current);
-            pollRef.current = null;
-            showToast(statusData.message || "M-PESA verification is temporarily unavailable. Please try again later.", "error");
-            setStep("input");
-            setLoading(false);
+          // ── Payment failed (insufficient balance, cancelled, etc.) ──
+          if (statusData.status === "failed") {
+            const rawMsg = statusData.message || "";
+            let userMsg;
+            if (/insufficient/i.test(rawMsg)) {
+              userMsg = "Your M-PESA account has insufficient balance. Please top up and try again.";
+            } else if (/cancel/i.test(rawMsg) || /1032/.test(rawMsg)) {
+              userMsg = "You cancelled the M-PESA prompt. Please try again when ready.";
+            } else if (/timeout/i.test(rawMsg) || /1037/.test(rawMsg)) {
+              userMsg = "The M-PESA request timed out. Please check your phone and try again.";
+            } else {
+              userMsg = rawMsg || "M-PESA did not complete the payment. Please try again.";
+            }
+            stopPolling(userMsg, "error");
             return;
+          }
+
+          // ── Service / configuration errors ──────────────────
+          if (statusData.status === "configuration_error" || statusData.status === "service_error") {
+            stopPolling(
+              statusData.message || "M-PESA verification is temporarily unavailable. Please try again later.",
+              "error"
+            );
+            return;
+          }
+
+          // ── Still pending — update UI message after a few polls ──
+          if (attempts >= 2) {
+            setLoadingMsg("Confirming your payment...");
           }
 
           if (attempts >= maxAttempts) {
-            clearTimeout(pollRef.current);
-            pollRef.current = null;
-            showToast("Payment confirmation is taking longer than expected. If you paid, contact the institution with the M-PESA message.", "info", { duration: 9000 });
-            setStep("input");
-            setLoading(false);
+            stopPolling(
+              "Payment confirmation is taking longer than expected. If you paid, contact the institution with the M-PESA message.",
+              "info"
+            );
             return;
           }
         } catch {
           if (attempts >= maxAttempts) {
-            clearTimeout(pollRef.current);
-            pollRef.current = null;
-            showToast("Payment confirmation timed out. If you paid, please contact the institution.", "error");
-            setStep("input");
-            setLoading(false);
+            stopPolling(
+              "Payment confirmation timed out. If you paid, please contact the institution.",
+              "error"
+            );
             return;
           }
         }
@@ -296,7 +327,7 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
       };
 
       pollRef.current = setTimeout(pollStatus, 12000);
-      
+
     } catch (err) {
       console.error(err);
       showToast(err.message || "Payment failed. Please try again.", "error");
@@ -372,11 +403,31 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
           {step === "loading" && (
             <div style={{ textAlign: "center", padding: "20px 0" }}>
               <div className="spinner" style={{ width: "48px", height: "48px", border: "4px solid rgba(15,110,86,0.2)", borderTopColor: "#0F6E56", borderRadius: "50%", margin: "0 auto 20px", animation: "spin 1s linear infinite" }}></div>
-              <h4 style={{ fontFamily: "var(--sans)", fontSize: "1.1rem", color: "#1a1a1a", marginBottom: "8px" }}>Awaiting M-PESA PIN...</h4>
-              <p style={{ fontFamily: "var(--sans)", fontSize: "14px", color: "#666", lineHeight: 1.5 }}>Please check your phone and enter your M-PESA PIN to complete the payment of KSh {paymentAmount}.</p>
+              <h4 style={{ fontFamily: "var(--sans)", fontSize: "1.1rem", color: "#1a1a1a", marginBottom: "8px" }}>{loadingMsg}</h4>
+              <p style={{ fontFamily: "var(--sans)", fontSize: "14px", color: "#666", lineHeight: 1.5 }}>
+                {loadingMsg === "Awaiting M-PESA PIN..."
+                  ? `Please check your phone and enter your M-PESA PIN to complete the payment of KSh ${paymentAmount}.`
+                  : loadingMsg === "Payment confirmed! Waiting for M-PESA receipt..."
+                  ? "Your payment was received. Fetching your M-PESA receipt number..."
+                  : "Please do not close this page. We are waiting for M-PESA to confirm your payment."}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  clearTimeout(pollRef.current);
+                  pollRef.current = null;
+                  setStep("input");
+                  setLoading(false);
+                  setLoadingMsg("Awaiting M-PESA PIN...");
+                }}
+                style={{ marginTop: "20px", padding: "10px 22px", background: "#fff", border: "1.5px solid #ddd", borderRadius: "8px", color: "#666", fontWeight: 600, fontFamily: "var(--sans)", cursor: "pointer", fontSize: "13px" }}
+              >
+                Cancel
+              </button>
               <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
           )}
+
 
           {step === "success" && (
             <div style={{ textAlign: "center", padding: "20px 0", animation: "fadeIn 0.4s ease" }}>
