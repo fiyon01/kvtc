@@ -284,7 +284,7 @@ export async function POST(req) {
     };
 
     // HTML Email body for Admin
-    const adminHtmlContent = `
+    const legacyAdminHtmlContent = `
       <div style="font-family: 'Times New Roman', Times, serif; color: #333; max-width: 600px; width: 100%; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-sizing: border-box;">
         <div style="background-color: #fffdf8; padding: 20px; text-align: center; border-top: 5px solid #0F6E56; border-bottom: 2px solid #d7e9e2;">
           <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 auto 12px;">
@@ -320,6 +320,112 @@ export async function POST(req) {
           </p>
         </div>
       </div>
+    `;
+
+    const adminHtmlContent = `
+      <!doctype html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta name="color-scheme" content="light only">
+        <meta name="supported-color-schemes" content="light only">
+        <title>New Kinoo VTC Application</title>
+        <style>
+          :root { color-scheme:light only; supported-color-schemes:light only; }
+          body, table, td, div, p, h1 { color-scheme:light only !important; }
+          @media only screen and (max-width:560px) {
+            .email-page { padding:0 !important; }
+            .email-card { border-left:0 !important; border-right:0 !important; }
+            .content-cell { padding-left:20px !important; padding-right:20px !important; }
+            .summary-label { width:36% !important; }
+          }
+          @media (prefers-color-scheme:dark) {
+            .email-page, .email-card, .email-section {
+              background-color:#ffffff !important;
+              background-image:linear-gradient(#ffffff,#ffffff) !important;
+            }
+          }
+        </style>
+      </head>
+      <body class="email-page" bgcolor="#ffffff" style="margin:0;padding:0;background:#ffffff!important;color:#405460;">
+        <div class="email-page" style="padding:24px 10px;background:#f2f5f7!important;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr><td align="center">
+              <table class="email-card" role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:100%;max-width:640px;border-collapse:collapse;background:#ffffff!important;border:1px solid #dce5e9;">
+                <tr>
+                  <td bgcolor="#203b49" style="padding:11px 28px;background:#203b49!important;font-family:Arial,Helvetica,sans-serif;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+                      <td style="color:#d7e4ea;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;">Kinoo VTC Admissions</td>
+                      <td align="right"><span style="display:inline-block;padding:5px 9px;border-radius:999px;background:#ffffff;color:#203b49;font-size:9px;font-weight:800;letter-spacing:.7px;">PAID APPLICATION</span></td>
+                    </tr></table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="email-section content-cell" bgcolor="#ffffff" style="padding:32px 38px 15px;background:#ffffff!important;font-family:Arial,Helvetica,sans-serif;">
+                    <p style="margin:0 0 7px;color:#2f79b7;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;">New online application</p>
+                    <h1 style="margin:0 0 9px;color:#172b3a!important;font-size:27px;line-height:1.25;font-weight:750;">${name}</h1>
+                    <p style="margin:0;color:#60717d!important;font-size:14px;line-height:1.7;">A completed application for <strong style="color:#223744;">${course}</strong> has been received and its M-PESA payment verified.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="email-section content-cell" bgcolor="#ffffff" style="padding:12px 38px 8px;background:#ffffff!important;font-family:Arial,Helvetica,sans-serif;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#f8fafb;border:1px solid #dfe8ec;border-radius:12px;">
+                      <tr><td colspan="2" style="padding:14px 17px 10px;color:#25384a;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid #e3eaed;">Application summary</td></tr>
+                      <tr><td class="summary-label" width="34%" style="padding:13px 17px 7px;color:#74838d;font-size:10px;font-weight:700;text-transform:uppercase;">Applicant</td><td style="padding:13px 17px 7px;color:#223744;font-size:14px;font-weight:700;">${name}</td></tr>
+                      <tr><td style="padding:7px 17px;color:#74838d;font-size:10px;font-weight:700;text-transform:uppercase;">Programme</td><td style="padding:7px 17px;color:#223744;font-size:14px;font-weight:700;">${course}</td></tr>
+                      <tr><td style="padding:7px 17px;color:#74838d;font-size:10px;font-weight:700;text-transform:uppercase;">Phone</td><td style="padding:7px 17px;color:#223744;font-size:14px;"><a href="tel:${phone}" style="color:#245a87;text-decoration:none;">${phone}</a></td></tr>
+                      <tr><td style="padding:7px 17px;color:#74838d;font-size:10px;font-weight:700;text-transform:uppercase;">Email</td><td style="padding:7px 17px;color:#223744;font-size:14px;word-break:break-word;"><a href="mailto:${email}" style="color:#245a87;text-decoration:none;">${email || 'Not provided'}</a></td></tr>
+                      <tr><td style="padding:7px 17px 14px;color:#74838d;font-size:10px;font-weight:700;text-transform:uppercase;">ID number</td><td style="padding:7px 17px 14px;color:#223744;font-size:14px;">${idNo}</td></tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="email-section content-cell" bgcolor="#ffffff" style="padding:12px 38px 8px;background:#ffffff!important;font-family:Arial,Helvetica,sans-serif;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#fbfdfc;border:1px solid #cfe6dc;border-radius:12px;">
+                      <tr>
+                        <td style="padding:14px 17px;border-bottom:1px solid #dcebe5;color:#173f32;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;">M-PESA payment verification</td>
+                        <td align="right" style="padding:14px 17px;border-bottom:1px solid #dcebe5;"><span style="display:inline-block;padding:4px 9px;background:#0f6e56;color:#ffffff;border-radius:999px;font-size:10px;font-weight:800;">CONFIRMED</span></td>
+                      </tr>
+                      <tr><td colspan="2" style="padding:17px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+                          <td valign="top" width="30%" style="padding-right:12px;"><p style="margin:0 0 5px;color:#77868e;font-size:9px;font-weight:700;text-transform:uppercase;">Amount</p><p style="margin:0;color:#173f32;font-size:17px;font-weight:800;">KSh ${admissionAmount}</p></td>
+                          <td valign="top" width="34%" style="padding:0 12px;border-left:1px solid #dcebe5;"><p style="margin:0 0 5px;color:#77868e;font-size:9px;font-weight:700;text-transform:uppercase;">Receipt</p><p style="margin:0;color:#0f6e56;font-size:13px;font-weight:800;letter-spacing:.3px;">${paymentReference}</p></td>
+                          <td valign="top" width="36%" style="padding-left:12px;border-left:1px solid #dcebe5;"><p style="margin:0 0 5px;color:#77868e;font-size:9px;font-weight:700;text-transform:uppercase;">Date &amp; time</p><p style="margin:0;color:#223744;font-size:11px;line-height:1.45;">${new Date(paymentDate).toLocaleString('en-KE', { timeZone:'Africa/Nairobi' })}</p></td>
+                        </tr></table>
+                      </td></tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="email-section content-cell" bgcolor="#ffffff" style="padding:12px 38px 10px;background:#ffffff!important;font-family:Arial,Helvetica,sans-serif;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#f5f8fa;border:1px solid #dfe8ec;border-radius:12px;"><tr>
+                      <td width="46" align="center" valign="top" style="padding:17px 0 17px 16px;color:#2f79b7;font-size:20px;">&#128206;</td>
+                      <td style="padding:16px 17px 16px 10px;color:#405460;font-size:13px;line-height:1.6;"><strong style="display:block;margin-bottom:3px;color:#223744;font-size:14px;">Completed admission form attached</strong>The filled and signed PDF contains the remaining application details for institutional review.</td>
+                    </tr></table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="email-section content-cell" bgcolor="#ffffff" style="padding:12px 38px 34px;background:#ffffff!important;font-family:Arial,Helvetica,sans-serif;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+                      <td style="padding-right:10px;"><a href="mailto:${email}?subject=${encodeURIComponent(`Re: Kinoo VTC application - ${course}`)}" style="display:inline-block;padding:12px 17px;border-radius:8px;background:#245a87;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;">Email applicant</a></td>
+                      <td><a href="tel:${phone}" style="display:inline-block;padding:11px 17px;border:1px solid #cbd8df;border-radius:8px;background:#ffffff;color:#29434f;text-decoration:none;font-size:13px;font-weight:700;">Call applicant</a></td>
+                    </tr></table>
+                    <p style="margin:20px 0 0;color:#71818a;font-size:11px;line-height:1.6;">Payment phone: ${paymentPhone}. Automated admissions notification for internal institutional use.</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td bgcolor="#f7f9fa" style="padding:18px 28px;background:#f7f9fa!important;border-top:1px solid #e2e9ec;text-align:center;font-family:Arial,Helvetica,sans-serif;">
+                    <p style="margin:0 0 5px;color:#245a87;font-size:11px;font-weight:800;letter-spacing:.5px;">KINOO VOCATIONAL TRAINING CENTRE</p>
+                    <p style="margin:0;color:#7b8991;font-size:10px;line-height:1.6;">Admissions administration notification &nbsp;|&nbsp; ${new Date().toLocaleString('en-KE', { timeZone:'Africa/Nairobi' })}</p>
+                  </td>
+                </tr>
+              </table>
+            </td></tr>
+          </table>
+        </div>
+      </body>
+      </html>
     `;
 
     // 2. Email to Admin (contains the filled Admission Form)
