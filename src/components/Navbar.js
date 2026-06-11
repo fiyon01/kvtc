@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -9,8 +9,26 @@ const BANNER_HEIGHT = 46; // must match TopBanner.js
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileMenuMounted, setMobileMenuMounted] = useState(false);
+  const [mobileDepartmentsOpen, setMobileDepartmentsOpen] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(true);
+  const mobileCloseTimer = useRef(null);
   const pathname = usePathname();
+
+  const openMobileMenu = () => {
+    if (mobileCloseTimer.current) clearTimeout(mobileCloseTimer.current);
+    setMobileMenuMounted(true);
+    setMobileOpen(true);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileOpen(false);
+    if (mobileCloseTimer.current) clearTimeout(mobileCloseTimer.current);
+    mobileCloseTimer.current = setTimeout(() => {
+      setMobileMenuMounted(false);
+      setMobileDepartmentsOpen(false);
+    }, 400);
+  };
 
   useEffect(() => {
     // Restore dismissed state from session
@@ -25,6 +43,33 @@ export default function Navbar() {
       window.removeEventListener('topBannerDismissed', onDismiss);
       window.removeEventListener('scroll', handleScroll);
     };
+  }, []);
+
+  useEffect(() => {
+    if (!mobileMenuMounted) return;
+    const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const currentPaddingRight = parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
+
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${currentPaddingRight + scrollbarWidth}px`;
+    }
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
+    };
+  }, [mobileMenuMounted]);
+
+  useEffect(() => {
+    setMobileOpen(false);
+    setMobileMenuMounted(false);
+    setMobileDepartmentsOpen(false);
+  }, [pathname]);
+
+  useEffect(() => () => {
+    if (mobileCloseTimer.current) clearTimeout(mobileCloseTimer.current);
   }, []);
 
   const navTop = bannerVisible ? `${BANNER_HEIGHT}px` : '0px';
@@ -224,7 +269,7 @@ export default function Navbar() {
         </div>
 
         {/* Hamburger */}
-        <button onClick={() => setMobileOpen(!mobileOpen)} style={{
+        <button onClick={mobileOpen ? closeMobileMenu : openMobileMenu} style={{
           display: 'none', flexDirection: 'column', gap: '5px', cursor: 'pointer',
           background: 'none', border: 'none', padding: '4px',
         }} className="hamburger-btn" aria-label="Toggle menu">
@@ -235,61 +280,115 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile Menu */}
-      {mobileOpen && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 1001,
-          background: '#fff',
-          display: 'flex', flexDirection: 'column',
-          padding: `${BANNER_HEIGHT + 90}px 32px 32px`,
-          gap: '24px',
-          overflowY: 'auto',
-        }}>
-          <button onClick={() => setMobileOpen(false)} style={{
-            position: 'absolute', top: `${BANNER_HEIGHT + 20}px`, right: '24px',
-            background: 'rgba(0,0,0,0.05)', borderRadius: '50%', border: 'none', width: '44px', height: '44px', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }} aria-label="Close menu">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-          {links.map(l => (
-            <div key={l.name || l.href} style={{ borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {l.isDropdown ? (
-                <>
-                  <Link href="/departments" onClick={() => setMobileOpen(false)} style={{
-                    fontSize: '18px', textDecoration: 'none', fontWeight: 500, color: '#1a1a1a',
-                  }}>{l.name}</Link>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingLeft: '16px', borderLeft: '2px solid rgba(0,0,0,0.06)' }}>
-                    {l.sublinks.map(s => (
-                      <Link key={s.href} href={s.href} onClick={() => setMobileOpen(false)} style={{
-                        fontSize: '15px', textDecoration: 'none', fontWeight: 500, color: pathname === s.href ? '#0F6E56' : '#555',
-                      }}>{s.name}</Link>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <Link href={l.href} onClick={() => setMobileOpen(false)} style={{
-                  fontSize: '18px', textDecoration: 'none', fontWeight: 500,
-                  color: pathname === l.href ? '#0F6E56' : '#1a1a1a',
-                }}>{l.name}</Link>
-              )}
+      {mobileMenuMounted && (
+        <div className={`mobile-nav-layer ${mobileOpen ? 'is-open' : 'is-closing'}`}>
+          <button className="mobile-nav-backdrop" onClick={closeMobileMenu} aria-label="Close navigation" />
+          <aside className="mobile-nav-drawer" aria-label="Mobile navigation">
+            <div className="mobile-nav-header">
+              <Link href="/" className="mobile-nav-brand" onClick={closeMobileMenu}>
+                <span className="mobile-logo-box">
+                  <img src="/kvtc_logo.png" alt="Kinoo VTC" className="kvtc-logo-crop" />
+                </span>
+                <span className="mobile-brand-divider" aria-hidden="true" />
+                <span className="mobile-logo-box mobile-county-logo">
+                  <img src="/cgok-logo.png" alt="County Government of Kiambu" />
+                </span>
+                <span className="mobile-brand-copy">
+                  <strong>Kinoo VTC</strong>
+                  <small>Technology for Empowerment</small>
+                </span>
+              </Link>
+              <button className="mobile-nav-close" onClick={closeMobileMenu} aria-label="Close menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
             </div>
-          ))}
-          <Link href="/prospectus" onClick={() => setMobileOpen(false)} style={{
-            color: '#0F6E56', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
-            borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',
-          }}>View Prospectus</Link>
-          <Link href="/fee-structure" onClick={() => setMobileOpen(false)} style={{
-            color: '#0F6E56', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
-            borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',
-          }}>View Fee Structure</Link>
-          <a href={`tel:${phoneNumber}`} style={{
-            color: '#1a1a1a', fontSize: '18px', textDecoration: 'none', fontWeight: 500,
-            borderBottom: '1px solid rgba(0,0,0,0.08)', paddingBottom: '16px',
-          }}>Call 0113 582 008</a>
-          <Link href="/apply" onClick={() => setMobileOpen(false)} style={{
-            background: '#0F6E56', color: '#fff', textAlign: 'center',
-            padding: '16px', borderRadius: '10px', textDecoration: 'none', fontWeight: 600,
-          }}>Apply Now</Link>
+
+            <div className="mobile-nav-scroll">
+              <p className="mobile-nav-eyebrow">Explore Kinoo VTC</p>
+              <nav className="mobile-primary-links">
+                {links.filter(link => !['Blog', 'FAQs'].includes(link.name)).map(link => (
+                  link.isDropdown ? (
+                    <div className={`mobile-departments ${mobileDepartmentsOpen ? 'is-open' : ''}`} key={link.name}>
+                      <button
+                        type="button"
+                        className="mobile-nav-row mobile-accordion-trigger"
+                        onClick={() => setMobileDepartmentsOpen(open => !open)}
+                        aria-expanded={mobileDepartmentsOpen}
+                      >
+                        <span>
+                          <strong>Departments</strong>
+                          <small>Explore our training areas</small>
+                        </span>
+                        <svg className="mobile-accordion-chevron" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                      </button>
+                      <div className="mobile-department-panel">
+                        <Link href="/departments" className="mobile-all-departments" onClick={closeMobileMenu}>
+                          View all departments <span>→</span>
+                        </Link>
+                        <div className="mobile-department-grid">
+                          {link.sublinks.map((item, index) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              onClick={closeMobileMenu}
+                              className={`mobile-department-card ${pathname === item.href ? 'is-active' : ''}`}
+                            >
+                              <span className="mobile-department-number">0{index + 1}</span>
+                              <strong>{item.name}</strong>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={closeMobileMenu}
+                      className={`mobile-nav-row ${pathname === link.href ? 'is-active' : ''}`}
+                    >
+                      <span><strong>{link.name}</strong></span>
+                      <span className="mobile-row-arrow" aria-hidden="true">→</span>
+                    </Link>
+                  )
+                ))}
+              </nav>
+
+              <section className="mobile-resource-section">
+                <p className="mobile-nav-eyebrow">Resources</p>
+                <div className="mobile-resource-grid">
+                  <Link href="/prospectus" onClick={closeMobileMenu}>
+                    <strong>Prospectus</strong><small>Courses &amp; guide</small>
+                  </Link>
+                  <Link href="/fee-structure" onClick={closeMobileMenu}>
+                    <strong>Fee Structure</strong><small>View all charges</small>
+                  </Link>
+                  <Link href="/blog" onClick={closeMobileMenu}>
+                    <strong>News &amp; Blog</strong><small>Campus updates</small>
+                  </Link>
+                  <Link href="/faqs" onClick={closeMobileMenu}>
+                    <strong>FAQs</strong><small>Quick answers</small>
+                  </Link>
+                </div>
+              </section>
+
+              <a href={`tel:${phoneNumber}`} className="mobile-call-card">
+                <span>
+                  <small>Admissions helpline</small>
+                  <strong>0113 582 008</strong>
+                </span>
+                <span aria-hidden="true">Call now</span>
+              </a>
+            </div>
+
+            <div className="mobile-nav-footer">
+              <Link href="/apply" onClick={closeMobileMenu}>
+                <span>Start Your Application</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+              <small>2026 intake is currently open</small>
+            </div>
+          </aside>
         </div>
       )}
 
@@ -301,6 +400,263 @@ export default function Navbar() {
         }
         @media (min-width: 1051px) {
           .hamburger-btn { display: none !important; }
+        }
+        .mobile-nav-layer {
+          position: fixed;
+          inset: 0;
+          z-index: 1001;
+        }
+        .mobile-nav-layer.is-closing { pointer-events: none; }
+        .mobile-nav-backdrop {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          border: 0;
+          background: rgba(12,29,38,.52);
+          backdrop-filter: blur(5px);
+          animation: mobile-backdrop-in .22s ease both;
+        }
+        .mobile-nav-layer.is-closing .mobile-nav-backdrop {
+          animation: mobile-backdrop-out .32s ease both;
+        }
+        .mobile-nav-drawer {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          width: min(430px, 94vw);
+          display: flex;
+          flex-direction: column;
+          background: #f8fafb;
+          box-shadow: -24px 0 70px rgba(13,35,47,.22);
+          animation: mobile-drawer-in .3s cubic-bezier(.22,.8,.28,1) both;
+          will-change: transform;
+        }
+        .mobile-nav-layer.is-closing .mobile-nav-drawer {
+          animation: mobile-drawer-out .36s cubic-bezier(.4,0,.7,.2) both;
+        }
+        .mobile-nav-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 16px 18px;
+          background: #fff;
+          border-bottom: 1px solid rgba(47,121,183,.13);
+        }
+        .mobile-nav-brand {
+          display: flex;
+          align-items: center;
+          min-width: 0;
+          color: #203743;
+          text-decoration: none;
+        }
+        .mobile-logo-box {
+          width: 42px;
+          height: 42px;
+          display: grid;
+          place-items: center;
+          flex-shrink: 0;
+        }
+        .mobile-logo-box img { width: 40px; height: 40px; object-fit: contain; }
+        .mobile-logo-box:first-child img { transform: scale(1.08) translateY(-1px); }
+        .mobile-brand-divider {
+          width: 1px;
+          height: 28px;
+          margin: 0 8px;
+          background: linear-gradient(180deg, transparent, #2F79B7, #0F6E56, transparent);
+        }
+        .mobile-county-logo { width: 38px; }
+        .mobile-county-logo img { width: 35px; height: 35px; }
+        .mobile-brand-copy { display: flex; flex-direction: column; margin-left: 10px; min-width: 0; }
+        .mobile-brand-copy strong { font-family: var(--serif); font-size: 16px; line-height: 1.2; }
+        .mobile-brand-copy small { color: #7a8a92; font-size: 9px; line-height: 1.3; letter-spacing: .35px; text-transform: uppercase; }
+        .mobile-nav-close {
+          width: 40px;
+          height: 40px;
+          display: grid;
+          place-items: center;
+          flex-shrink: 0;
+          border: 1px solid rgba(32,55,67,.09);
+          border-radius: 12px;
+          background: #f3f6f7;
+          color: #29434f;
+          cursor: pointer;
+        }
+        .mobile-nav-scroll {
+          flex: 1;
+          overflow-y: auto;
+          padding: 20px 18px 126px;
+          overscroll-behavior: contain;
+        }
+        .mobile-nav-eyebrow {
+          margin: 0 0 10px;
+          color: #77909d;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 1.4px;
+          text-transform: uppercase;
+        }
+        .mobile-primary-links {
+          overflow: hidden;
+          border: 1px solid rgba(47,121,183,.12);
+          border-radius: 16px;
+          background: #fff;
+          box-shadow: 0 8px 28px rgba(32,70,91,.06);
+        }
+        .mobile-nav-row {
+          min-height: 54px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          padding: 12px 15px;
+          border: 0;
+          border-bottom: 1px solid #edf1f3;
+          background: #fff;
+          color: #29404c;
+          text-align: left;
+          text-decoration: none;
+          cursor: pointer;
+        }
+        .mobile-primary-links > :last-child,
+        .mobile-primary-links > :last-child .mobile-nav-row { border-bottom: 0; }
+        .mobile-nav-row strong { font-size: 15px; font-weight: 650; }
+        .mobile-nav-row small { display: block; margin-top: 2px; color: #8a989f; font-size: 10px; }
+        .mobile-nav-row.is-active {
+          color: #0F6E56;
+          background: linear-gradient(90deg, #eef8f4, #fff);
+          box-shadow: inset 3px 0 #0F6E56;
+        }
+        .mobile-row-arrow { color: #9aacb5; font-size: 15px; }
+        .mobile-accordion-chevron { color: #6f8793; transition: transform .22s ease; }
+        .mobile-departments.is-open .mobile-accordion-chevron { transform: rotate(180deg); }
+        .mobile-department-panel {
+          max-height: 0;
+          overflow: hidden;
+          background: linear-gradient(145deg, #f3f9f7, #f2f7fb);
+          transition: max-height .32s ease;
+        }
+        .mobile-departments.is-open .mobile-department-panel {
+          max-height: 520px;
+          padding-bottom: 13px;
+          border-bottom: 1px solid #edf1f3;
+        }
+        .mobile-all-departments {
+          display: flex;
+          justify-content: space-between;
+          padding: 12px 14px 8px;
+          color: #0F6E56;
+          font-size: 11px;
+          font-weight: 800;
+          text-decoration: none;
+          text-transform: uppercase;
+          letter-spacing: .5px;
+        }
+        .mobile-department-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          padding: 0 12px;
+        }
+        .mobile-department-card {
+          min-height: 68px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 10px;
+          border: 1px solid rgba(47,121,183,.11);
+          border-radius: 11px;
+          background: rgba(255,255,255,.9);
+          color: #334c58;
+          text-decoration: none;
+        }
+        .mobile-department-card.is-active { border-color: #0F6E56; background: #eaf7f2; color: #0F6E56; }
+        .mobile-department-number { color: #2F79B7; font-size: 9px; font-weight: 800; letter-spacing: .8px; }
+        .mobile-department-card strong { font-size: 12px; line-height: 1.25; }
+        .mobile-resource-section { margin-top: 22px; }
+        .mobile-resource-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 9px;
+        }
+        .mobile-resource-grid a {
+          min-height: 72px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 12px 13px;
+          border: 1px solid rgba(47,121,183,.12);
+          border-radius: 13px;
+          background: #fff;
+          color: #304752;
+          text-decoration: none;
+          box-shadow: 0 5px 18px rgba(32,70,91,.045);
+        }
+        .mobile-resource-grid strong { font-size: 12px; }
+        .mobile-resource-grid small { margin-top: 3px; color: #89979e; font-size: 10px; }
+        .mobile-call-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 14px;
+          padding: 14px 16px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, #203b49, #2F6077);
+          color: #fff;
+          text-decoration: none;
+          box-shadow: 0 10px 28px rgba(26,61,78,.17);
+        }
+        .mobile-call-card span:first-child { display: flex; flex-direction: column; }
+        .mobile-call-card small { color: rgba(255,255,255,.66); font-size: 10px; text-transform: uppercase; letter-spacing: .7px; }
+        .mobile-call-card strong { margin-top: 2px; font-size: 15px; }
+        .mobile-call-card > span:last-child { font-size: 11px; font-weight: 700; }
+        .mobile-nav-footer {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          padding: 14px 18px max(14px, env(safe-area-inset-bottom));
+          background: rgba(255,255,255,.97);
+          border-top: 1px solid rgba(47,121,183,.13);
+          box-shadow: 0 -10px 30px rgba(28,60,77,.08);
+          backdrop-filter: blur(12px);
+        }
+        .mobile-nav-footer a {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 17px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #0F6E56, #198665);
+          color: #fff;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 750;
+          box-shadow: 0 9px 24px rgba(15,110,86,.24);
+        }
+        .mobile-nav-footer small {
+          display: block;
+          margin-top: 7px;
+          color: #829199;
+          font-size: 9px;
+          text-align: center;
+          text-transform: uppercase;
+          letter-spacing: .8px;
+        }
+        @keyframes mobile-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes mobile-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes mobile-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes mobile-drawer-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
+        @media (max-width: 380px) {
+          .mobile-brand-copy { display: none; }
+          .mobile-nav-scroll { padding-left: 13px; padding-right: 13px; }
+          .mobile-department-grid, .mobile-resource-grid { gap: 7px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .mobile-nav-backdrop, .mobile-nav-drawer { animation: none; }
+          .mobile-department-panel, .mobile-accordion-chevron { transition: none; }
         }
       `}</style>
     </>
