@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useToast } from "./ToastProvider";
 
 const KVTC_LOGO = "/kvtc_logo.png";
 
@@ -148,6 +149,7 @@ function SignatureModal({ onSave, onClose }) {
 
 // ── Payment Modal ───────────────────────────────────────────────
 function PaymentModal({ name, phone: initialPhone, amount, application, onClose, onSuccess }) {
+  const { showToast } = useToast();
   const [phone, setPhone] = useState(initialPhone);
   const [email, setEmail] = useState("");
   const [paymentAmount, setPaymentAmount] = useState(String(amount));
@@ -173,11 +175,18 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
   const handlePay = async (e) => {
     e.preventDefault();
     if (loading) return;
-    if (!email) return alert("Please enter your email address to receive the receipt and copy of your application.");
-    if (!isValidPhone(phone)) return alert("Please enter a valid M-PESA phone number (e.g. 0712345678).");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      showToast("Please enter a valid email address to receive the receipt and application copy.", "warning");
+      return;
+    }
+    if (!isValidPhone(phone)) {
+      showToast("Enter a valid M-PESA phone number, for example 0712345678.", "warning");
+      return;
+    }
     const numericAmount = Number(paymentAmount);
     if (!Number.isFinite(numericAmount) || numericAmount < 1) {
-      return alert("Please enter a valid payment amount of at least KSh 1.");
+      showToast("Enter a valid payment amount of at least KSh 1.", "warning");
+      return;
     }
     
     setLoading(true);
@@ -249,7 +258,7 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
           if (statusData.status === "failed") {
             clearTimeout(pollRef.current);
             pollRef.current = null;
-            alert(statusData.message || "M-PESA did not complete the payment. Please try again.");
+            showToast(statusData.message || "M-PESA did not complete the payment. Please try again.", "error");
             setStep("input");
             setLoading(false);
             return;
@@ -258,7 +267,7 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
           if (statusData.status === "configuration_error" || statusData.status === "service_error") {
             clearTimeout(pollRef.current);
             pollRef.current = null;
-            alert(statusData.message || "M-PESA verification is temporarily unavailable. Please try again later.");
+            showToast(statusData.message || "M-PESA verification is temporarily unavailable. Please try again later.", "error");
             setStep("input");
             setLoading(false);
             return;
@@ -267,7 +276,7 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
           if (attempts >= maxAttempts) {
             clearTimeout(pollRef.current);
             pollRef.current = null;
-            alert("Payment confirmation is taking longer than expected. If you completed the payment, please contact the institution with the M-PESA message.");
+            showToast("Payment confirmation is taking longer than expected. If you paid, contact the institution with the M-PESA message.", "info", { duration: 9000 });
             setStep("input");
             setLoading(false);
             return;
@@ -276,7 +285,7 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
           if (attempts >= maxAttempts) {
             clearTimeout(pollRef.current);
             pollRef.current = null;
-            alert("Payment confirmation timed out. If you paid, please contact the institution.");
+            showToast("Payment confirmation timed out. If you paid, please contact the institution.", "error");
             setStep("input");
             setLoading(false);
             return;
@@ -290,7 +299,7 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
       
     } catch (err) {
       console.error(err);
-      alert(err.message || "Payment failed. Please try again.");
+      showToast(err.message || "Payment failed. Please try again.", "error");
       setStep("input");
       setLoading(false);
     }
@@ -314,7 +323,7 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
         {/* Content */}
         <div style={{ padding:"24px" }}>
           {step === "input" && (
-            <form onSubmit={handlePay}>
+            <form onSubmit={handlePay} noValidate>
               <p style={{ fontFamily: "var(--sans)", fontSize: "14px", color: "#555", marginBottom: "20px", textAlign: "center", lineHeight: 1.5 }}>
                 To proceed with your application, please pay the non-refundable admission fee of <strong>KSh {amount}</strong> via M-PESA.
               </p>
@@ -476,6 +485,7 @@ const Sec = ({t}) => (
 
 // ═════════════════════════════════════════════════════════════
 export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplicationSuccess }) {
+  const { showToast } = useToast();
   const [kvtcLogo, setKvtcLogo] = useState(KVTC_LOGO);
   const [cgokLogo, setCgokLogo] = useState("/cgok-logo.png"); // Use the public folder logo
   const [sigModal, setSigModal] = useState(false);
@@ -534,7 +544,10 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
     ];
     for (const [field, label] of requiredFields) {
       if (!String(form[field] || '').trim()) {
-        alert(`Please fill in the required ${label} field before proceeding.`);
+        showToast(`Please fill in the required ${label} field before proceeding.`, "warning");
+        const invalidField = formRef.current?.querySelector(`[data-field="${field}"]`);
+        invalidField?.scrollIntoView({ behavior: "smooth", block: "center" });
+        invalidField?.focus?.();
         return false;
       }
     }
@@ -618,7 +631,7 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       
     } catch (err) {
       console.error(err);
-      alert("There was an issue submitting your application. Please contact the institution.");
+      showToast("There was an issue submitting your application. Please contact the institution.", "error", { duration: 8000 });
       setSubmitting(false);
     }
   };

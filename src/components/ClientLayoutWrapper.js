@@ -6,6 +6,7 @@ import Footer from './Footer';
 import TopBanner from './TopBanner';
 import FloatingWhatsApp from './FloatingWhatsApp';
 import SplashScreen from './SplashScreen';
+import { ToastProvider } from './ToastProvider';
 
 export default function ClientLayoutWrapper({ children }) {
   const pathname = usePathname();
@@ -13,7 +14,7 @@ export default function ClientLayoutWrapper({ children }) {
   const isApp = !pathname.startsWith('/admin') && !isDocumentView;
 
   return (
-    <>
+    <ToastProvider>
       {isApp && <SplashScreen />}
       {isApp && <TopBanner />}
       {isApp && <Navbar />}
@@ -22,6 +23,6 @@ export default function ClientLayoutWrapper({ children }) {
       </main>
       {isApp && <Footer />}
       {isApp && <FloatingWhatsApp />}
-    </>
+    </ToastProvider>
   );
 }

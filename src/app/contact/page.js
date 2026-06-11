@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from 'react';
+import { useToast } from '@/components/ToastProvider';
 
 function FadeIn({ children, delay = 0, style = {} }) {
   const ref = useRef();
@@ -28,6 +29,7 @@ const inputBase = {
 };
 
 export default function Contact() {
+  const { showToast } = useToast();
   const [focused, setFocused] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -263,21 +265,53 @@ export default function Contact() {
                   </p>
                 </div>
 
-                <form onSubmit={(e) => {
+                <form noValidate onSubmit={async (e) => {
                   e.preventDefault();
                   const fd = new FormData(e.target);
-                  const fname = fd.get('fname');
-                  const lname = fd.get('lname');
-                  const phone = fd.get('phone');
+                  const fname = String(fd.get('fname') || '').trim();
+                  const lname = String(fd.get('lname') || '').trim();
+                  const phone = String(fd.get('phone') || '').trim();
                   const email = fd.get('email');
                   const course = fd.get('course') || 'General enquiry';
-                  const msg = fd.get('msg');
+                  const msg = String(fd.get('msg') || '').trim();
+
+                  const required = [
+                    ['fname', fname, 'first name'],
+                    ['lname', lname, 'last name'],
+                    ['phone', phone, 'phone number'],
+                    ['msg', msg, 'message'],
+                  ];
+                  const missing = required.find(([, value]) => !value);
+                  if (missing) {
+                    showToast(`Please enter your ${missing[2]}.`, 'warning');
+                    e.currentTarget.elements[missing[0]]?.focus();
+                    return;
+                  }
+                  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) {
+                    showToast('Please enter a valid email address.', 'warning');
+                    e.currentTarget.elements.email?.focus();
+                    return;
+                  }
+                  if (!/^(\+?254|0)[17]\d{8}$/.test(phone.replace(/\s/g, ''))) {
+                    showToast('Please enter a valid phone number, for example 0712345678.', 'warning');
+                    e.currentTarget.elements.phone?.focus();
+                    return;
+                  }
 
                   const waText = `Hello Kinoo VTC, I have an enquiry.\n\n*Name:* ${fname} ${lname}\n*Phone:* ${phone}\n*Email:* ${email || 'N/A'}\n*Course:* ${course}\n*Message:* ${msg || 'N/A'}`;
                   window.open(`https://wa.me/254113582008?text=${encodeURIComponent(waText)}`, '_blank');
-                  fetch('/api/contact', { method: 'POST', body: fd }).catch(console.error);
-                  setSubmitted(true);
-                  e.target.reset();
+                  try {
+                    const response = await fetch('/api/contact', { method: 'POST', body: fd });
+                    const result = await response.json();
+                    if (!response.ok || !result.success) {
+                      throw new Error(result.message || 'The enquiry could not be sent.');
+                    }
+                    setSubmitted(true);
+                    e.target.reset();
+                  } catch (error) {
+                    console.error(error);
+                    showToast(error.message || 'The enquiry could not be sent. Please try again.', 'error');
+                  }
                 }}>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }} className="form-2col">

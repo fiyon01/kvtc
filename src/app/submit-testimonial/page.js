@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useToast } from '@/components/ToastProvider';
 
 const inputStyle = {
   width: '100%', padding: '12px 14px',
@@ -11,6 +12,7 @@ const inputStyle = {
 };
 
 export default function SubmitTestimonial() {
+  const { showToast } = useToast();
   const [focused, setFocused] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -42,31 +44,47 @@ export default function SubmitTestimonial() {
         <div style={{ maxWidth: '680px', margin: '0 auto' }}>
           <div style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '16px', padding: '40px', boxShadow: '0 4px 32px rgba(0,0,0,0.06)' }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#1a1a1a', marginBottom: '28px' }}>Testimonial Form</h3>
-            <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}>
+            <form noValidate onSubmit={(e) => {
+              e.preventDefault();
+              const fields = [
+                ['name', 'full name'],
+                ['year', 'graduation year'],
+                ['course', 'course completed'],
+                ['role', 'current role or employment'],
+                ['text', 'testimonial'],
+              ];
+              const missing = fields.find(([name]) => !String(e.currentTarget.elements[name]?.value || '').trim());
+              if (missing) {
+                showToast(`Please enter your ${missing[1]}.`, 'warning');
+                e.currentTarget.elements[missing[0]]?.focus();
+                return;
+              }
+              setSubmitted(true);
+            }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="ts-r">
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#1a1a1a', marginBottom: '6px' }}>Full Name *</label>
-                  <input type="text" placeholder="e.g. Wanjiku Kamau" required style={focusStyle('name')} onFocus={() => setFocused('name')} onBlur={() => setFocused(null)} />
+                  <input type="text" name="name" placeholder="e.g. Wanjiku Kamau" required style={focusStyle('name')} onFocus={() => setFocused('name')} onBlur={() => setFocused(null)} />
                 </div>
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#1a1a1a', marginBottom: '6px' }}>Graduation Year *</label>
-                  <input type="text" placeholder="e.g. 2024" required style={focusStyle('year')} onFocus={() => setFocused('year')} onBlur={() => setFocused(null)} />
+                  <input type="text" name="year" placeholder="e.g. 2024" required style={focusStyle('year')} onFocus={() => setFocused('year')} onBlur={() => setFocused(null)} />
                 </div>
               </div>
 
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#1a1a1a', marginBottom: '6px' }}>Course Completed *</label>
-                <input type="text" placeholder="e.g. Hair Dressing and Beauty Therapy" required style={focusStyle('course')} onFocus={() => setFocused('course')} onBlur={() => setFocused(null)} />
+                <input type="text" name="course" placeholder="e.g. Hair Dressing and Beauty Therapy" required style={focusStyle('course')} onFocus={() => setFocused('course')} onBlur={() => setFocused(null)} />
               </div>
 
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#1a1a1a', marginBottom: '6px' }}>Current Role / Employment *</label>
-                <input type="text" placeholder="e.g. Salon Owner, Kikuyu Town" required style={focusStyle('role')} onFocus={() => setFocused('role')} onBlur={() => setFocused(null)} />
+                <input type="text" name="role" placeholder="e.g. Salon Owner, Kikuyu Town" required style={focusStyle('role')} onFocus={() => setFocused('role')} onBlur={() => setFocused(null)} />
               </div>
 
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#1a1a1a', marginBottom: '6px' }}>Your Rating *</label>
-                <select required style={focusStyle('rating')} onFocus={() => setFocused('rating')} onBlur={() => setFocused(null)} defaultValue="5">
+                <select name="rating" required style={focusStyle('rating')} onFocus={() => setFocused('rating')} onBlur={() => setFocused(null)} defaultValue="5">
                   <option value="5">★★★★★ – Excellent</option>
                   <option value="4">★★★★☆ – Very Good</option>
                   <option value="3">★★★☆☆ – Good</option>
@@ -77,7 +95,7 @@ export default function SubmitTestimonial() {
 
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#1a1a1a', marginBottom: '6px' }}>Your Testimonial *</label>
-                <textarea placeholder="Describe your experience at Kinoo VTC and how it impacted your career and life..." rows={6} required style={{ ...focusStyle('text'), resize: 'vertical', minHeight: '140px' }} onFocus={() => setFocused('text')} onBlur={() => setFocused(null)} />
+                <textarea name="text" placeholder="Describe your experience at Kinoo VTC and how it impacted your career and life..." rows={6} required style={{ ...focusStyle('text'), resize: 'vertical', minHeight: '140px' }} onFocus={() => setFocused('text')} onBlur={() => setFocused(null)} />
               </div>
 
               <button type="submit" style={{ width: '100%', padding: '15px', background: '#0F6E56', color: '#fff', border: 'none', borderRadius: '10px', fontFamily: 'var(--sans)', fontSize: '15px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s, transform 0.15s' }}
