@@ -9,7 +9,8 @@ import SplashScreen from './SplashScreen';
 
 export default function ClientLayoutWrapper({ children }) {
   const pathname = usePathname();
-  const isApp = !pathname.startsWith('/admin') && !pathname.startsWith('/prospectus');
+  const isDocumentView = pathname.startsWith('/prospectus') || pathname.startsWith('/fee-structure');
+  const isApp = !pathname.startsWith('/admin') && !isDocumentView;
 
   return (
     <>

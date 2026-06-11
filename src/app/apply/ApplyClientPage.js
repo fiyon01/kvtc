@@ -160,7 +160,7 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
 
             <div style={{ marginTop: 14, background: '#FFF8E8', borderRadius: 10, padding: '12px 16px', border: '1px solid #f5dea0' }}>
               <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#7a5a00', margin: 0, lineHeight: 1.5 }}>
-                ⚡ <strong>KSh {appFee}</strong> application fee is paid online via M-PESA today. The remaining fees are paid on your first day.
+                <strong>Registration &amp; Admission Account:</strong> Co-operative Bank, Kangemi Branch — A/C <strong>01141151624400</strong>.
               </p>
             </div>
           </div>
@@ -194,7 +194,7 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
             </div>
 
             <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#888', margin: 0, lineHeight: 1.6 }}>
-              📍 <strong>Tuition Fees</strong> are paid at KCB Kikuyu, while <strong>Registration/Admission fees</strong> are paid at Co-op Bank Kangemi. See full payment instructions after admission.
+              <strong>Tuition Fee Account:</strong> KCB, Kikuyu Branch — A/C <strong>1104169527</strong>.
             </p>
           </div>
         </FadeIn>

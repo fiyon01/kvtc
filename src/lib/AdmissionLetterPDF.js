@@ -26,9 +26,9 @@ const RULES = [
   "All trainees must respect Authority and Co-exist harmoniously with the entire polytechnic Community.",
   "Sneaking out of school compound is a serious offence without express permission from the Manager, deputy manager, and instructor on duty or the class Instructor.",
   "English, Kiswahili shall be the language of communication in the institution and out of school activities.",
-  "Stern disciplinary action will be taken against any trainee who bullies, molests, fights or insults and other trainee or trainees. When offended seek administrative redress.",
+  "Stern disciplinary action will be taken against any trainee who bullies, molests, fights or insults any other trainee or trainees. When offended seek administrative redress.",
   "Every trainee expected to exhibit good and proper behavior towards members of the teaching, Non-teaching staff, other trainees as well as school prefects. Any trainee who disregards this rule will be heavily punished.",
-  "Any type of punishment administered to ANY trainee by the school authorities must be carried out satisfactorily. Failure to observe this rule may even lead to suspension, and/ or expulsion.",
+  "Any type of punishment administered to ANY trainee by the school authorities must be carried out satisfactorily. Failure to observe this rule may even lead to suspension, and/or expulsion.",
   {
     main: "Every trainee must stick to institution programmes by:",
     subs: [
@@ -44,7 +44,7 @@ const RULES = [
   "It is a serious offence for ANY trainee to incite others to deviate or disobey rules and regulation. Such trainees will be expelled.",
   "No trainee should absent himself/herself from the institution without express permission from the authorities. Any absence permission will require accompaniment by a parent/guardian.",
   "Every trainee should observe personal hygiene, smartness and be in proper official uniforms at all times.",
-  "Taking of harmful drugs. Alcohol or smoking by any trainee is illegal. Drastic disciplinary action will be taken against the culprit.",
+  "Taking of harmful drugs, alcohol or smoking by any trainee is illegal. Drastic disciplinary action will be taken against the culprit.",
   "Acts of vandalism and hooliganism will not be tolerated in the school compound. Any student who willfully destroys institutions' property will be required to immediately replace the items and subsequently receive disciplinary action.",
   "Stealing is wrong. ANY trainee caught engaging in this undesirable activity will be punished severely by the administration.",
   "The staffroom, store, kitchen are out of bounds for ALL trainees unless with special permission.",
@@ -68,10 +68,10 @@ const s = StyleSheet.create({
   pageRules: {
     backgroundColor: '#ffffff',
     fontFamily: 'Times-Roman',
-    fontSize: 10.5,
+    fontSize: 10,
     color: dark,
-    paddingTop: 42,
-    paddingBottom: 52,
+    paddingTop: 38,
+    paddingBottom: 45,
     paddingLeft: 55,
     paddingRight: 55,
   },
@@ -130,7 +130,7 @@ const s = StyleSheet.create({
   },
 
   para: {
-    lineHeight: 1.55,
+    lineHeight: 16,
     marginBottom: 10,
     textAlign: 'justify',
     fontSize: 10.5,
@@ -180,7 +180,7 @@ const s = StyleSheet.create({
   bulletText: {
     fontSize: 10.5,
     flex: 1,
-    lineHeight: 1.45,
+    lineHeight: 15,
   },
 
   footer: {
@@ -206,63 +206,71 @@ const s = StyleSheet.create({
     fontSize: 8,
     color: '#333',
     flex: 1,
-    lineHeight: 1.3,
+    lineHeight: 11,
   },
 
   rulesTitle: {
     textAlign: 'center',
     fontFamily: 'Times-Bold',
-    fontSize: 13,
+    fontSize: 14,
     textDecoration: 'underline',
-    marginBottom: 16,
+    marginBottom: 20,
     letterSpacing: 0.3,
   },
 
   ruleItem: {
     flexDirection: 'row',
-    marginBottom: 10,
+    alignItems: 'flex-start',
+    marginBottom: 13,
   },
   ruleNum: {
-    width: 28,
-    fontSize: 9.8,
-    lineHeight: 1.7,
+    width: 34,
+    fontSize: 10,
     fontFamily: 'Times-Roman',
+    paddingTop: 1,
+  },
+  ruleBody: {
+    flex: 1,
   },
   ruleText: {
-    flex: 1,
-    fontSize: 9.8,
-    lineHeight: 1.7,
+    fontSize: 10,
+    lineHeight: 16,
     fontFamily: 'Times-Roman',
-    textAlign: 'justify',
+    textAlign: 'left',
   },
 
   subList: {
-    marginTop: 5,
-    marginLeft: 4,
+    marginTop: 7,
+    marginLeft: 8,
   },
   subItem: {
     flexDirection: 'row',
-    marginBottom: 5,
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
   subNum: {
-    width: 22,
-    fontSize: 9.8,
-    lineHeight: 1.65,
+    width: 28,
+    fontSize: 10,
+    lineHeight: 16,
+    fontFamily: 'Times-Roman',
   },
   subText: {
     flex: 1,
-    fontSize: 9.8,
-    lineHeight: 1.65,
-    textAlign: 'justify',
+    fontSize: 10,
+    lineHeight: 16,
+    fontFamily: 'Times-Roman',
+    textAlign: 'left',
   },
 
+  declareBlock: {
+    marginTop: 20,
+  },
   declareText: {
     fontFamily: 'Times-Italic',
     fontSize: 10.5,
-    marginTop: 20,
     marginBottom: 12,
     textAlign: 'center',
-    lineHeight: 1.5,
+    lineHeight: 16,
   },
   signRow: {
     flexDirection: 'row',
@@ -351,10 +359,10 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
 
   const renderRules = (rules, startIndex = 0) =>
     rules.map((rule, index) => (
-      <View style={s.ruleItem} key={startIndex + index} wrap={false}>
+      <View style={s.ruleItem} key={startIndex + index}>
         <Text style={s.ruleNum}>{startIndex + index + 1}.</Text>
 
-        <View style={{ flex: 1 }}>
+        <View style={s.ruleBody}>
           {typeof rule === 'string' ? (
             <Text style={s.ruleText}>{rule}</Text>
           ) : (
@@ -363,7 +371,7 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
 
               <View style={s.subList}>
                 {rule.subs.map((sub, si) => (
-                  <View style={s.subItem} key={si} wrap={false}>
+                  <View style={s.subItem} key={si}>
                     <Text style={s.subNum}>{String.fromCharCode(97 + si)})</Text>
                     <Text style={s.subText}>{sub}</Text>
                   </View>
@@ -444,18 +452,16 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
         <Footer />
       </Page>
 
-      {/* PAGE 2 - RULES 1 TO 12 */}
       <Page size="A4" style={s.pageRules}>
         <Text style={s.rulesTitle}>RULES AND REGULATIONS</Text>
         {renderRules(RULES.slice(0, 12), 0)}
       </Page>
 
-      {/* PAGE 3 - RULES 13 TO 22 + DECLARATION */}
       <Page size="A4" style={s.pageRules}>
         <Text style={s.rulesTitle}>RULES AND REGULATIONS</Text>
         {renderRules(RULES.slice(12), 12)}
 
-        <View wrap={false}>
+        <View style={s.declareBlock}>
           <Text style={s.declareText}>
             I hereby declare that I will adhere to all the rules and regulations of this institution.
           </Text>
