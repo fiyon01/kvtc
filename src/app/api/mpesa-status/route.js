@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 import { getTransactionStatus, setTransactionStatus } from '@/lib/mpesaStore';
 import {
   createMpesaPassword,
+  darajaRequest,
   getDarajaToken,
   mpesaTimestamp,
   readDarajaResponse,
@@ -55,7 +56,7 @@ export async function GET(req) {
   try {
     const { token, base } = await getDarajaToken();
     const timestamp = mpesaTimestamp();
-    const response = await fetch(`${base}/mpesa/stkpushquery/v1/query`, {
+    const response = await darajaRequest(`${base}/mpesa/stkpushquery/v1/query`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -67,7 +68,6 @@ export async function GET(req) {
         Timestamp: timestamp,
         CheckoutRequestID: checkoutId,
       }),
-      cache: 'no-store',
     });
     const data = await readDarajaResponse(response);
 

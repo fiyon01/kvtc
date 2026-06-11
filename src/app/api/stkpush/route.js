@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 import { setTransactionStatus } from '@/lib/mpesaStore';
 import {
   createMpesaPassword,
+  darajaRequest,
   getDarajaToken,
   mpesaTimestamp,
   normalizeMpesaPhone,
@@ -96,7 +97,7 @@ export async function POST(req) {
       TransactionDesc: 'Kinoo VTC Application Fee',
     };
 
-    const stkRes = await fetch(`${base}/mpesa/stkpush/v1/processrequest`, {
+    const stkRes = await darajaRequest(`${base}/mpesa/stkpush/v1/processrequest`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -108,10 +109,13 @@ export async function POST(req) {
     const stkData = await readDarajaResponse(stkRes);
 
     if (!stkRes.ok || stkData.ResponseCode !== '0') {
-      return Response.json(
-        { error: stkData.errorMessage || stkData.ResponseDescription || 'STK Push failed' },
-        { status: 400 }
-      );
+      const errMsg =
+        stkData.errorMessage ||
+        stkData.ResponseDescription ||
+        stkData.ResultDesc ||
+        `STK Push request failed (HTTP ${stkRes.status})`;
+      console.error('[STK Push] Daraja rejected STK push:', stkRes.status, JSON.stringify(stkData));
+      return Response.json({ error: errMsg }, { status: 400 });
     }
 
     setTransactionStatus(
@@ -140,13 +144,22 @@ export async function POST(req) {
     return Response.json(responsePayload);
 
   } catch (err) {
-    console.error('[STK Push] Error:', err);
-    const authFailure = err.code === 'MPESA_AUTH_FAILED' || err.code === 'MPESA_NOT_CONFIGURED';
+    console.error('[STK Push] Error:', err.code, err.message, err.status);
+    if (err.code === 'MPESA_NOT_CONFIGURED') {
+      return Response.json({
+        error: 'M-PESA payment is not configured on this server. Contact the institution.',
+        code: err.code,
+      }, { status: 503 });
+    }
+    if (err.code === 'MPESA_AUTH_FAILED') {
+      return Response.json({
+        error: `M-PESA authentication failed (HTTP ${err.status || '?'}). Please try again in a moment or contact the institution.`,
+        code: err.code,
+      }, { status: 503 });
+    }
     return Response.json({
-      error: authFailure
-        ? 'M-PESA is temporarily unavailable because the Daraja credentials could not be authenticated.'
-        : err.message,
+      error: err.message || 'Payment request failed. Please try again.',
       code: err.code || 'MPESA_REQUEST_FAILED',
-    }, { status: authFailure ? 503 : 500 });
+    }, { status: 500 });
   }
 }
