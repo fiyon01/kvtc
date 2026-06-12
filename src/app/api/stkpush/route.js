@@ -1,6 +1,8 @@
 export const runtime = 'nodejs';
 
+import crypto from 'node:crypto';
 import { setTransactionStatus } from '@/lib/mpesaStore';
+import { rateLimit, requestIp } from '@/lib/rateLimit';
 import {
   createMpesaPassword,
   darajaRequest,
@@ -30,6 +32,16 @@ globalThis.__kvtcStkRequests = stkRequests;
 
 export async function POST(req) {
   try {
+    const attempt = rateLimit(`stk:${requestIp(req)}`, {
+      limit: 5,
+      windowMs: 10 * 60 * 1000,
+    });
+    if (!attempt.allowed) {
+      return Response.json({ error: 'Too many payment requests. Please wait before trying again.' }, {
+        status: 429,
+        headers: { 'Retry-After': String(attempt.retryAfter) },
+      });
+    }
     const { phone, amount, idempotencyKey, application } = await req.json();
     const numericAmount = Number(amount);
 
@@ -82,6 +94,11 @@ export async function POST(req) {
     const password = createMpesaPassword(shortcode, passkey, ts);
 
     const normalizedPhone = normalizeMpesaPhone(phone);
+    const securedCallbackUrl = new URL(callbackUrl);
+    securedCallbackUrl.searchParams.set(
+      'token',
+      crypto.createHmac('sha256', passkey).update('kvtc-mpesa-callback').digest('hex'),
+    );
 
     const body = {
       BusinessShortCode: shortcode,
@@ -92,7 +109,7 @@ export async function POST(req) {
       PartyA: normalizedPhone,
       PartyB: shortcode,
       PhoneNumber: normalizedPhone,
-      CallBackURL: callbackUrl,
+      CallBackURL: securedCallbackUrl.toString(),
       AccountReference: 'KVTC-ADMISSION',
       TransactionDesc: 'Kinoo VTC Application Fee',
     };

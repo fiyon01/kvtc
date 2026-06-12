@@ -58,13 +58,18 @@ const RULES = [
 ];
 
 const s = StyleSheet.create({
+  // ── PAGE STYLES ──────────────────────────────────────────────
+  // Page 1: letterhead + admission body + footer ONCE at the bottom
   pageAdmission: {
     backgroundColor: '#ffffff',
     fontFamily: 'Times-Roman',
     fontSize: 10.5,
     color: dark,
+    // paddingBottom matches footer height so body never overlaps it
+    paddingBottom: 72,
   },
 
+  // Rules pages: no footer, clean padding
   pageRules: {
     backgroundColor: '#ffffff',
     fontFamily: 'Times-Roman',
@@ -76,32 +81,32 @@ const s = StyleSheet.create({
     paddingRight: 55,
   },
 
+  // ── BODY ─────────────────────────────────────────────────────
   body: {
     paddingTop: 10,
-    paddingBottom: 20,
+    paddingBottom: 10,
     paddingLeft: 42,
     paddingRight: 42,
+    flex: 1,
   },
 
+  // ── TITLE ────────────────────────────────────────────────────
   title: {
     textAlign: 'center',
     fontFamily: 'Times-Bold',
     fontSize: 13,
     textDecoration: 'underline',
-    marginBottom: 16,
+    marginBottom: 14,
     letterSpacing: 0.5,
   },
 
+  // ── NAME / DEPT ROW ──────────────────────────────────────────
   nameLine: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    marginBottom: 14,
+    marginBottom: 12,
   },
-  nameLabel: {
-    fontFamily: 'Times-Bold',
-    fontSize: 10.5,
-    marginRight: 2,
-  },
+  nameLabel: { fontFamily: 'Times-Bold', fontSize: 10.5, marginRight: 2 },
   nameDots: {
     flex: 2,
     borderBottomWidth: 1,
@@ -111,15 +116,8 @@ const s = StyleSheet.create({
     paddingBottom: 1,
     marginRight: 10,
   },
-  nameValue: {
-    fontFamily: 'Times-Roman',
-    fontSize: 10.5,
-  },
-  deptLabel: {
-    fontFamily: 'Times-Bold',
-    fontSize: 10.5,
-    marginRight: 2,
-  },
+  nameValue: { fontFamily: 'Times-Roman', fontSize: 10.5 },
+  deptLabel: { fontFamily: 'Times-Bold', fontSize: 10.5, marginRight: 2 },
   deptDots: {
     flex: 1.4,
     borderBottomWidth: 1,
@@ -129,61 +127,38 @@ const s = StyleSheet.create({
     paddingBottom: 1,
   },
 
+  // ── BODY TEXT ────────────────────────────────────────────────
   para: {
-    lineHeight: 16,
-    marginBottom: 10,
+    lineHeight: 1.55,
+    marginBottom: 8,
     textAlign: 'justify',
     fontSize: 10.5,
   },
-  bold: {
-    fontFamily: 'Times-Bold',
-  },
+  bold: { fontFamily: 'Times-Bold' },
 
-  table: {
-    width: '100%',
-    marginTop: 4,
-    marginBottom: 8,
-  },
+  // ── COURSE TABLE ─────────────────────────────────────────────
+  table: { width: '100%', marginTop: 4, marginBottom: 6 },
   trHead: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#000',
   },
-  th: {
-    fontFamily: 'Times-Bold',
-    fontSize: 10.5,
-    paddingBottom: 3,
-  },
-  trRow: {
-    flexDirection: 'row',
-  },
-  td: {
-    fontFamily: 'Times-Roman',
-    fontSize: 10,
-    paddingTop: 1,
-    paddingBottom: 1,
-  },
+  th: { fontFamily: 'Times-Bold', fontSize: 10.5, paddingBottom: 3 },
+  trRow: { flexDirection: 'row' },
+  td: { fontFamily: 'Times-Roman', fontSize: 10, paddingTop: 1.5, paddingBottom: 1.5 },
 
-  otherLabel: {
-    fontFamily: 'Times-Bold',
-    fontSize: 10.5,
-    marginBottom: 3,
-  },
-  bulletRow: {
-    flexDirection: 'row',
-    marginLeft: 10,
-  },
-  bulletDot: {
-    fontSize: 10.5,
-    marginRight: 5,
-  },
-  bulletText: {
-    fontSize: 10.5,
-    flex: 1,
-    lineHeight: 15,
-  },
+  // ── OTHER SUBJECTS ───────────────────────────────────────────
+  otherLabel: { fontFamily: 'Times-Bold', fontSize: 10.5, marginBottom: 3 },
+  bulletRow: { flexDirection: 'row', marginLeft: 10 },
+  bulletDot: { fontSize: 10.5, marginRight: 5 },
+  bulletText: { fontSize: 10.5, flex: 1, lineHeight: 1.5 },
 
+  // ── FOOTER (only on page 1, NOT fixed — placed at bottom naturally) ──
   footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     borderTopWidth: 2.5,
     borderTopColor: green,
     paddingTop: 5,
@@ -192,67 +167,42 @@ const s = StyleSheet.create({
     paddingRight: 20,
     backgroundColor: bgFooter,
   },
-  footerRow: {
-    flexDirection: 'row',
-    marginBottom: 1,
-  },
-  footerLabel: {
-    fontFamily: 'Times-Bold',
-    fontSize: 8,
-    marginRight: 3,
-  },
+  footerRow: { flexDirection: 'row', marginBottom: 2 },
+  footerLabel: { fontFamily: 'Times-Bold', fontSize: 8, marginRight: 3 },
   footerText: {
     fontFamily: 'Times-Roman',
     fontSize: 8,
     color: '#333',
     flex: 1,
-    lineHeight: 11,
+    lineHeight: 1.4,
   },
 
+  // ── RULES ────────────────────────────────────────────────────
   rulesTitle: {
     textAlign: 'center',
     fontFamily: 'Times-Bold',
     fontSize: 14,
     textDecoration: 'underline',
-    marginBottom: 20,
+    marginBottom: 18,
     letterSpacing: 0.3,
   },
-
-  ruleItem: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
+  ruleItem: { flexDirection: 'row', marginBottom: 9 },
   ruleNum: {
     width: 34,
     fontSize: 10,
     fontFamily: 'Times-Roman',
     lineHeight: 1.5,
-    paddingTop: 0,
   },
-  ruleBody: {
-    flex: 1,
-  },
+  ruleBody: { flex: 1 },
   ruleText: {
     fontSize: 10,
     lineHeight: 1.5,
     fontFamily: 'Times-Roman',
     textAlign: 'justify',
   },
-
-  subList: {
-    marginTop: 5,
-    marginLeft: 8,
-  },
-  subItem: {
-    flexDirection: 'row',
-    marginBottom: 5,
-  },
-  subNum: {
-    width: 28,
-    fontSize: 10,
-    lineHeight: 1.5,
-    fontFamily: 'Times-Roman',
-  },
+  subList: { marginTop: 4, marginLeft: 8 },
+  subItem: { flexDirection: 'row', marginBottom: 4 },
+  subNum: { width: 28, fontSize: 10, lineHeight: 1.5, fontFamily: 'Times-Roman' },
   subText: {
     flex: 1,
     fontSize: 10,
@@ -261,26 +211,17 @@ const s = StyleSheet.create({
     textAlign: 'justify',
   },
 
-  declareBlock: {
-    marginTop: 20,
-  },
+  // ── DECLARATION ──────────────────────────────────────────────
+  declareBlock: { marginTop: 20 },
   declareText: {
     fontFamily: 'Times-Italic',
     fontSize: 10.5,
-    marginBottom: 12,
+    marginBottom: 14,
     textAlign: 'center',
-    lineHeight: 16,
+    lineHeight: 1.5,
   },
-  signRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    marginTop: 6,
-  },
-  signLabel: {
-    fontFamily: 'Times-Roman',
-    fontSize: 10.5,
-    marginRight: 3,
-  },
+  signRow: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 6 },
+  signLabel: { fontFamily: 'Times-Roman', fontSize: 10.5, marginRight: 3 },
   signLine: {
     flex: 1,
     borderBottomWidth: 1,
@@ -304,20 +245,14 @@ const s = StyleSheet.create({
     minHeight: 15,
     paddingBottom: 1,
   },
-  signValue: {
-    fontFamily: 'Times-Roman',
-    fontSize: 10.5,
-  },
-  signImg: {
-    width: 80,
-    height: 18,
-    objectFit: 'contain',
-  },
+  signValue: { fontFamily: 'Times-Roman', fontSize: 10.5 },
+  signImg: { width: 80, height: 18, objectFit: 'contain' },
 });
 
-function Footer() {
+// Footer — rendered once, absolutely positioned at the bottom of page 1 only
+function AdmissionFooter() {
   return (
-    <View style={s.footer} fixed>
+    <View style={s.footer}>
       <View style={s.footerRow}>
         <Text style={s.footerLabel}>MISSION: </Text>
         <Text style={s.footerText}>
@@ -341,33 +276,33 @@ function Footer() {
 }
 
 export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
-  const {
-    name = '',
-    course = '',
-    signatureData,
-    signDate,
-  } = formData;
+  const { name = '', course = '', signatureData, signDate } = formData;
 
-  const dateStr = signDate
-    ? signDate
-    : new Date().toLocaleDateString('en-KE', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
+  // Always format the date properly regardless of input format
+  const dateStr = (() => {
+    if (!signDate) {
+      return new Date().toLocaleDateString('en-KE', {
+        day: '2-digit', month: 'short', year: 'numeric',
       });
+    }
+    const d = new Date(signDate);
+    return isNaN(d.getTime())
+      ? signDate
+      : d.toLocaleDateString('en-KE', {
+          day: '2-digit', month: 'short', year: 'numeric',
+        });
+  })();
 
   const renderRules = (rules, startIndex = 0) =>
     rules.map((rule, index) => (
-      <View style={s.ruleItem} key={startIndex + index}>
+      <View style={s.ruleItem} key={startIndex + index} wrap={false}>
         <Text style={s.ruleNum}>{startIndex + index + 1}.</Text>
-
         <View style={s.ruleBody}>
           {typeof rule === 'string' ? (
             <Text style={s.ruleText}>{rule}</Text>
           ) : (
             <>
               <Text style={s.ruleText}>{rule.main}</Text>
-
               <View style={s.subList}>
                 {rule.subs.map((sub, si) => (
                   <View style={s.subItem} key={si}>
@@ -388,6 +323,7 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
       author="Kinoo Vocational Training Centre"
       subject="Student Admission Letter"
     >
+      {/* ── PAGE 1: Admission Letter ── */}
       <Page size="A4" style={s.pageAdmission}>
         <PdfLetterhead kvtcLogoUrl={kvtcLogoUrl} cgokLogoUrl={cgokLogoUrl} />
 
@@ -399,7 +335,6 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
             <View style={s.nameDots}>
               <Text style={s.nameValue}>{name || ' '}</Text>
             </View>
-
             <Text style={s.deptLabel}>DEPARTMENT</Text>
             <View style={s.deptDots}>
               <Text style={s.nameValue}>{course || ' '}</Text>
@@ -428,7 +363,6 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
               <Text style={[s.th, { flex: 1.2 }]}>EXAM BODY</Text>
               <Text style={[s.th, { flex: 1.1 }]}>DURATION</Text>
             </View>
-
             {COURSES.map((c, i) => (
               <View style={s.trRow} key={i}>
                 <Text style={[s.td, { flex: 3.2 }]}>{c.name}</Text>
@@ -448,14 +382,17 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
           </View>
         </View>
 
-        <Footer />
+        {/* Footer appears ONCE, pinned to bottom of page 1 only */}
+        <AdmissionFooter />
       </Page>
 
+      {/* ── PAGE 2: Rules 1–12 ── */}
       <Page size="A4" style={s.pageRules}>
         <Text style={s.rulesTitle}>RULES AND REGULATIONS</Text>
         {renderRules(RULES.slice(0, 12), 0)}
       </Page>
 
+      {/* ── PAGE 3: Rules 13–22 + Declaration ── */}
       <Page size="A4" style={s.pageRules}>
         <Text style={s.rulesTitle}>RULES AND REGULATIONS</Text>
         {renderRules(RULES.slice(12), 12)}
@@ -464,25 +401,21 @@ export function AdmissionLetterPDF({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) 
           <Text style={s.declareText}>
             I hereby declare that I will adhere to all the rules and regulations of this institution.
           </Text>
-
           <View style={s.signRow}>
             <Text style={s.signLabel}>Name:</Text>
             <View style={s.signLine}>
               <Text style={s.signValue}>{name || ' '}</Text>
             </View>
-
             <Text style={s.signLabel}>Date:</Text>
             <View style={s.dateSignLine}>
-              <Text style={s.signValue}>{dateStr || ' '}</Text>
+              <Text style={s.signValue}>{dateStr}</Text>
             </View>
-
             <Text style={s.signLabel}>Sign:</Text>
             <View style={s.sigSignLine}>
-              {signatureData ? (
-                <Image src={signatureData} style={s.signImg} />
-              ) : (
-                <Text style={s.signValue}> </Text>
-              )}
+              {signatureData
+                ? <Image src={signatureData} style={s.signImg} />
+                : <Text style={s.signValue}> </Text>
+              }
             </View>
           </View>
         </View>

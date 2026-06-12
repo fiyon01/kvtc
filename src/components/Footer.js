@@ -2,11 +2,15 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useToast } from './ToastProvider';
 
 export default function Footer() {
   const year = new Date().getFullYear();
   const [db, setDb] = useState(null);
   const [isActive, setIsActive] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterBusy, setNewsletterBusy] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetch('/api/data')
@@ -27,6 +31,27 @@ export default function Footer() {
   const colHeaderStyle = { color: '#fff', fontSize: '15px', fontWeight: 600, marginBottom: '20px' };
   const footerLinkStyle = { color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '13px', transition: 'color 0.2s' };
 
+  const subscribe = async (event) => {
+    event.preventDefault();
+    if (newsletterBusy) return;
+    setNewsletterBusy(true);
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Subscription failed.');
+      setNewsletterEmail('');
+      showToast(result.message, 'success', { title: 'Newsletter' });
+    } catch (error) {
+      showToast(error.message || 'Subscription failed. Please try again.', 'error', { title: 'Newsletter' });
+    } finally {
+      setNewsletterBusy(false);
+    }
+  };
+
   return (
     <footer style={{ background: '#111', color: 'rgba(255,255,255,0.6)', padding: '60px 5% 32px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1.2fr', gap: '40px', marginBottom: '48px' }}>
@@ -41,7 +66,7 @@ export default function Footer() {
             </div>
           </div>
           <p style={{ fontSize: '13px', lineHeight: 1.7, marginBottom: '20px', maxWidth: '280px' }}>
-            Kiambu County's premier public vocational training centre offering NITA & KNEC-certified courses in 13+ technical disciplines.
+            Kiambu County&apos;s premier public vocational training centre offering NITA & KNEC-certified courses in 13+ technical disciplines.
           </p>
           {/* Social Links */}
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -104,6 +129,30 @@ export default function Footer() {
         </div>
       </div>
 
+      <section className="footer-newsletter" aria-labelledby="newsletter-title">
+        <div>
+          <span>Stay connected</span>
+          <h3 id="newsletter-title">Get intake dates, course news and campus updates.</h3>
+          <p>Useful KVTC updates only. No unnecessary messages.</p>
+        </div>
+        <form onSubmit={subscribe}>
+          <label htmlFor="newsletter-email" className="sr-only">Email address</label>
+          <input
+            id="newsletter-email"
+            type="email"
+            required
+            maxLength={254}
+            autoComplete="email"
+            value={newsletterEmail}
+            onChange={event => setNewsletterEmail(event.target.value)}
+            placeholder="Enter your email address"
+          />
+          <button type="submit" disabled={newsletterBusy}>
+            {newsletterBusy ? 'Subscribing...' : 'Subscribe'}
+          </button>
+        </form>
+      </section>
+
       {/* Admission CTA Banner */}
       {isActive && (
         <div style={{
@@ -117,7 +166,7 @@ export default function Footer() {
             {db?.intake?.yearText} Intake is Now Open!
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.75)', marginBottom: '24px', maxWidth: '500px', margin: '0 auto 24px' }}>
-            Don't miss your chance to enroll in Kenya's most affordable vocational training centre.
+            Don&apos;t miss your chance to enroll in Kenya&apos;s most affordable vocational training centre.
           </p>
           <Link href="/apply" style={{
             background: '#EF9F27', color: '#1a1a1a', display: 'inline-block',
@@ -143,6 +192,80 @@ export default function Footer() {
         }
         @media (max-width: 600px) {
           footer > div:first-child { grid-template-columns: 1fr !important; }
+        }
+        .footer-newsletter {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 32px;
+          margin-bottom: 40px;
+          padding: 30px 32px;
+          border: 1px solid rgba(47,121,183,.28);
+          border-radius: 18px;
+          background: linear-gradient(135deg, rgba(47,121,183,.16), rgba(15,110,86,.14));
+        }
+        .footer-newsletter > div { max-width: 520px; }
+        .footer-newsletter span {
+          color: #72b7e6;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 1.3px;
+          text-transform: uppercase;
+        }
+        .footer-newsletter h3 {
+          margin: 7px 0 5px;
+          color: #fff;
+          font-family: var(--serif);
+          font-size: clamp(20px, 2.3vw, 28px);
+          line-height: 1.25;
+        }
+        .footer-newsletter p { margin: 0; color: rgba(255,255,255,.55); font-size: 12px; }
+        .footer-newsletter form {
+          min-width: min(100%, 410px);
+          display: flex;
+          gap: 8px;
+          padding: 6px;
+          border: 1px solid rgba(255,255,255,.15);
+          border-radius: 12px;
+          background: rgba(255,255,255,.08);
+        }
+        .footer-newsletter input {
+          min-width: 0;
+          flex: 1;
+          padding: 10px 12px;
+          border: 0;
+          outline: 0;
+          background: transparent;
+          color: #fff;
+          font: inherit;
+          font-size: 13px;
+        }
+        .footer-newsletter input::placeholder { color: rgba(255,255,255,.42); }
+        .footer-newsletter button {
+          padding: 11px 17px;
+          border: 0;
+          border-radius: 8px;
+          background: #2F79B7;
+          color: #fff;
+          font-size: 12px;
+          font-weight: 750;
+          cursor: pointer;
+        }
+        .footer-newsletter button:disabled { cursor: wait; opacity: .65; }
+        @media (max-width: 820px) {
+          .footer-newsletter { align-items: stretch; flex-direction: column; padding: 26px 24px; }
+          .footer-newsletter form { min-width: 0; width: 100%; }
+        }
+        @media (max-width: 480px) {
+          .footer-newsletter { padding: 23px 18px; }
+          .footer-newsletter form { flex-direction: column; background: transparent; border: 0; padding: 0; }
+          .footer-newsletter input {
+            min-height: 48px;
+            border: 1px solid rgba(255,255,255,.16);
+            border-radius: 9px;
+            background: rgba(255,255,255,.08);
+          }
+          .footer-newsletter button { min-height: 46px; }
         }
       `}</style>
     </footer>

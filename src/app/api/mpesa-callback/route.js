@@ -1,6 +1,17 @@
 export const runtime = 'nodejs';
 
-import { setTransactionStatus } from '@/lib/mpesaStore';
+import crypto from 'node:crypto';
+import { getTransactionStatus, setTransactionStatus } from '@/lib/mpesaStore';
+
+function validCallbackToken(req) {
+  const passkey = process.env.MPESA_PASSKEY;
+  if (!passkey) return false;
+  const supplied = new URL(req.url).searchParams.get('token') || '';
+  const expected = crypto.createHmac('sha256', passkey).update('kvtc-mpesa-callback').digest('hex');
+  const left = Buffer.from(supplied);
+  const right = Buffer.from(expected);
+  return left.length === right.length && crypto.timingSafeEqual(left, right);
+}
 
 function parseTransactionDate(value) {
   const raw = String(value || '');
@@ -16,6 +27,9 @@ function parseTransactionDate(value) {
 
 export async function POST(req) {
   try {
+    if (!validCallbackToken(req)) {
+      return Response.json({ message: 'Unauthorized callback' }, { status: 401 });
+    }
     const body = await req.json();
     const { Body } = body;
 
@@ -30,6 +44,10 @@ export async function POST(req) {
       ResultDesc,
       CallbackMetadata,
     } = Body.stkCallback;
+    const initiated = getTransactionStatus(CheckoutRequestID);
+    if (initiated.status === 'unknown') {
+      return Response.json({ message: 'Unknown transaction' }, { status: 202 });
+    }
 
     const metadata = Object.fromEntries(
       (CallbackMetadata?.Item || [])

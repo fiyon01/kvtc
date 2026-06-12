@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { rateLimit, requestIp } from '@/lib/rateLimit';
 
 const escapeHtml = (value) => String(value ?? '')
   .replaceAll('&', '&amp;')
@@ -10,6 +11,16 @@ const escapeHtml = (value) => String(value ?? '')
 
 export async function POST(req) {
   try {
+    const attempt = rateLimit(`contact:${requestIp(req)}`, {
+      limit: 5,
+      windowMs: 10 * 60 * 1000,
+    });
+    if (!attempt.allowed) {
+      return NextResponse.json({ success: false, message: 'Too many enquiries. Please try again later.' }, {
+        status: 429,
+        headers: { 'Retry-After': String(attempt.retryAfter) },
+      });
+    }
     const formData = await req.formData();
     const fname = formData.get('fname') || '';
     const lname = formData.get('lname') || '';

@@ -42,6 +42,20 @@ const s = StyleSheet.create({
   // ── BODY ──
   body: { paddingTop: 10, paddingBottom: 12, paddingLeft: 20, paddingRight: 20, flex: 1 },
   formTitle: { textAlign: 'center', fontFamily: 'Times-Bold', fontSize: 12, textDecoration: 'underline', marginBottom: 8 },
+  personalHeader: { flexDirection: 'row', alignItems: 'flex-start' },
+  personalFields: { flex: 1, paddingRight: 12 },
+  photoCard: {
+    width: 78,
+    height: 98,
+    borderWidth: 1,
+    borderColor: '#8a969c',
+    backgroundColor: '#f7f8f8',
+    padding: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  applicantPhoto: { width: 70, height: 90, objectFit: 'cover' },
+  photoPlaceholder: { color: '#7a858b', fontSize: 7.5, textAlign: 'center', lineHeight: 1.3 },
 
   // ── SECTION HEADERS ──
   sectionTitle: { fontFamily: 'Times-Bold', textDecoration: 'underline', marginTop: 8, marginBottom: 2, fontSize: 10 },
@@ -179,7 +193,7 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
     name, idNo, dob, tel, homeAddress, residentialArea,
     kinName, kinIdNo, kinTel, relationship,
     course, duration, examBody, startDate,
-    signatureData, signDate,
+    signatureData, signDate, applicantPhoto,
     paymentAmount = 500,
     paymentReference = '',
     paymentDate = '',
@@ -214,30 +228,39 @@ export function AdmissionDocument({ formData = {}, kvtcLogoUrl, cgokLogoUrl }) {
           <Text style={s.formTitle}>ADMISSION FORM</Text>
 
           {/* PERSONAL DETAILS */}
-          <Text style={s.sectionTitle}>PERSONAL DETAILS</Text>
-          <Row>
-            <L t="ADM NO" /><Ghost maxWidth={140} /><L t="   DATE" /><Ghost maxWidth={110} />
-          </Row>
-          <Row mt={2}>
-            <L t="NAME  " />
-            <View style={[s.field, { flex: 1 }]}><Text style={s.fieldText}>{name || ' '}</Text></View>
-          </Row>
-          <Row mt={2}>
-            <L t="ID NO  " />
-            <View style={[s.field, { maxWidth: 140 }]}><Text style={s.fieldText}>{idNo || ' '}</Text></View>
-            <L t="   DATE OF BIRTH  " />
-            <View style={[s.field, { maxWidth: 140 }]}><Text style={s.fieldText}>{fmtDate(dob)}</Text></View>
-          </Row>
-          <Row mt={2}>
-            <L t="TEL  " />
-            <View style={[s.field, { maxWidth: 200 }]}><Text style={s.fieldText}>{tel || ' '}</Text></View>
-          </Row>
-          <Row mt={2}>
-            <L t="HOME ADDRESS  " />
-            <View style={[s.field, { maxWidth: 160 }]}><Text style={s.fieldText}>{homeAddress || ' '}</Text></View>
-            <L t="  RESIDENTIAL AREA  " />
-            <View style={[s.field, { flex: 1 }]}><Text style={s.fieldText}>{residentialArea || ' '}</Text></View>
-          </Row>
+          <View style={s.personalHeader} wrap={false}>
+            <View style={s.personalFields}>
+              <Text style={s.sectionTitle}>PERSONAL DETAILS</Text>
+              <Row>
+                <L t="ADM NO" /><Ghost maxWidth={105} /><L t="   DATE" /><Ghost maxWidth={80} />
+              </Row>
+              <Row mt={2}>
+                <L t="NAME  " />
+                <View style={[s.field, { flex: 1 }]}><Text style={s.fieldText}>{name || ' '}</Text></View>
+              </Row>
+              <Row mt={2}>
+                <L t="ID NO  " />
+                <View style={[s.field, { maxWidth: 110 }]}><Text style={s.fieldText}>{idNo || ' '}</Text></View>
+                <L t="   D.O.B  " />
+                <View style={[s.field, { maxWidth: 100 }]}><Text style={s.fieldText}>{fmtDate(dob)}</Text></View>
+              </Row>
+              <Row mt={2}>
+                <L t="TEL  " />
+                <View style={[s.field, { maxWidth: 180 }]}><Text style={s.fieldText}>{tel || ' '}</Text></View>
+              </Row>
+              <Row mt={2}>
+                <L t="HOME ADDRESS  " />
+                <View style={[s.field, { maxWidth: 125 }]}><Text style={s.fieldText}>{homeAddress || ' '}</Text></View>
+                <L t="  AREA  " />
+                <View style={[s.field, { flex: 1 }]}><Text style={s.fieldText}>{residentialArea || ' '}</Text></View>
+              </Row>
+            </View>
+            <View style={s.photoCard}>
+              {applicantPhoto
+                ? <Image src={applicantPhoto} style={s.applicantPhoto} />
+                : <Text style={s.photoPlaceholder}>APPLICANT{'\n'}PHOTO</Text>}
+            </View>
+          </View>
 
           {/* NEXT OF KIN */}
           <Text style={s.sectionTitle}>NEXT OF KIN</Text>

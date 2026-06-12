@@ -17,23 +17,26 @@ export default function AdminDashboard() {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem('adminAuth') === 'true') {
-      setAuth(a => ({ ...a, authenticated: true }));
-    }
     fetch('/api/data')
       .then(res => res.json())
-      .then(data => setDb(data))
+      .then(data => {
+        if (Array.isArray(data.applications)) {
+          setDb(data);
+          setAuth(a => ({ ...a, authenticated: true }));
+        }
+      })
       .catch(err => console.error("Failed to load db", err));
   }, []);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await fetch('/api/data', {
+      const res = await fetch('/api/data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(db)
       });
+      if (!res.ok) throw new Error('Save rejected');
       alert('✅ Changes saved successfully!');
     } catch (e) {
       alert('❌ Failed to save changes.');
@@ -76,7 +79,9 @@ export default function AdminDashboard() {
         body: JSON.stringify({ action: 'login', password: auth.password })
       });
       if (res.ok) {
-        sessionStorage.setItem('adminAuth', 'true');
+        const dataRes = await fetch('/api/data', { cache: 'no-store' });
+        if (!dataRes.ok) throw new Error('Could not load protected data');
+        setDb(await dataRes.json());
         setAuth(a => ({ ...a, authenticated: true, loading: false }));
       } else {
         setAuth(a => ({ ...a, error: 'Incorrect password.', loading: false }));
@@ -86,8 +91,13 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('adminAuth');
+  const handleLogout = async () => {
+    await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'logout' }),
+    }).catch(() => {});
+    setDb(null);
     setAuth({ authenticated: false, password: '', error: '', loading: false });
   };
 

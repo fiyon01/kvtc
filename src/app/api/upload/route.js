@@ -1,21 +1,39 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
+import crypto from 'node:crypto';
+import { isAdminRequest } from '@/lib/adminAuth';
+
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const IMAGE_EXTENSIONS = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+};
 
 export async function POST(req) {
   try {
+    const dbPath = path.join(process.cwd(), 'src', 'data', 'db.json');
+    const currentData = JSON.parse(await fs.readFile(dbPath, 'utf8'));
+    if (!isAdminRequest(req, currentData.security?.password)) {
+      return NextResponse.json({ error: 'Admin authentication required' }, { status: 401 });
+    }
     const formData = await req.formData();
     const file = formData.get('file');
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    if (!file || typeof file.arrayBuffer !== 'function') {
+      return NextResponse.json({ error: 'No valid file provided' }, { status: 400 });
+    }
+    if (!IMAGE_EXTENSIONS[file.type]) {
+      return NextResponse.json({ error: 'Only JPEG, PNG, WebP and GIF images are allowed' }, { status: 415 });
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json({ error: 'Image exceeds the 5 MB limit' }, { status: 413 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    // Create a unique filename
-    const ext = path.extname(file.name);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const filename = `upload-${uniqueSuffix}${ext}`;
+    const filename = `upload-${crypto.randomUUID()}${IMAGE_EXTENSIONS[file.type]}`;
     
     // Write to public/uploads directory
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');

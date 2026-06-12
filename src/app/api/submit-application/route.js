@@ -2,9 +2,21 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
+import { getTransactionStatus } from '@/lib/mpesaStore';
+import { rateLimit, requestIp } from '@/lib/rateLimit';
 
 export async function POST(req) {
   try {
+    const attempt = rateLimit(`application:${requestIp(req)}`, {
+      limit: 3,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (!attempt.allowed) {
+      return NextResponse.json({ success: false, message: 'Too many submission attempts. Please try again later.' }, {
+        status: 429,
+        headers: { 'Retry-After': String(attempt.retryAfter) },
+      });
+    }
     const formData = await req.formData();
 
     const name = formData.get('name') || 'Applicant';
@@ -28,8 +40,34 @@ export async function POST(req) {
     }
     const paymentDate = formData.get('paymentDate') || new Date().toISOString();
     const paymentPhone = formData.get('paymentPhone') || phone;
+    const checkoutRequestId = String(formData.get('checkoutRequestId') || '').trim();
     const formPdfFile = formData.get('formPdf');
     const letterPdfFile = formData.get('letterPdf');
+    if (
+      (formPdfFile?.size || 0) > 10 * 1024 * 1024
+      || (letterPdfFile?.size || 0) > 10 * 1024 * 1024
+    ) {
+      return NextResponse.json({
+        success: false,
+        message: 'Submitted PDF exceeds the 10 MB file limit.',
+      }, { status: 413 });
+    }
+    const transaction = getTransactionStatus(checkoutRequestId);
+    const configuredForMpesa = Boolean(
+      process.env.MPESA_CONSUMER_KEY
+      && process.env.MPESA_CONSUMER_SECRET
+      && process.env.MPESA_SHORTCODE
+      && process.env.MPESA_PASSKEY
+    );
+    const verifiedPayment = transaction.status === 'success'
+      && transaction.paymentReference === paymentReference
+      && Number(transaction.amount) === Number(admissionAmount);
+    if (configuredForMpesa && !verifiedPayment) {
+      return NextResponse.json({
+        success: false,
+        message: 'Payment could not be verified against the completed M-PESA transaction.',
+      }, { status: 403 });
+    }
 
     // Check if email credentials are provided
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {

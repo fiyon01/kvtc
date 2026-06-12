@@ -3,8 +3,43 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useToast } from "./ToastProvider";
+import CourseRequirementsModal from "./CourseRequirementsModal";
 
 const KVTC_LOGO = "/kvtc_logo.png";
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
+function resizeApplicantPhoto(file) {
+  return new Promise((resolve, reject) => {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      reject(new Error('Upload a JPG, PNG, or WebP image.'));
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      reject(new Error('The applicant photo must be smaller than 5 MB.'));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('The selected photo could not be read.'));
+    reader.onload = () => {
+      const image = new window.Image();
+      image.onerror = () => reject(new Error('The selected file is not a valid image.'));
+      image.onload = () => {
+        const scale = Math.min(1, 720 / image.width, 900 / image.height);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(image.width * scale));
+        canvas.height = Math.max(1, Math.round(image.height * scale));
+        const context = canvas.getContext('2d');
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.84));
+      };
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 // ── Signature Modal ────────────────────────────────────────────
 function SignatureModal({ onSave, onClose }) {
@@ -541,12 +576,14 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
   const [cgokLogo, setCgokLogo] = useState("/cgok-logo.png"); // Use the public folder logo
   const [sigModal, setSigModal] = useState(false);
   const [paymentModal, setPaymentModal] = useState(false);
+  const [reviewCourse, setReviewCourse] = useState(null);
+  const [confirmedCourse, setConfirmedCourse] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name:"", idNo:"", dob:"", tel:"", homeAddress:"", residentialArea:"",
     kinName:"", kinIdNo:"", kinTel:"", relationship:"",
     course: selectedCoursePre, duration:"", examBody:"", startDate:"",
-    signatureData:"", signDate:"",
+    signatureData:"", signDate:"", applicantPhoto:"",
   });
   const formRef = useRef();
   
@@ -592,6 +629,7 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       ['startDate', 'start date'],
       ['signatureData', 'signature'],
       ['signDate', 'signature date'],
+      ['applicantPhoto', 'applicant photo'],
     ];
     for (const [field, label] of requiredFields) {
       if (!String(form[field] || '').trim()) {
@@ -607,7 +645,36 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
 
   const handleNext = () => {
     if (!validateForm()) return;
+    if (confirmedCourse !== form.course) {
+      const selected = courseList.find(course => course.name === form.course);
+      if (selected) setReviewCourse(selected);
+      return;
+    }
     setPaymentModal(true);
+  };
+
+  const handleCourseSelection = (courseName) => {
+    const selected = courseList.find(course => course.name === courseName);
+    setConfirmedCourse('');
+    setForm(current => ({
+      ...current,
+      course: courseName,
+      duration: selected?.dur || '',
+      examBody: selected?.cert || '',
+    }));
+    if (selected) setReviewCourse(selected);
+  };
+
+  const handlePhotoChange = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    try {
+      set('applicantPhoto', await resizeApplicantPhoto(file));
+      showToast('Applicant photo attached successfully.', 'success');
+    } catch (error) {
+      showToast(error.message, 'warning');
+    }
   };
 
   const handlePaymentSuccess = async (userEmail, payment = {}) => {
@@ -663,6 +730,7 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       fd.append("paymentReference", payment.paymentReference || "");
       fd.append("paymentDate", payment.paymentDate || new Date().toISOString());
       fd.append("paymentPhone", payment.paymentPhone || payment.phone || form.tel);
+      fd.append("checkoutRequestId", payment.checkoutRequestId || "");
       
       // Attach both PDF files
       const formFile = new File([formBlob], `AdmissionForm_${form.name.replace(/\s+/g, '_')}.pdf`, { type: 'application/pdf' });
@@ -697,6 +765,19 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
         input,select{font-size:16px!important;} /* prevents iOS zoom/scroll-jump */
         input:focus,select:focus{outline:none!important;box-shadow:none!important;}
         input::placeholder{color:rgba(0,0,0,0.2);}
+        .applicant-photo-field{display:flex;align-items:center;gap:16px;margin:7px 0 10px;padding:12px;border:1px solid #cfd8dc;border-radius:10px;background:#fff;font-family:var(--sans);}
+        .applicant-photo-preview{width:96px;height:120px;flex-shrink:0;border:1px solid #aebbc1;border-radius:7px;overflow:hidden;background:#f4f7f8;}
+        .applicant-photo-preview img{width:100%;height:100%;object-fit:cover;display:block;}
+        .applicant-photo-placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#829199;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+        .applicant-photo-copy{flex:1;min-width:0;}
+        .applicant-photo-copy strong{display:block;color:#263b47;font-size:13px;margin-bottom:5px;}
+        .applicant-photo-copy strong span{color:#d92d20;}
+        .applicant-photo-copy p{margin:0 0 10px;color:#72828a;font-size:11px;line-height:1.5;}
+        .applicant-photo-copy>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+        .applicant-photo-copy label,.applicant-photo-copy button{padding:8px 13px;border-radius:7px;font:700 11px var(--sans);cursor:pointer;}
+        .applicant-photo-copy label{background:#245A87;color:#fff;}
+        .applicant-photo-copy button{border:1px solid #d6dde0;background:#fff;color:#b42318;}
+        .applicant-photo-copy input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
         @media(max-width:580px){
           .form-kvtc-logo{width:58px!important;height:58px!important;}
           .form-cgok-logo{width:52px!important;height:52px!important;}
@@ -708,6 +789,8 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
           .cntc{font-size:7pt!important;}
           .fbody{padding:10px 12px 14px!important;}
           .ftg{grid-template-columns:58px 1fr!important;}
+          .applicant-photo-field{align-items:flex-start;gap:12px;padding:10px;}
+          .applicant-photo-preview{width:80px;height:100px;}
         }
         @media(max-width:380px){
           .form-kvtc-logo{width:48px!important;height:48px!important;}
@@ -720,6 +803,21 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
       `}</style>
 
       {sigModal && <SignatureModal onSave={v=>set("signatureData",v)} onClose={()=>setSigModal(false)} />}
+      {reviewCourse && (
+        <CourseRequirementsModal
+          course={reviewCourse}
+          onChooseAnother={() => {
+            setReviewCourse(null);
+            setConfirmedCourse('');
+            setForm(current => ({ ...current, course: '', duration: '', examBody: '' }));
+          }}
+          onConfirm={() => {
+            setConfirmedCourse(reviewCourse.name);
+            setReviewCourse(null);
+            showToast(`${reviewCourse.name} selected. Requirements confirmed.`, 'success');
+          }}
+        />
+      )}
       {paymentModal && (
         <PaymentModal
           name={form.name}
@@ -774,6 +872,38 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
 
           {/* PERSONAL DETAILS */}
           <Sec t="PART I: PERSONAL DETAILS"/>
+          <div data-field="applicantPhoto" tabIndex={-1} className="applicant-photo-field">
+            <div className="applicant-photo-preview">
+              {form.applicantPhoto
+                ? <img src={form.applicantPhoto} alt="Applicant preview" />
+                : (
+                  <div className="applicant-photo-placeholder">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                      <circle cx="12" cy="8" r="3.2" />
+                      <path d="M5.5 20c.7-4 3-6 6.5-6s5.8 2 6.5 6" />
+                    </svg>
+                    <span>Passport photo</span>
+                  </div>
+                )}
+            </div>
+            <div className="applicant-photo-copy">
+              <strong>Applicant Photo <span>*</span></strong>
+              <p>Attach a clear, recent passport-style photo. JPG, PNG or WebP, maximum 5 MB.</p>
+              <div>
+                <label htmlFor="applicant-photo">{form.applicantPhoto ? 'Change Photo' : 'Attach Photo'}</label>
+                {form.applicantPhoto && (
+                  <button type="button" onClick={() => set('applicantPhoto', '')}>Remove</button>
+                )}
+              </div>
+              <input
+                id="applicant-photo"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handlePhotoChange}
+                required
+              />
+            </div>
+          </div>
           <Row mt={4}>
             <L t="ADM NO"/>
             <Locked flex={1} maxWidth={140}/>
@@ -823,7 +953,7 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
           <Row>
             <L t="COURSE&nbsp;" required/>
             <div style={{flex:"1 1 auto",minWidth:80, maxWidth:"none"}}>
-              <select value={form.course} onChange={e=>set("course",e.target.value)} required aria-required="true" style={{...S, whiteSpace:"normal", overflow:"visible"}}>
+              <select value={form.course} onChange={e=>handleCourseSelection(e.target.value)} required aria-required="true" style={{...S, whiteSpace:"normal", overflow:"visible"}}>
                 <option value="">{"............................................."}</option>
                 {courseList.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}
               </select>

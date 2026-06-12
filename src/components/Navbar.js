@@ -94,6 +94,7 @@ export default function Navbar() {
     { name: 'About', href: '/about' },
     links.find(link => link.name === 'Departments'),
     { name: 'Courses', href: '/courses' },
+    { name: 'Search', href: '/courses?focus=search', isSearch: true },
     { name: 'Admissions', href: '/admissions' },
     { name: 'Contact', href: '/contact' },
     {
@@ -150,7 +151,15 @@ export default function Navbar() {
         <ul style={{ display: 'flex', gap: 'clamp(16px, 1.7vw, 26px)', listStyle: 'none', margin: 0, padding: 0, alignItems: 'center' }} className="nav-desktop-ul">
           {desktopLinks.map(l => (
             <li key={l.name} style={{ position: 'relative', display: 'flex', alignItems: 'center' }} className={l.isDropdown ? 'nav-dropdown-wrapper' : ''}>
-              {l.isDropdown ? (
+              {l.isSearch ? (
+                <Link href={l.href} className="nav-primary-search" aria-label="Search courses">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m20 20-3.5-3.5" />
+                  </svg>
+                  <span>Search</span>
+                </Link>
+              ) : l.isDropdown ? (
                 <div className="nav-item nav-dropdown-trigger" style={{
                   cursor: 'pointer',
                   color: '#555',
@@ -253,6 +262,27 @@ export default function Navbar() {
             box-shadow: 0 6px 18px rgba(32,82,112,0.09);
             background: linear-gradient(135deg, rgba(47,121,183,0.09), rgba(15,110,86,0.055)) !important;
           }
+          .nav-primary-search {
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 0 10px;
+            border: 1px solid rgba(47,121,183,.2);
+            border-radius: 9px;
+            background: #f4f8fb;
+            color: #245A87;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: .2s ease;
+          }
+          .nav-primary-search:hover {
+            border-color: #2F79B7;
+            background: #eaf4fb;
+            transform: translateY(-1px);
+          }
         `}</style>
 
         <div className="nav-cta-btn" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -267,6 +297,13 @@ export default function Navbar() {
             textDecoration: 'none', whiteSpace: 'nowrap',
           }}>Apply Now</Link>
         </div>
+
+        <Link href="/courses?focus=search" className="mobile-header-search" aria-label="Search courses">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+        </Link>
 
         {/* Hamburger */}
         <button onClick={mobileOpen ? closeMobileMenu : openMobileMenu} style={{
@@ -397,9 +434,26 @@ export default function Navbar() {
           .nav-desktop-ul { display: none !important; }
           .nav-cta-btn { display: none !important; }
           .hamburger-btn { display: flex !important; }
+          .mobile-header-search { display: grid !important; }
         }
         @media (min-width: 1051px) {
           .hamburger-btn { display: none !important; }
+          .mobile-header-search { display: none !important; }
+        }
+        .mobile-header-search {
+          width: 40px;
+          height: 40px;
+          display: none;
+          place-items: center;
+          flex-shrink: 0;
+          margin-left: auto;
+          margin-right: 10px;
+          border: 1px solid rgba(47,121,183,.2);
+          border-radius: 11px;
+          background: linear-gradient(135deg, #edf6fc, #eef8f4);
+          color: #245A87;
+          text-decoration: none;
+          box-shadow: 0 5px 15px rgba(36,90,135,.08);
         }
         .mobile-nav-layer {
           position: fixed;
@@ -650,6 +704,11 @@ export default function Navbar() {
         @keyframes mobile-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
         @keyframes mobile-drawer-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
         @media (max-width: 380px) {
+          nav { padding-left: 10px !important; padding-right: 10px !important; }
+          .nav-brand-lockup { padding-left: 4px !important; padding-right: 5px !important; gap: 5px !important; }
+          .nav-brand-lockup > span:first-child { width: 42px !important; }
+          .nav-brand-lockup > span:nth-child(3) { width: 38px !important; }
+          .mobile-header-search { width: 38px; height: 38px; margin-right: 7px; }
           .mobile-brand-copy { display: none; }
           .mobile-nav-scroll { padding-left: 13px; padding-right: 13px; }
           .mobile-department-grid, .mobile-resource-grid { gap: 7px; }

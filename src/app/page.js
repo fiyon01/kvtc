@@ -381,6 +381,7 @@ function TestimonialsCarousel({ testimonials }) {
 
 export default function Home() {
   const [db, setDb] = useState(null);
+  const [homeCourseSearch, setHomeCourseSearch] = useState('');
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
@@ -409,6 +410,13 @@ export default function Home() {
   const intake = db?.intake || { isOngoing: true, yearText: "2026" };
 
   const events = db?.events || [];
+  const submitCourseSearch = (event) => {
+    event.preventDefault();
+    const query = homeCourseSearch.trim();
+    window.location.href = query
+      ? `/courses?q=${encodeURIComponent(query)}`
+      : '/courses?focus=search';
+  };
 
   const testimonials = db?.testimonials || [
     { initials: 'WK', name: 'Wanjiku Kamau', role: 'Hair & Beauty Graduate, 2024 · Salon Owner', text: 'The Hair Dressing course at Kinoo VTC was a turning point for me. Within 3 months of graduating, I opened my own salon in Kikuyu town. The practical training was exceptional.' },
@@ -450,6 +458,30 @@ export default function Home() {
           Kiambu County's premier public vocational training centre — NITA & KNEC-certified courses in 13+ disciplines. Affordable. Practical. Life-changing.
         </p>
 
+        <form className="home-course-search" onSubmit={submitCourseSearch}>
+          <div>
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            <input
+              type="search"
+              value={homeCourseSearch}
+              onChange={event => setHomeCourseSearch(event.target.value)}
+              placeholder="What would you like to study?"
+              aria-label="Search courses"
+            />
+            <button type="submit">Find Courses</button>
+          </div>
+          <nav aria-label="Popular course searches">
+            <span>Quick search:</span>
+            <Link href="/courses?category=short">Short courses</Link>
+            <Link href="/courses?category=nita">NITA</Link>
+            <Link href="/courses?category=knec">KNEC</Link>
+            <Link href="/courses?budget=under-15000">Under KSh 15,000</Link>
+          </nav>
+        </form>
+
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '60px', animation: 'heroFadeUp 0.8s 0.5s both' }}>
           <Link href="/apply" style={{ background: '#EF9F27', color: '#1a1a1a', padding: '16px 36px', borderRadius: '10px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 24px rgba(239,159,39,0.25)', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
             Apply Now
@@ -479,6 +511,74 @@ export default function Home() {
           }
           @keyframes blink {
             50% { opacity: 0; }
+          }
+          .home-course-search {
+            width: min(680px, 100%);
+            margin: -14px 0 30px;
+            animation: heroFadeUp .8s .43s both;
+          }
+          .home-course-search > div {
+            min-height: 58px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 7px 6px 17px;
+            border: 1px solid rgba(255,255,255,.35);
+            border-radius: 15px;
+            background: rgba(255,255,255,.96);
+            color: #607985;
+            box-shadow: 0 18px 45px rgba(8,38,31,.22);
+          }
+          .home-course-search input {
+            min-width: 0;
+            flex: 1;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: #203743;
+            font: inherit;
+            font-size: 15px;
+          }
+          .home-course-search button {
+            align-self: stretch;
+            padding: 0 20px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #245A87, #2F79B7);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 750;
+            cursor: pointer;
+          }
+          .home-course-search nav {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 9px;
+          }
+          .home-course-search nav span { color: rgba(255,255,255,.68); font-size: 10px; font-weight: 700; }
+          .home-course-search nav a {
+            padding: 5px 9px;
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 999px;
+            background: rgba(255,255,255,.1);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 650;
+            text-decoration: none;
+            backdrop-filter: blur(7px);
+          }
+          @media(max-width:560px) {
+            .home-course-search { margin-top: -18px; }
+            .home-course-search > div { min-height: 52px; padding-left: 13px; }
+            .home-course-search input { font-size: 14px; }
+            .home-course-search button { padding: 0 13px; font-size: 11px; }
+            .home-course-search nav { gap: 5px; }
+          }
+          @media(max-width:380px) {
+            .home-course-search button { width: 48px; padding: 0; font-size: 0; }
+            .home-course-search button::after { content: "Go"; font-size: 12px; }
           }
         `}</style>
       </section>
@@ -652,7 +752,7 @@ export default function Home() {
               <h3 style={{ fontFamily: 'var(--serif)', fontSize: '2.2rem', color: '#fff', marginBottom: '8px' }}>Fast-Track Your Career</h3>
               <p style={{ color: '#aaa', fontSize: '15px', maxWidth: '500px' }}>Can't commit to a full year? We offer intensive, highly practical short courses tailored for working adults and those looking for quick skills.</p>
             </div>
-            <Link href="/courses" style={{ background: '#0F6E56', color: '#fff', padding: '16px 32px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)' }}>
+            <Link href="/courses?category=short" style={{ background: '#0F6E56', color: '#fff', padding: '16px 32px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)' }}>
               Explore Short Courses →
             </Link>
           </div>
