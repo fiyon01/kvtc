@@ -1,5 +1,3 @@
-import { Worker } from 'node:worker_threads';
-
 export function mpesaBaseUrl(env = process.env.MPESA_ENV || 'sandbox') {
   return env === 'production'
     ? 'https://api.safaricom.co.ke'
@@ -14,58 +12,26 @@ export function darajaHeaders(additional = {}) {
   };
 }
 
-export function darajaRequest(url, { method = 'GET', headers = {}, body } = {}) {
-  return new Promise((resolve, reject) => {
-    const workerCode = `
-      import { parentPort, workerData } from 'node:worker_threads';
-      try {
-        const response = await fetch(workerData.url, {
-          method: workerData.method,
-          headers: workerData.headers,
-          body: workerData.body,
-          signal: AbortSignal.timeout(15000),
-        });
-        parentPort.postMessage({
-          ok: response.ok,
-          status: response.status,
-          body: await response.text(),
-        });
-      } catch (error) {
-        parentPort.postMessage({ error: error.message });
-      }
-    `;
-    const worker = new Worker(workerCode, {
-      eval: true,
-      type: 'module',
-      workerData: {
-        url,
-        method,
-        headers: darajaHeaders(headers),
-        body,
-      },
+export async function darajaRequest(url, { method = 'GET', headers = {}, body } = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    return await fetch(url, {
+      method,
+      headers: darajaHeaders(headers),
+      body,
+      signal: controller.signal,
+      cache: 'no-store',
     });
-    const timeout = setTimeout(() => {
-      worker.terminate();
-      reject(new Error('Daraja request timed out'));
-    }, 17000);
-    worker.once('message', (result) => {
-      clearTimeout(timeout);
-      worker.terminate();
-      if (result.error) {
-        reject(new Error(result.error));
-        return;
-      }
-      resolve({
-        ok: result.ok,
-        status: result.status,
-        text: async () => result.body,
-      });
-    });
-    worker.once('error', (error) => {
-      clearTimeout(timeout);
-      reject(error);
-    });
-  });
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Daraja request timed out');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export function mpesaTimestamp(date = new Date()) {
