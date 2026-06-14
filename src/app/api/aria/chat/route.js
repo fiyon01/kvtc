@@ -512,6 +512,7 @@ export async function POST(req) {
       { role: 'user', content: message }
     ];
 
+    let result = null;
     for (const [name, fn] of [
       ['Groq', callGroq],
       ['Gemini', callGemini],
