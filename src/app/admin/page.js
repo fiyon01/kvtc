@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Settings, Wallet, Building, LayoutGrid, GraduationCap, Calendar, FileText, Image as ImageIcon, HelpCircle, Phone, Mail, FileCheck, BarChart3, Lock } from 'lucide-react';
 
 const COURSES_PER_PAGE = 6;
 
@@ -9,12 +10,39 @@ export default function AdminDashboard() {
   const [db, setDb] = useState(null);
   const [activeTab, setActiveTab] = useState('general');
   const [saving, setSaving] = useState(false);
-  const [auth, setAuth] = useState({ authenticated: false, password: '', error: '', loading: false });
+  const [auth, setAuth] = useState({ authenticated: false, email: '', password: '', error: '', loading: false });
   const [coursePage, setCoursePage] = useState(1);
   const [courseModal, setCourseModal] = useState(null); // null | 'add' | {index}
   const [newCourse, setNewCourse] = useState({ name: '', tag: '', cert: 'NITA', dur: '2 Years', fees: 'KSh 27,000/yr', img: '', description: '', outcomes: '', careers: '', intake: 'January & September' });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [analytics, setAnalytics] = useState({ loading: true, topCourses: [], recentEvents: [], funnelData: [], totalEvents: 0, eventsToday: 0, uniqueCourses: 0, error: null });
+  const [funnel, setFunnel] = useState({ loading: true, page_visits: 0, aria_chats: 0, apply_starts: 0, apply_completes: 0, enrolled: 0 });
+  const [leads, setLeads] = useState({ loading: true, list: [], total: 0 });
+  const [enrolledInput, setEnrolledInput] = useState('');
+
+  const refreshAnalytics = () => {
+    setAnalytics(a => ({ ...a, loading: true }));
+    fetch('/api/analytics/admin')
+      .then(r => r.json())
+      .then(d => setAnalytics({ loading: false, ...d, error: null }))
+      .catch(() => setAnalytics({ loading: false, topCourses: [], recentEvents: [], funnelData: [], totalEvents: 0, eventsToday: 0, uniqueCourses: 0, error: 'Could not load analytics.' }));
+
+    fetch('/api/funnel')
+      .then(r => r.json())
+      .then(d => setFunnel({ loading: false, ...d }))
+      .catch(() => setFunnel({ loading: false, page_visits: 0, aria_chats: 0, apply_starts: 0, apply_completes: 0, enrolled: 0 }));
+
+    fetch('/api/leads')
+      .then(r => r.json())
+      .then(d => setLeads({ loading: false, list: d.leads || [], total: d.total || 0 }))
+      .catch(() => setLeads({ loading: false, list: [], total: 0 }));
+  };
+
+  useEffect(() => {
+    if (activeTab !== 'analytics') return;
+    refreshAnalytics();
+  }, [activeTab]);
 
   useEffect(() => {
     fetch('/api/data')
@@ -76,7 +104,7 @@ export default function AdminDashboard() {
       const res = await fetch('/api/data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'login', password: auth.password })
+        body: JSON.stringify({ action: 'login', email: auth.email, password: auth.password })
       });
       if (res.ok) {
         const dataRes = await fetch('/api/data', { cache: 'no-store' });
@@ -98,7 +126,7 @@ export default function AdminDashboard() {
       body: JSON.stringify({ action: 'logout' }),
     }).catch(() => {});
     setDb(null);
-    setAuth({ authenticated: false, password: '', error: '', loading: false });
+    setAuth({ authenticated: false, email: '', password: '', error: '', loading: false });
   };
 
   // ── Login Screen ──
@@ -108,9 +136,11 @@ export default function AdminDashboard() {
         <form onSubmit={handleLogin} style={{ background: '#fff', padding: '40px', borderRadius: '20px', boxShadow: '0 24px 80px rgba(0,0,0,0.2)', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
           <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ width: '64px', height: '64px', margin: '0 auto 24px' }} />
           <h1 style={{ fontFamily: 'var(--serif)', fontSize: '26px', marginBottom: '8px', color: '#1a1a1a' }}>Admin Login</h1>
-          <p style={{ color: '#888', fontSize: '14px', marginBottom: '28px' }}>Enter your administrator password to manage the website.</p>
+          <p style={{ color: '#888', fontSize: '14px', marginBottom: '28px' }}>Enter your email and password to manage the website.</p>
+          <input type="email" placeholder="Email Address" value={auth.email} onChange={e => setAuth({...auth, email: e.target.value})}
+            style={{ width: '100%', padding: '14px', border: '1.5px solid #ddd', borderRadius: '10px', marginBottom: '12px', fontFamily: 'inherit', fontSize: '15px', boxSizing: 'border-box' }} autoFocus />
           <input type="password" placeholder="Password" value={auth.password} onChange={e => setAuth({...auth, password: e.target.value})}
-            style={{ width: '100%', padding: '14px', border: '1.5px solid #ddd', borderRadius: '10px', marginBottom: '16px', fontFamily: 'inherit', fontSize: '15px', boxSizing: 'border-box' }} autoFocus />
+            style={{ width: '100%', padding: '14px', border: '1.5px solid #ddd', borderRadius: '10px', marginBottom: '16px', fontFamily: 'inherit', fontSize: '15px', boxSizing: 'border-box' }} />
           {auth.error && <div style={{ color: '#ff4444', fontSize: '13px', marginBottom: '16px', padding: '10px', background: '#fff5f5', borderRadius: '8px' }}>{auth.error}</div>}
           <button type="submit" disabled={auth.loading}
             style={{ width: '100%', background: '#0F6E56', color: '#fff', border: 'none', padding: '15px', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '15px' }}>
@@ -129,19 +159,20 @@ export default function AdminDashboard() {
   const labelStyle = { display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px' };
 
   const tabs = [
-    { id: 'general', label: '⚙️ General Settings' },
-    { id: 'fees', label: '💰 Fee Structure' },
-    { id: 'about', label: '🏫 About Page' },
-    { id: 'departments', label: '🏛️ Departments' },
-    { id: 'courses', label: '🎓 Course Manager' },
-    { id: 'events', label: '📅 Events Manager' },
-    { id: 'blog', label: '📝 Blog Manager' },
-    { id: 'faqs', label: '❓ FAQ Manager' },
-    { id: 'gallery', label: '🖼️ Gallery Manager' },
-    { id: 'contact', label: '📞 Contact Info' },
-    { id: 'letter', label: '✉️ Admission Letter' },
-    { id: 'applications', label: '📄 Applications & Payments' },
-    { id: 'security', label: '🔒 Security' },
+    { id: 'general', label: 'General Settings', icon: <Settings size={16} /> },
+    { id: 'fees', label: 'Fee Structure', icon: <Wallet size={16} /> },
+    { id: 'about', label: 'About Page', icon: <Building size={16} /> },
+    { id: 'departments', label: 'Departments', icon: <LayoutGrid size={16} /> },
+    { id: 'courses', label: 'Course Manager', icon: <GraduationCap size={16} /> },
+    { id: 'events', label: 'Events Manager', icon: <Calendar size={16} /> },
+    { id: 'blog', label: 'Blog Manager', icon: <FileText size={16} /> },
+    { id: 'faqs', label: 'FAQ Manager', icon: <HelpCircle size={16} /> },
+    { id: 'gallery', label: 'Gallery Manager', icon: <ImageIcon size={16} /> },
+    { id: 'contact', label: 'Contact Info', icon: <Phone size={16} /> },
+    { id: 'letter', label: 'Admission Letter', icon: <Mail size={16} /> },
+    { id: 'applications', label: 'Applications & Payments', icon: <FileCheck size={16} /> },
+    { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={16} /> },
+    { id: 'security', label: 'Security', icon: <Lock size={16} /> },
   ];
 
   // Paginated courses
@@ -206,15 +237,17 @@ export default function AdminDashboard() {
       <div className="admin-layout" style={{ display: 'flex', maxWidth: '1300px', margin: '0 auto', gap: '24px', padding: '24px', alignItems: 'flex-start' }}>
 
         {/* Sidebar */}
-        <div className="admin-sidebar" style={{ width: '220px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '4px', background: '#fff', borderRadius: '14px', padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', position: 'sticky', top: '88px' }}>
+        <div className="admin-sidebar" style={{ width: '220px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '4px', background: '#fff', borderRadius: '14px', padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', position: 'sticky', top: '88px', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => { setActiveTab(t.id); setSidebarOpen(false); }} style={{
+              display: 'flex', alignItems: 'center', gap: '10px',
               textAlign: 'left', padding: '11px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer',
               background: activeTab === t.id ? '#0F6E56' : 'transparent',
               color: activeTab === t.id ? '#fff' : '#555',
               fontWeight: activeTab === t.id ? 700 : 500,
               fontSize: '13px', transition: '0.2s',
             }}>
+              {t.icon}
               {t.label}
             </button>
           ))}
@@ -236,9 +269,17 @@ export default function AdminDashboard() {
                 <label style={labelStyle}>Intake Year / Term Text</label>
                 <input type="text" value={db.intake.yearText} onChange={e => setDb({...db, intake: {...db.intake, yearText: e.target.value}})} style={inputStyle} placeholder="e.g. 2026 or May 2026" />
                 <p style={{ fontSize: '12px', color: '#888', marginTop: '-4px', marginBottom: '20px' }}>This text appears in the hero banner and prospectus.</p>
-                <label style={labelStyle}>Intake End Date (For Countdown & Auto-hide)</label>
-                <input type="date" value={db.intake.endDate || ''} onChange={e => setDb({...db, intake: {...db.intake, endDate: e.target.value}})} style={inputStyle} />
-                <p style={{ fontSize: '12px', color: '#888', marginTop: '-4px' }}>The website will compute a countdown. When this date passes, the intake banners will automatically disappear from the site (unless you manually disable them earlier).</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={labelStyle}>Intake Start Date</label>
+                    <input type="date" value={db.intake.startDate || ''} onChange={e => setDb({...db, intake: {...db.intake, startDate: e.target.value}})} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Intake End Date</label>
+                    <input type="date" value={db.intake.endDate || ''} onChange={e => setDb({...db, intake: {...db.intake, endDate: e.target.value}})} style={inputStyle} />
+                  </div>
+                </div>
+                <p style={{ fontSize: '12px', color: '#888', marginTop: '-4px' }}>The website computes a countdown from the start to end date. When the end date passes, the intake banners automatically hide.</p>
               </div>
             </div>
           )}
@@ -846,6 +887,255 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* ── ANALYTICS ── */}
+          {activeTab === 'analytics' && (
+            <div>
+              <h2 style={{ fontFamily: 'var(--serif)', marginBottom: '6px', fontSize: '22px' }}>📊 Analytics Dashboard</h2>
+              <p style={{ color: '#888', marginBottom: '28px', fontSize: '14px' }}>Real-time intelligence from ARIA conversations and student interactions.</p>
+              {analytics.loading ? (
+                <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>Loading analytics…</div>
+              ) : analytics.error ? (
+                <div style={{ textAlign: 'center', padding: '60px', color: '#ef4444' }}>{analytics.error}</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+                  {/* KPI Cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+                    {[
+                      { label: 'Total Events', value: analytics.totalEvents ?? 0, icon: '⚡', color: '#0F6E56' },
+                      { label: 'Unique Courses', value: analytics.uniqueCourses ?? 0, icon: '🎓', color: '#6366f1' },
+                      { label: 'Top Course', value: analytics.topCourses?.[0]?.course ?? '—', icon: '🔥', color: '#ef4444', small: true },
+                  { label: 'Events Today', value: analytics.eventsToday ?? 0, icon: '📅', color: '#f59e0b' },
+                    ].map((kpi, i) => (
+                      <div key={i} style={{ background: '#f8fafc', borderRadius: '14px', padding: '20px', border: `1.5px solid ${kpi.color}22` }}>
+                        <div style={{ fontSize: '24px', marginBottom: '6px' }}>{kpi.icon}</div>
+                        <div style={{ fontSize: kpi.small ? '15px' : '26px', fontWeight: 800, color: kpi.color, lineHeight: 1.2 }}>{kpi.value}</div>
+                        <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{kpi.label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* ── LEAD FUNNEL ── */}
+                  <div style={{ background: '#0f172a', borderRadius: '20px', padding: '28px', color: '#fff' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                      <div>
+                        <h3 style={{ margin: '0 0 4px', fontSize: '17px', fontWeight: 800, color: '#fff' }}>🎯 Student Lead Funnel</h3>
+                        <p style={{ margin: 0, color: '#94a3b8', fontSize: '13px' }}>Live conversion from visitor to enrolled student</p>
+                      </div>
+                      <button onClick={refreshAnalytics} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#94a3b8', padding: '8px 14px', borderRadius: '10px', fontSize: '12px', cursor: 'pointer' }}>↻ Refresh</button>
+                    </div>
+                    {(() => {
+                      const stages = [
+                        { label: 'Website Visitors', key: 'page_visits', icon: '🌐', color: '#6366f1' },
+                        { label: 'Chatted with ARIA', key: 'aria_chats', icon: '💬', color: '#0ea5e9' },
+                        { label: 'Started Application', key: 'apply_starts', icon: '📝', color: '#f59e0b' },
+                        { label: 'Completed Application', key: 'apply_completes', icon: '✅', color: '#22c55e' },
+                        { label: 'Enrolled', key: 'enrolled', icon: '🎓', color: '#0F6E56' },
+                      ];
+                      const top = Math.max(funnel.page_visits || 1, 1);
+                      return (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {stages.map((s, i) => {
+                            const val = funnel[s.key] || 0;
+                            const pct = Math.min(100, Math.round((val / top) * 100));
+                            const prevVal = i > 0 ? (funnel[stages[i-1].key] || 0) : null;
+                            const dropoff = prevVal !== null && prevVal > 0 ? Math.round((1 - val / prevVal) * 100) : null;
+                            return (
+                              <div key={s.key}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <span style={{ fontSize: '18px' }}>{s.icon}</span>
+                                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#e2e8f0' }}>{s.label}</span>
+                                    {dropoff !== null && dropoff > 0 && (
+                                      <span style={{ fontSize: '11px', color: '#f87171', background: 'rgba(248,113,113,0.12)', padding: '2px 8px', borderRadius: '100px' }}>
+                                        −{dropoff}% drop
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span style={{ fontSize: '20px', fontWeight: 900, color: s.color }}>{val.toLocaleString()}</span>
+                                </div>
+                                <div style={{ height: '8px', background: 'rgba(255,255,255,0.07)', borderRadius: '100px', overflow: 'hidden' }}>
+                                  <div style={{ height: '100%', width: `${pct}%`, background: `linear-gradient(90deg, ${s.color}99, ${s.color})`, borderRadius: '100px', transition: 'width 0.8s ease' }} />
+                                </div>
+                                {i < stages.length - 1 && (
+                                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '6px' }}>
+                                    <span style={{ color: '#475569', fontSize: '16px' }}>↓</span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                          {/* Enrolled manual input */}
+                          <div style={{ marginTop: '8px', padding: '16px', background: 'rgba(15,110,86,0.15)', borderRadius: '14px', border: '1px solid rgba(15,110,86,0.3)' }}>
+                            <p style={{ margin: '0 0 10px', fontSize: '13px', color: '#86efac' }}>✏️ Update enrolled count manually:</p>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              <input
+                                type="number" min="0" placeholder="e.g. 20"
+                                value={enrolledInput}
+                                onChange={e => setEnrolledInput(e.target.value)}
+                                style={{ flex: 1, padding: '10px 14px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#fff', fontSize: '14px' }}
+                              />
+                              <button
+                                onClick={() => {
+                                  if (!enrolledInput) return;
+                                  fetch('/api/funnel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stage: 'enrolled', value: enrolledInput }) })
+                                    .then(() => { refreshAnalytics(); setEnrolledInput(''); });
+                                }}
+                                style={{ padding: '10px 20px', background: '#0F6E56', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
+                              >Save</button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* ── CAPTURED LEADS ── */}
+                  <div style={{ background: '#f8fafc', borderRadius: '20px', padding: '28px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                      <div>
+                        <h3 style={{ margin: '0 0 4px', fontSize: '17px', fontWeight: 800, color: '#0f172a' }}>📋 Captured Leads</h3>
+                        <p style={{ margin: 0, color: '#94a3b8', fontSize: '13px' }}>{leads.total} students left their contact details</p>
+                      </div>
+                      <a
+                        href="/api/leads"
+                        target="_blank"
+                        style={{ background: '#0F6E56', color: '#fff', padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 700, textDecoration: 'none' }}
+                      >Export JSON ↗</a>
+                    </div>
+                    {leads.loading ? (
+                      <p style={{ color: '#94a3b8', fontSize: '14px' }}>Loading leads…</p>
+                    ) : leads.list.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
+                        <div style={{ fontSize: '40px', marginBottom: '12px' }}>📭</div>
+                        <p style={{ margin: 0, fontSize: '14px' }}>No leads yet. The exit-intent modal will capture them automatically!</p>
+                      </div>
+                    ) : (
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                          <thead>
+                            <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
+                              {['Name', 'Phone', 'Interested Course', 'Source', 'Date'].map(h => (
+                                <th key={h} style={{ textAlign: 'left', padding: '10px 12px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {leads.list.slice(0, 50).map((lead, i) => (
+                              <tr key={lead.id || i} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
+                                onMouseEnter={e => e.currentTarget.style.background = '#f0fdf4'}
+                                onMouseLeave={e => e.currentTarget.style.background = ''}
+                              >
+                                <td style={{ padding: '12px', fontWeight: 700, color: '#1e293b' }}>{lead.name}</td>
+                                <td style={{ padding: '12px' }}>
+                                  <a href={`https://wa.me/${lead.phone.replace(/\D/g,'').replace(/^0/, '254')}`} target="_blank" rel="noopener noreferrer"
+                                    style={{ color: '#25D366', fontWeight: 700, textDecoration: 'none' }}>
+                                    📱 {lead.phone}
+                                  </a>
+                                </td>
+                                <td style={{ padding: '12px', color: '#0F6E56', fontWeight: 600 }}>{lead.course}</td>
+                                <td style={{ padding: '12px' }}>
+                                  <span style={{ background: '#ede9fe', color: '#7c3aed', padding: '3px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: 700 }}>{lead.source?.replace('_', ' ')}</span>
+                                </td>
+                                <td style={{ padding: '12px', color: '#94a3b8', fontSize: '12px' }}>
+                                  {new Date(lead.timestamp).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        {leads.total > 50 && <p style={{ color: '#94a3b8', fontSize: '12px', padding: '12px', margin: 0 }}>Showing 50 of {leads.total} leads. Export JSON for full list.</p>}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Demand Chart */}
+                  <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '24px' }}>
+                    <h3 style={{ margin: '0 0 20px', fontSize: '16px', fontWeight: 700, color: '#1e293b' }}>🔥 Course Demand Ranking</h3>
+                    {analytics.topCourses.length === 0 ? (
+                      <p style={{ color: '#94a3b8', fontSize: '14px' }}>No data yet — ARIA conversations will populate this automatically.</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {analytics.topCourses.map((item, i) => {
+                          const max = analytics.topCourses[0]?.count || 1;
+                          const pct = Math.round((item.count / max) * 100);
+                          const colors = ['#0F6E56','#1d9e75','#6366f1','#f59e0b','#ef4444','#06b6d4','#8b5cf6'];
+                          return (
+                            <div key={i}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>{i === 0 ? '🔥 ' : `#${i+1} `}{item.course}</span>
+                                <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 600 }}>{item.count} views</span>
+                              </div>
+                              <div style={{ height: '10px', background: '#e2e8f0', borderRadius: '100px', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${pct}%`, background: colors[i] || '#0F6E56', borderRadius: '100px' }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Recent Activity Log */}
+                  <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '24px' }}>
+                    <h3 style={{ margin: '0 0 20px', fontSize: '16px', fontWeight: 700, color: '#1e293b' }}>💬 Recent ARIA Activity</h3>
+                    {analytics.recentEvents.length === 0 ? (
+                      <p style={{ color: '#94a3b8', fontSize: '14px' }}>No recent events logged.</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '320px', overflowY: 'auto' }}>
+                        {analytics.recentEvents.map((ev, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: '#fff', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '13px' }}>
+                            <span style={{ fontSize: '18px' }}>{ev.event_type === 'aria_requirements' ? '📋' : ev.event_type === 'aria_recommendation' ? '⭐' : '📌'}</span>
+                            <div style={{ flex: 1 }}>
+                              <span style={{ fontWeight: 700, color: '#1e293b' }}>{ev.course_name || ev.course}</span>
+                              <span style={{ color: '#94a3b8', marginLeft: '8px', fontSize: '12px' }}>{(ev.event_type || '').replace('_', ' ')}</span>
+                            </div>
+                            <span style={{ color: '#94a3b8', fontSize: '11px', whiteSpace: 'nowrap' }}>
+                              {new Date(ev.created_at || ev.timestamp).toLocaleString('en-KE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Funnel Table */}
+                  <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '24px' }}>
+                    <h3 style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 700, color: '#1e293b' }}>🎯 Apply Funnel per Course</h3>
+                    <p style={{ color: '#94a3b8', fontSize: '12px', margin: '0 0 20px' }}>ARIA mentions vs actual applications submitted.</p>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
+                            {['Course','ARIA Mentions','Applications','Conversion'].map(h => (
+                              <th key={h} style={{ textAlign: 'left', padding: '10px 12px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '11px' }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {analytics.funnelData?.length > 0 ? analytics.funnelData.map((row, i) => (
+                            <tr key={i} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                              <td style={{ padding: '12px', fontWeight: 700, color: '#1e293b' }}>{row.course}</td>
+                              <td style={{ padding: '12px', color: '#64748b' }}>{row.mentions}</td>
+                              <td style={{ padding: '12px', color: '#64748b' }}>{row.applications}</td>
+                              <td style={{ padding: '12px' }}>
+                                <span style={{ background: row.rate > 20 ? '#dcfce7' : row.rate > 5 ? '#fef9c3' : '#fee2e2', color: row.rate > 20 ? '#166534' : row.rate > 5 ? '#854d0e' : '#991b1b', padding: '4px 10px', borderRadius: '100px', fontWeight: 700, fontSize: '12px' }}>
+                                  {row.rate}%
+                                </span>
+                              </td>
+                            </tr>
+                          )) : (
+                            <tr><td colSpan={4} style={{ padding: '24px', textAlign: 'center', color: '#94a3b8' }}>Funnel data will appear once students interact with ARIA and apply.</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                </div>
+              )}
             </div>
           )}
 

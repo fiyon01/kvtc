@@ -7,12 +7,15 @@ import TopBanner from './TopBanner';
 import FloatingWhatsApp from './FloatingWhatsApp';
 import SplashScreen from './SplashScreen';
 import { ToastProvider } from './ToastProvider';
+import LeadCaptureModal from './LeadCaptureModal';
+import FunnelTracker from './FunnelTracker';
 
 export default function ClientLayoutWrapper({ children }) {
   const pathname = usePathname();
   const isDocumentView = pathname.startsWith('/prospectus') || pathname.startsWith('/fee-structure');
   const isAria = pathname.startsWith('/aria');
-  const isApp = !pathname.startsWith('/admin') && !isDocumentView && !isAria;
+  const isAdmin = pathname.startsWith('/admin');
+  const isApp = !isAdmin && !isDocumentView && !isAria;
 
   return (
     <ToastProvider>
@@ -24,6 +27,10 @@ export default function ClientLayoutWrapper({ children }) {
       </main>
       {isApp && <Footer />}
       {isApp && <FloatingWhatsApp />}
+      {/* Track every public page visit for funnel analytics */}
+      {isApp && <FunnelTracker stage="page_visits" />}
+      {/* Exit-intent lead capture — only on public pages, not admin/aria */}
+      {isApp && <LeadCaptureModal />}
     </ToastProvider>
   );
 }

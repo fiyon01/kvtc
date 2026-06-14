@@ -7,7 +7,7 @@ export default function ApplicationGuideCard({ onAction }) {
   return (
     <div className="application-guide-container">
       <h3 className="rail-main-title">How to Apply</h3>
-      <p className="rail-intro">Follow these simple steps to complete your application.</p>
+      <p className="rail-intro">Follow these simple steps to complete your online application, or visit our campus to apply in person.</p>
       
       <div className="guide-card">
          <div className="guide-steps">

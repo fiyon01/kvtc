@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AdmissionForm from '@/components/AdmissionForm';
+import FunnelTracker from '@/components/FunnelTracker';
 
 /* ─────────────────────────────────────────
    Fade-in animation helper
@@ -360,6 +361,8 @@ function ApplyInner({ dbData }) {
     setApplicantEmail(email);
     setStep('success');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Track apply completion in funnel
+    fetch('/api/funnel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stage: 'apply_completes' }) }).catch(() => {});
   };
 
   return (

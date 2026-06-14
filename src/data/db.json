@@ -969,5 +969,12 @@
       "date": "2026-06-06T13:30:12.306Z",
       "status": "Paid via M-PESA"
     }
+  ],
+  "newsletterSubscribers": [
+    {
+      "email": "peakperformance24@gmail.com",
+      "subscribedAt": "2026-06-14T12:14:43.610Z",
+      "status": "active"
+    }
   ]
 }

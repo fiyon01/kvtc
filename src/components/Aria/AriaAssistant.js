@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, Trash2 } from 'lucide-react';
+import { 
+  X, Send, Trash2, PhoneCall, GraduationCap, ChevronRight, 
+  MapPin, Clock, Banknote, ShieldCheck 
+} from 'lucide-react';
 import AriaHeader from './AriaHeader';
 import WelcomeCard from './WelcomeCard';
 import QuickActionGrid from './QuickActionGrid';
@@ -141,7 +144,12 @@ export default function AriaAssistant() {
         })
       });
       
-      const data = await response.json();
+      let data;
+      if (!response.ok) {
+        throw new Error('Backend API failed');
+      } else {
+        data = await response.json();
+      }
       
       // Typing effect: simulate human reading/typing speed based on response length
       const textLength = data.text ? data.text.length : 100;
@@ -152,12 +160,13 @@ export default function AriaAssistant() {
       
       setMessages(prev => [...prev, { role: 'assistant', ...data }]);
     } catch (error) {
-      console.error("Chat error:", error);
+      console.error("Chat fetch failed:", error);
+      // Absolute final UI fallback (Tier 4) so the app never breaks
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        response_type: 'error',
-        title: 'Error',
-        content: 'Something went wrong while preparing your answer. Please try again.',
+        response_type: 'whatsapp_handoff',
+        text: 'ARIA is having trouble connecting right now. You can chat with our human admissions team directly using the buttons below.',
+        provider: 'offline',
         timestamp: new Date().toISOString()
       }]);
     } finally {

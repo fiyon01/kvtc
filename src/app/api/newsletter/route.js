@@ -40,19 +40,23 @@ export async function POST(req) {
       fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
 
       if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        const transporter = nodemailer.createTransport({
-          service: process.env.EMAIL_SERVICE || 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-        await transporter.sendMail({
-          from: `"KVTC Website" <${process.env.EMAIL_USER}>`,
-          to: process.env.RECEIVER_EMAIL || process.env.EMAIL_USER,
-          subject: 'New KVTC newsletter subscriber',
-          text: `A new visitor subscribed to KVTC updates: ${email}`,
-        });
+        try {
+          const transporter = nodemailer.createTransport({
+            service: process.env.EMAIL_SERVICE || 'gmail',
+            auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS,
+            },
+          });
+          await transporter.sendMail({
+            from: `"KVTC Website" <${process.env.EMAIL_USER}>`,
+            to: process.env.RECEIVER_EMAIL || process.env.EMAIL_USER,
+            subject: 'New KVTC newsletter subscriber',
+            text: `A new visitor subscribed to KVTC updates: ${email}`,
+          });
+        } catch (emailError) {
+          console.error('[Newsletter API] Email notification failed, but saved to DB:', emailError.message);
+        }
       }
     }
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import TrendingCoursesWidget from '@/components/TrendingCoursesWidget';
 
 // --- Custom Premium Icons ---
 const IconCap = () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>;
@@ -587,6 +588,11 @@ export default function Home() {
           }
         `}</style>
       </section>
+
+      {/* ── TRENDING COURSES WIDGET ── */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '0 20px', background: '#f8f7f4' }}>
+        <TrendingCoursesWidget />
+      </div>
 
       {/* ── TRUST BAR MARQUEE ── */}
       <div style={{ background: '#f8f7f4', padding: '20px 0', overflow: 'hidden', borderBottom: '1px solid rgba(0,0,0,0.07)', whiteSpace: 'nowrap', display: 'flex' }}>

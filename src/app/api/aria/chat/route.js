@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { trackCourseEvent, incrementFunnel } from '@/lib/analytics';
+import { localEngine } from '@/lib/localEngine';
 
 const dbPath = path.join(process.cwd(), 'src', 'data', 'db.json');
 const memoryPath = path.join(process.cwd(), 'src', 'data', 'aria_institutional_memory.json');
@@ -138,23 +140,21 @@ Other:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ADMISSION REQUIREMENTS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- KCSE Certificate — minimum D plain or above (D- accepted for some courses)
+- No strict minimum grades. Provide a copy of previous academic result slip (KCPE/KCSE/equivalent) IF ANY.
 - National ID or Birth Certificate (copy)
-- KCSE certificate or results slip (copy)
 - 2 recent passport-size photographs
-- Completed application form
-- KSh 500 application fee (paid at Co-op Bank Kangemi)
+- Completed application form (can be done online or physically at the institution)
+- KSh 500 application fee (paid via M-PESA during online application, or at Co-op Bank)
 - No specific grades needed for short courses — open to everyone
 - Minimum age: 16 years (18+ for Driving Classes)
 - Each course has specific practical items the student must bring (tools, uniforms, etc.)
 
 HOW TO APPLY (step by step):
-1. Visit us at Kikuyu, Kiambu or apply online
+1. Apply online via our website OR visit us physically at Kikuyu, Kiambu
 2. Fill in the application form
-3. Attach copies of: National ID, KCSE certificate, 2 passport photos
-4. Pay KSh 500 application fee at Co-op Bank Kangemi (A/C: ${feeStructure?.bankCoop?.accountNumber})
-5. Submit form + bank slip to our admissions office
-6. Await your reporting date confirmation
+3. Attach/upload copies of: National ID/Birth Certificate, previous result slip (if any), 2 passport photos
+4. Pay KSh 500 application fee (via M-PESA online, or at Co-op Bank Kangemi A/C: ${feeStructure?.bankCoop?.accountNumber})
+5. Receive your admission letter / await reporting date confirmation
 7. On reporting day: bring Term 1 fees (KSh 9,000 to KCB Kikuyu A/C: ${feeStructure?.bankKCB?.accountNumber}) + all departmental requirements
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -239,37 +239,79 @@ You may use this tag if necessary, but keep it at the very end of your output te
 }
 
 
-// ─── Provider 1: Mixtral via HuggingFace ──────────────────────────────────────
+// ─── Local engine is now handled by @/lib/localEngine (imported above) ─────────
+
+// ─── Provider 1: HuggingFace ──────────────────────────────────────────────────
+// Strategy: try multiple FREE models via the stable serverless inference endpoint.
+// URL pattern: https://api-inference.huggingface.co/models/{model}/v1/chat/completions
+// This avoids the provider-routing layer (novita/together/etc.) that caused fetch failures.
 async function callHuggingFace(systemPrompt, messages) {
   const hfKey = process.env.HUGGINGFACE_API_KEY;
-  if (!hfKey || hfKey === 'your_huggingface_api_key_here') throw new Error('HF key not set');
+  if (!hfKey || hfKey === 'your_huggingface_api_key_here') {
+    throw new Error('HF key not set');
+  }
 
   const formatted = messages.map(m => ({
     role: m.role === 'assistant' ? 'assistant' : 'user',
     content: m.content || m.text || ''
   }));
 
-  const res = await fetch(
-    'https://api-inference.huggingface.co/v1/chat/completions',
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${hfKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'mistralai/Mistral-7B-Instruct-v0.3',
-        messages: [{ role: 'system', content: systemPrompt }, ...formatted],
-        max_tokens: 512,
-        temperature: 0.6,
-        stream: false
-      }),
-      signal: AbortSignal.timeout(20000)
-    }
-  );
+  // Models to try in order — all free on HF serverless inference.
+  // Using the /models/{id}/v1/chat/completions path (OpenAI-compatible, no provider field needed).
+  const HF_MODELS = [
+    'mistralai/Mistral-7B-Instruct-v0.3',
+    'HuggingFaceH4/zephyr-7b-beta',
+    'microsoft/Phi-3-mini-4k-instruct',
+    'Qwen/Qwen2.5-7B-Instruct',
+    'TinyLlama/TinyLlama-1.1B-Chat-v1.0',  // smallest fallback — almost always available
+  ];
 
-  if (!res.ok) throw new Error(`HF error: ${res.status}`);
-  const data = await res.json();
-  const text = data?.choices?.[0]?.message?.content;
-  if (!text) throw new Error('No content from HF');
-  return { provider: 'Mistral (HuggingFace)', text };
+  for (const model of HF_MODELS) {
+    const url = `https://api-inference.huggingface.co/models/${model}/v1/chat/completions`;
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${hfKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,                          // required by the endpoint
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...formatted,
+          ],
+          max_tokens: 512,
+          temperature: 0.6,
+          stream: false,
+        }),
+        signal: AbortSignal.timeout(25000), // 25s — HF cold-start can be slow
+      });
+
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => '');
+        console.warn(`HF model "${model}" returned HTTP ${res.status}: ${errBody.slice(0, 120)}`);
+        continue; // try next model
+      }
+
+      const data = await res.json();
+      const text = data?.choices?.[0]?.message?.content?.trim();
+      if (!text) {
+        console.warn(`HF model "${model}" returned empty content`);
+        continue;
+      }
+
+      console.log(`ARIA: HuggingFace responded via model "${model}"`);
+      return { provider: `HuggingFace (${model.split('/')[1]})`, text };
+
+    } catch (err) {
+      // Network-level error (DNS, timeout, etc.)
+      console.warn(`HF model "${model}" fetch error: ${err.message}`);
+      // continue to next model
+    }
+  }
+
+  throw new Error('All HuggingFace models failed');
 }
 
 // ─── Provider 2: Groq ─────────────────────────────────────────────────────────
@@ -313,7 +355,7 @@ async function callGemini(systemPrompt, messages) {
   }));
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -330,13 +372,47 @@ async function callGemini(systemPrompt, messages) {
   const data = await res.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!text) throw new Error('No content from Gemini');
-  return { provider: 'Gemini 1.5 Flash', text };
+  return { provider: 'Gemini 2.0 Flash', text };
+}
+
+// ─── Provider 4: OpenRouter ───────────────────────────────────────────────────
+async function callOpenRouter(systemPrompt, messages) {
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+  if (!openRouterKey || openRouterKey === 'your_openrouter_api_key_here') throw new Error('OpenRouter key not set');
+
+  const formatted = messages.map(m => ({
+    role: m.role === 'assistant' ? 'assistant' : 'user',
+    content: m.content || m.text || ''
+  }));
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: { 
+      Authorization: `Bearer ${openRouterKey}`, 
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://kinoovtc.ac.ke', // Optional, for OpenRouter rankings
+      'X-Title': 'KVTC ARIA' // Optional, for OpenRouter rankings
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash', // You can change this to any OpenRouter model
+      messages: [{ role: 'system', content: systemPrompt }, ...formatted],
+      max_tokens: 512,
+      temperature: 0.6
+    }),
+    signal: AbortSignal.timeout(15000)
+  });
+
+  if (!res.ok) throw new Error(`OpenRouter error: ${res.status}`);
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('No content from OpenRouter');
+  return { provider: 'OpenRouter', text };
 }
 
 // ─── Main handler ─────────────────────────────────────────────────────────────
 export async function POST(req) {
   try {
-    const { message, history = [] } = await req.json();
+    const { message, history = [], forceLocal = false } = await req.json();
 
     // ── 1. Moderation Interceptor ──
     const INAPPROPRIATE_PATTERNS = [
@@ -349,6 +425,12 @@ export async function POST(req) {
         provider: 'ARIA Guard',
         timestamp: new Date().toISOString()
       });
+    }
+
+    // ── Track ARIA chat engagement in funnel (only on first message of a session) ──
+    if (history.length === 0 && !forceLocal) {
+      // Fire-and-forget directly (no network fetch needed)
+      incrementFunnel('aria_chats').catch(() => {});
     }
 
     // ── 2. Smart Apply Intent (Readiness vs Guide) ──
@@ -381,7 +463,25 @@ export async function POST(req) {
     if (HOW_TO_APPLY_PATTERNS.some(p => p.test(message.trim()))) {
       return NextResponse.json({
         response_type: 'application_guide',
-        text: `Applying to Kinoo VTC is fully online and takes less than 3 minutes. Here's how it works:`,
+        text: `You can apply to Kinoo VTC either online in less than 3 minutes, or by visiting our campus in person. Here's how the online process works:`,
+        provider: 'ARIA',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // ── 3. WhatsApp Handoff / Talk to Human Intent ──
+    const HUMAN_PATTERNS = [
+      /\b(talk|speak|chat) (to|with) a (human|person|agent|representative|real person)\b/i,
+      /\bi want a human\b/i,
+      /\bi want a real person\b/i,
+      /\bwhatsapp (number|you)\b/i,
+      /\bcall (you|someone|a human)\b/i
+    ];
+
+    if (HUMAN_PATTERNS.some(p => p.test(message.trim()))) {
+      return NextResponse.json({
+        response_type: 'whatsapp_handoff',
+        text: `I'd be happy to connect you with one of our human admissions officers! They can help with any specific questions you have. 😊`,
         provider: 'ARIA',
         timestamp: new Date().toISOString()
       });
@@ -416,6 +516,7 @@ export async function POST(req) {
       }
 
       if (matchedCourse) {
+        trackCourseEvent('aria_requirements', matchedCourse.name);
         return NextResponse.json({
           response_type: 'course_requirements',
           text: `Here are the entry requirements for **${matchedCourse.name}** at Kinoo VTC:`,
@@ -431,7 +532,6 @@ export async function POST(req) {
       /\b(compare|vs|versus|difference between|which is better)\b/i
     ];
     if (COMPARE_PATTERNS.some(p => p.test(message))) {
-      // Find two matched courses
       const matchedCourses = courseList.filter(c => 
         message.toLowerCase().includes(c.name.toLowerCase().split(' ')[0])
       );
@@ -461,7 +561,7 @@ export async function POST(req) {
       });
     }
 
-    // ── 5. WhatsApp Handoff Intent (Feature 15) ──
+    // ── 5. WhatsApp Handoff Intent ──
     const HANDOFF_PATTERNS = [
       /\b(speak to a human|contact admissions|whatsapp|call somebody|talk to someone|human agent|call admissions)\b/i
     ];
@@ -474,7 +574,7 @@ export async function POST(req) {
       });
     }
 
-    // ── 6. Personalized Intake Alerts Intent (Feature 17) ──
+    // ── 6. Personalized Intake Alerts Intent ──
     const INTAKE_ALERT_PATTERNS = [
       /\b(when is the next intake|notify me|alert me|september intake|january intake|may intake)\b/i
     ];
@@ -489,7 +589,9 @@ export async function POST(req) {
 
     // ── 7. Parent Mode Detection ──
     const isParent = /\b(my son|my daughter|my child|my kids)\b/i.test(message);
-    const parentPromptModifier = isParent ? "\n\nPARENT MODE: The user is a parent inquiring for their child. Use a highly respectful, reassuring, and formal tone. Emphasize safety, career outcomes, and that KVTC is a disciplined and excellent environment for their child." : "";
+    const parentPromptModifier = isParent
+      ? '\n\nPARENT MODE: The user is a parent inquiring for their child. Use a highly respectful, reassuring, and formal tone. Emphasize safety, career outcomes, and that KVTC is a disciplined and excellent environment for their child.'
+      : '';
     const errors = [];
 
     // Load memory
@@ -512,28 +614,50 @@ export async function POST(req) {
       { role: 'user', content: message }
     ];
 
+
+    // ── Provider waterfall: OpenRouter → Gemini → Groq → HuggingFace ──
     let result = null;
-    for (const [name, fn] of [
-      ['Gemini', callGemini],
-      ['Groq', callGroq],
-      ['Mistral (HuggingFace)', callHuggingFace]
-    ]) {
-      try {
-        result = await fn(systemPrompt, allMessages);
-        console.log(`ARIA: responded via ${result.provider}`);
-        break;
-      } catch (err) {
-        console.warn(`ARIA: ${name} failed — ${err.message}`);
-        errors.push(`${name}: ${err.message}`);
+    
+    if (!forceLocal) {
+      for (const [name, fn] of [
+        ['OpenRouter', callOpenRouter],
+        ['Gemini', callGemini],
+        ['Groq', callGroq],
+        ['Mistral (HuggingFace)', callHuggingFace]
+      ]) {
+        try {
+          result = await fn(systemPrompt, allMessages);
+          console.log(`ARIA: responded via ${result.provider}`);
+          break;
+        } catch (err) {
+          console.warn(`ARIA: ${name} failed — ${err.message}`);
+          errors.push(`${name}: ${err.message}`);
+        }
       }
     }
 
-    if (!result) {
-      // All providers failed — return friendly error
+    if (!result && !forceLocal) {
+      // Cloud providers failed. Fallback to the intelligent local engine.
+      console.log('ARIA: All cloud providers failed, executing intelligent local engine');
+      const localText = localEngine(message, db, allMessages);
+      
       return NextResponse.json({
         response_type: 'text',
-        text: `I'm having trouble connecting right now. Please call us directly on **${db.contact?.phone1}** or email **${db.contact?.email}** and our team will assist you immediately.`,
-        provider: 'fallback'
+        text: localText,
+        provider: 'ARIA Local Intelligence',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (forceLocal) {
+      console.log('ARIA: Executing intelligent local engine (forceLocal request)');
+      const localText = localEngine(message, db, allMessages);
+      
+      return NextResponse.json({
+        response_type: 'text',
+        text: localText,
+        provider: 'ARIA Local Intelligence',
+        timestamp: new Date().toISOString()
       });
     }
 
@@ -544,7 +668,7 @@ export async function POST(req) {
     const learnMatch = finalResponseText.match(/\[LEARN:\s*(.*?)\]/i);
     if (learnMatch) {
       const insight = learnMatch[1].trim();
-      finalResponseText = finalResponseText.replace(learnMatch[0], ''); // Strip it
+      finalResponseText = finalResponseText.replace(learnMatch[0], '').trim();
       
       // Save to memory asynchronously
       try {
@@ -553,7 +677,23 @@ export async function POST(req) {
         memData.push({ insight, timestamp: new Date().toISOString() });
         fs.writeFileSync(memoryPath, JSON.stringify(memData, null, 2));
       } catch (e) {
-        console.error("Failed to save institutional memory:", e);
+        console.error('Failed to save institutional memory:', e);
+      }
+    }
+
+    // ── Track if the LLM recommended a course ──
+    const AI_COURSE_KEYWORDS = [
+      'electrical','electronics','plumbing','welding','motor','vehicle','mechanics','hair','beauty','dressing',
+      'food','beverage','production','computer','ict','carpentry','masonry','brickwork','garment','fashion',
+      'design','cutting','tailoring','solar','pv','security','systems','cna','caregiver','nursing','baking',
+      'pastry','barista','driving','building','construction','technology'
+    ];
+    
+    const mentionedInResponse = AI_COURSE_KEYWORDS.find(k => finalResponseText.toLowerCase().includes(k));
+    if (mentionedInResponse) {
+      const matched = courseList.find(c => c.name.toLowerCase().includes(mentionedInResponse));
+      if (matched) {
+        trackCourseEvent('aria_recommendation', matched.name);
       }
     }
 
