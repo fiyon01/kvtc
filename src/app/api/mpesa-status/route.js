@@ -106,12 +106,20 @@ export async function GET(req) {
     }
 
     if (data.ResultCode !== undefined) {
-      setTransactionStatus(checkoutId, 'failed', data.ResultDesc || 'Payment was not completed', {
-        resultCode: data.ResultCode,
-      });
+      // SENIOR FIX: Only permanently mark as failed in DB if it's explicitly cancelled (1032) or other fatal errors.
+      // If it's a timeout (1037), we return failed to the frontend, but we don't pollute the DB. 
+      // This allows a late-arriving webhook to cleanly overwrite the DB state to 'success'.
+      const isTimeout = String(data.ResultCode) === '1037';
+      if (!isTimeout) {
+        setTransactionStatus(checkoutId, 'failed', data.ResultDesc || 'Payment was not completed', {
+          resultCode: data.ResultCode,
+        });
+      }
+      
       return Response.json({
         status: 'failed',
         message: data.ResultDesc || 'Payment was not completed',
+        isTimeout
       });
     }
 

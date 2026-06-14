@@ -11,7 +11,8 @@ import { ToastProvider } from './ToastProvider';
 export default function ClientLayoutWrapper({ children }) {
   const pathname = usePathname();
   const isDocumentView = pathname.startsWith('/prospectus') || pathname.startsWith('/fee-structure');
-  const isApp = !pathname.startsWith('/admin') && !isDocumentView;
+  const isAria = pathname.startsWith('/aria');
+  const isApp = !pathname.startsWith('/admin') && !isDocumentView && !isAria;
 
   return (
     <ToastProvider>

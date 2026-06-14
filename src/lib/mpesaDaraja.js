@@ -50,7 +50,8 @@ export function mpesaTimestamp(date = new Date()) {
 }
 
 export function normalizeMpesaPhone(phone) {
-  return '254' + String(phone).replace(/\s/g, '').replace(/^(\+?254|0)/, '');
+  const digitsOnly = String(phone).replace(/\D/g, '');
+  return '254' + digitsOnly.replace(/^(254|0)/, '');
 }
 
 const tokenCache = globalThis.__kvtcDarajaTokenCache || {

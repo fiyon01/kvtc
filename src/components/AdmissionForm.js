@@ -228,9 +228,14 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
     setLoading(true);
     setStep("loading");
     setLoadingMsg("Awaiting M-PESA PIN...");
-    if (!idempotencyKeyRef.current) {
-      idempotencyKeyRef.current = crypto.randomUUID();
-    }
+    
+    // Generate a fresh idempotency key for every attempt so the user actually gets a new STK push if they retry.
+    // Fallback for mobile browsers testing on local network (non-HTTPS) where crypto.randomUUID is undefined.
+    const generateId = () => {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+      return 'id-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+    };
+    idempotencyKeyRef.current = generateId();
     
     try {
       const res = await fetch("/api/stkpush", {
@@ -306,6 +311,17 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
           if (statusData.status === "confirming_receipt") {
             setLoadingMsg("Payment confirmed! Waiting for M-PESA receipt...");
             // Keep polling – receipt usually arrives within the next poll
+            if (attempts >= maxAttempts / 2) {
+              // If we've waited half the max time and still no webhook, proceed anyway. Daraja confirmed it.
+              clearTimeout(pollRef.current);
+              pollRef.current = null;
+              setStep("success");
+              setTimeout(() => onSuccess(email, {
+                ...statusData,
+                paymentReference: statusData.paymentReference || 'AWAITING_RECEIPT'
+              }), 2000);
+              return;
+            }
             pollRef.current = setTimeout(pollStatus, 8000);
             return;
           }
@@ -313,6 +329,16 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
           // ── Payment failed (insufficient balance, cancelled, etc.) ──
           if (statusData.status === "failed") {
             const rawMsg = statusData.message || "";
+            
+            // SENIOR FIX: If it's a timeout, the user might have paid at the very last second.
+            // Safaricom Daraja Query returns 1037, but the webhook might still arrive with Success.
+            // Do NOT stop polling immediately. Give the webhook time to arrive.
+            if ((/timeout/i.test(rawMsg) || /1037/.test(rawMsg)) && attempts < maxAttempts - 2) {
+              setLoadingMsg("M-PESA prompt timed out, but we are double-checking if the payment went through...");
+              pollRef.current = setTimeout(pollStatus, 8000);
+              return;
+            }
+
             let userMsg;
             if (/insufficient/i.test(rawMsg)) {
               userMsg = "Your M-PESA account has insufficient balance. Please top up and try again.";
@@ -570,7 +596,7 @@ const Sec = ({t}) => (
 );
 
 // ═════════════════════════════════════════════════════════════
-export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplicationSuccess }) {
+export default function AdmissionForm({ dbData, selectedCoursePre = "", prefilledName = "", prefilledPhone = "", prefilledIdNo = "", prefilledKinName = "", prefilledKinTel = "", onApplicationSuccess }) {
   const { showToast } = useToast();
   const [kvtcLogo, setKvtcLogo] = useState(KVTC_LOGO);
   const [cgokLogo, setCgokLogo] = useState("/cgok-logo.png"); // Use the public folder logo
@@ -580,8 +606,8 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
   const [confirmedCourse, setConfirmedCourse] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
-    name:"", idNo:"", dob:"", tel:"", homeAddress:"", residentialArea:"",
-    kinName:"", kinIdNo:"", kinTel:"", relationship:"",
+    name: prefilledName, idNo: prefilledIdNo, dob:"", tel: prefilledPhone, homeAddress:"", residentialArea:"",
+    kinName: prefilledKinName, kinIdNo:"", kinTel: prefilledKinTel, relationship:"",
     course: selectedCoursePre, duration:"", examBody:"", startDate:"",
     signatureData:"", signDate:"", applicantPhoto:"",
   });
@@ -640,6 +666,28 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", onApplic
         return false;
       }
     }
+    
+    // Phone number validation (10 digits, starts with 01 or 07)
+    const phoneRegex = /^(01|07)\d{8}$/;
+    
+    const telClean = String(form.tel || '').replace(/\s/g, '');
+    if (!phoneRegex.test(telClean)) {
+      showToast("Student telephone must be exactly 10 digits and start with 01 or 07.", "warning");
+      const invalidField = formRef.current?.querySelector(`[data-field="tel"]`);
+      invalidField?.scrollIntoView({ behavior: "smooth", block: "center" });
+      invalidField?.focus?.();
+      return false;
+    }
+
+    const kinTelClean = String(form.kinTel || '').replace(/\s/g, '');
+    if (!phoneRegex.test(kinTelClean)) {
+      showToast("Next of kin telephone must be exactly 10 digits and start with 01 or 07.", "warning");
+      const invalidField = formRef.current?.querySelector(`[data-field="kinTel"]`);
+      invalidField?.scrollIntoView({ behavior: "smooth", block: "center" });
+      invalidField?.focus?.();
+      return false;
+    }
+
     return true;
   };
 

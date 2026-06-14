@@ -482,12 +482,15 @@ export default function Home() {
           </nav>
         </form>
 
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '60px', animation: 'heroFadeUp 0.8s 0.5s both' }}>
-          <Link href="/apply" style={{ background: '#EF9F27', color: '#1a1a1a', padding: '16px 36px', borderRadius: '10px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 24px rgba(239,159,39,0.25)', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
+        <div className="hero-actions-container" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '60px', animation: 'heroFadeUp 0.8s 0.5s both' }}>
+          <Link href="/aria" className="hero-btn" style={{ background: 'linear-gradient(135deg, #0F6E56, #1D9E75)', color: '#fff', padding: '16px 36px', borderRadius: '10px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', border: '1.5px solid #0F6E56', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: '8px', transition: 'all 0.2s', boxShadow: '0 8px 24px rgba(15,110,86,0.3)' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
+            ✨ Ask ARIA
+          </Link>
+          <Link href="/apply" className="hero-btn" style={{ background: '#EF9F27', color: '#1a1a1a', padding: '16px 36px', borderRadius: '10px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: '8px', boxShadow: '0 8px 24px rgba(239,159,39,0.25)', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
             Apply Now
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </Link>
-          <Link href="/contact" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', padding: '16px 36px', borderRadius: '10px', fontWeight: 600, fontSize: '16px', textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(10px)', display: 'inline-flex', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}>
+          <Link href="/contact" className="hero-btn" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', padding: '16px 36px', borderRadius: '10px', fontWeight: 600, fontSize: '16px', textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(10px)', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}>
             Enquire Now
           </Link>
         </div>
@@ -575,6 +578,8 @@ export default function Home() {
             .home-course-search input { font-size: 14px; }
             .home-course-search button { padding: 0 13px; font-size: 11px; }
             .home-course-search nav { gap: 5px; }
+            .hero-actions-container { flex-direction: column !important; width: 100%; align-items: stretch; }
+            .hero-actions-container .hero-btn { width: 100% !important; justify-content: center !important; }
           }
           @media(max-width:380px) {
             .home-course-search button { width: 48px; padding: 0; font-size: 0; }

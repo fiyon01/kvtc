@@ -345,13 +345,15 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
 function ApplyInner({ dbData }) {
   const searchParams = useSearchParams();
   const courseSlug = searchParams.get('course') || '';
+  const preName = searchParams.get('name') || '';
+  const prePhone = searchParams.get('phone') || '';
   const skipPre = searchParams.get('skipPre') === 'true';
   const courseList = dbData?.courses || [];
   const preselectedCourse = courseList.find(c => c.name === courseSlug) || null;
 
   const [step, setStep] = useState(skipPre ? 'form' : 'pre'); // 'pre' | 'form' | 'success'
-  const [applicantName, setApplicantName] = useState('');
-  const [applicantEmail, setApplicantEmail] = useState('');
+  const [applicantName, setApplicantName] = useState(preName);
+  const [applicantEmail, setApplicantEmail] = useState(prePhone);
 
   const handleSuccess = (name, email) => {
     setApplicantName(name);
@@ -515,6 +517,11 @@ function ApplyInner({ dbData }) {
               <AdmissionForm
                 dbData={dbData}
                 selectedCoursePre={preselectedCourse?.name || courseSlug}
+                prefilledName={searchParams.get('name') || ''}
+                prefilledPhone={searchParams.get('phone') || ''}
+                prefilledIdNo={searchParams.get('idNo') || ''}
+                prefilledKinName={searchParams.get('kinName') || ''}
+                prefilledKinTel={searchParams.get('kinTel') || ''}
                 onApplicationSuccess={(name, email) => handleSuccess(name, email)}
               />
             </div>
