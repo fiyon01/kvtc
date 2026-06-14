@@ -19,9 +19,9 @@ function buildSystemPrompt(db, memoryStr) {
     Requirements: ${c.requirements?.join('; ')}`
   ).join('\n');
 
-  const admissionFees = feeStructure?.admissionFees?.map(f => `${f.item}: KSh ${f.amount}`).join('\n  - ');
-  const termBreakdown = feeStructure?.termBreakdown?.map(t => `${t.label}: KSh ${t.amount}`).join(', ');
-  const voteHeads = feeStructure?.termVoteHeads?.map(v => `${v.head}: KSh ${v.perTerm}/term`).join(', ');
+  const admissionFees = (feeStructure?.admissionFees || []).map(f => `${f.item}: KSh ${f.amount}`).join('\n  - ');
+  const termBreakdown = (feeStructure?.termBreakdown || []).map(t => `${t.label}: KSh ${t.amount}`).join(', ');
+  const voteHeads = (feeStructure?.termVoteHeads || []).map(v => `${v.head}: KSh ${v.perTerm}/term`).join(', ');
 
   return `You are ARIA — the Admissions & Registration Intelligence Assistant for Kinoo Vocational Training Centre (Kinoo VTC).
 
