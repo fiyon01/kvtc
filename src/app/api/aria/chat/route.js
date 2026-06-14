@@ -338,25 +338,50 @@ export async function POST(req) {
   try {
     const { message, history = [] } = await req.json();
 
-    // ── Server-side intent detection: force wizard only on explicit apply intent ──
-    // IMPORTANT: Must NOT fire on queries like "how much is the application fee?"
-    // Only fire when user explicitly wants to START the application process.
-    const APPLY_PATTERNS = [
+    // ── 1. Moderation Interceptor ──
+    const INAPPROPRIATE_PATTERNS = [
+      /\b(sex|fuck|shit|bitch|asshole|dick|pussy|porn|nude|naked|politics|raila|ruto|uhuru)\b/i
+    ];
+    if (INAPPROPRIATE_PATTERNS.some(p => p.test(message))) {
+      return NextResponse.json({
+        response_type: 'text',
+        text: `I am an Admissions Guide for Kinoo VTC. I only assist with education, courses, and admissions. How can I help you with your studies today?`,
+        provider: 'ARIA Guard',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // ── 2. Smart Apply Intent (Readiness vs Guide) ──
+    const READY_TO_APPLY_PATTERNS = [
       /^apply online/i,
       /^apply now/i,
-      /\bi want to (apply|enroll|enrol|register|join)\b/i,
+      /\bi am ready to apply\b/i,
       /\bstart (my |an |the )?(application|admission|enrollment)\b/i,
       /\b(enroll|enrol|register) (me|now|online|here)\b/i,
-      /\bhow (do i|can i|to) (apply|enroll|enrol|register|join kinoo|join kvtc|get admitted)\b/i,
       /\b(begin|start|complete) (my )?(application|admission|enrollment)\b/i,
-      /\bapply (online|here|now|today|for a course)\b/i,
-      /\bi('d| would) like to (apply|enroll|join|register)\b/i,
+      /\bapply (online|here|now|today)\b/i,
     ];
-    const isApplyIntent = APPLY_PATTERNS.some(p => p.test(message.trim()));
-    if (isApplyIntent) {
+    
+    const HOW_TO_APPLY_PATTERNS = [
+      /\bhow (do i|can i|to) (apply|enroll|enrol|register|join kinoo|join kvtc|get admitted)\b/i,
+      /\bapplication process\b/i,
+      /\bi('d| would) like to (apply|enroll|join|register)\b/i,
+      /\bi want to (apply|enroll|enrol|register|join)\b/i,
+    ];
+
+    if (READY_TO_APPLY_PATTERNS.some(p => p.test(message.trim()))) {
       return NextResponse.json({
         response_type: 'application_wizard',
         text: `I can help you apply **right here** — no need to go anywhere else! 🎉\n\nI'll collect a few quick details from you, then open your pre-filled admission form. After that, you pay **KSh 500** via **M-PESA** and get your **Admission Letter instantly**.\n\nLet's go — just answer the questions below 👇`,
+        provider: 'ARIA',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (HOW_TO_APPLY_PATTERNS.some(p => p.test(message.trim()))) {
+      return NextResponse.json({
+        response_type: 'application_guide',
+        text: `Applying to Kinoo VTC is fully online and takes less than 3 minutes. Here's how it works:`,
         provider: 'ARIA',
         timestamp: new Date().toISOString()
       });
@@ -399,11 +424,72 @@ export async function POST(req) {
           timestamp: new Date().toISOString()
         });
       }
-      // If no specific course detected, fall through to AI to ask which course
     }
 
-    // Try providers in order: DeepSeek → Groq → Gemini
-    let result = null;
+    // ── 3. Course Comparison Intent ──
+    const COMPARE_PATTERNS = [
+      /\b(compare|vs|versus|difference between|which is better)\b/i
+    ];
+    if (COMPARE_PATTERNS.some(p => p.test(message))) {
+      // Find two matched courses
+      const matchedCourses = courseList.filter(c => 
+        message.toLowerCase().includes(c.name.toLowerCase().split(' ')[0])
+      );
+      if (matchedCourses.length >= 2) {
+        return NextResponse.json({
+          response_type: 'course_comparison',
+          text: `Here is a comparison between **${matchedCourses[0].name}** and **${matchedCourses[1].name}**:`,
+          courses: [matchedCourses[0], matchedCourses[1]],
+          provider: 'ARIA',
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
+    // ── 4. Smart Fee Advisor Intent ──
+    const FEE_PATTERNS = [
+      /\bi have (ksh|sh)?\s*(\d+[,.]?\d*)\b/i,
+      /\bcan i pay in installments\b/i,
+      /\bpayment plan\b/i,
+    ];
+    if (FEE_PATTERNS.some(p => p.test(message))) {
+      return NextResponse.json({
+        response_type: 'fee_advisor',
+        text: `Don't worry if you don't have the full fee right now! Because our courses are government-subsidized, we offer very flexible payment plans.`,
+        provider: 'ARIA',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // ── 5. WhatsApp Handoff Intent (Feature 15) ──
+    const HANDOFF_PATTERNS = [
+      /\b(speak to a human|contact admissions|whatsapp|call somebody|talk to someone|human agent|call admissions)\b/i
+    ];
+    if (HANDOFF_PATTERNS.some(p => p.test(message))) {
+      return NextResponse.json({
+        response_type: 'whatsapp_handoff',
+        text: `I'd be happy to connect you with one of our human admissions officers. They can answer any specific questions I might have missed!`,
+        provider: 'ARIA',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // ── 6. Personalized Intake Alerts Intent (Feature 17) ──
+    const INTAKE_ALERT_PATTERNS = [
+      /\b(when is the next intake|notify me|alert me|september intake|january intake|may intake)\b/i
+    ];
+    if (INTAKE_ALERT_PATTERNS.some(p => p.test(message))) {
+      return NextResponse.json({
+        response_type: 'intake_alert',
+        text: `I can send you an SMS alert as soon as the next intake opens, so you don't miss your chance to join!`,
+        provider: 'ARIA',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // ── 7. Parent Mode Detection ──
+    const isParent = /\b(my son|my daughter|my child|my kids)\b/i.test(message);
+    const parentPromptModifier = isParent ? "\n\nPARENT MODE: The user is a parent inquiring for their child. Use a highly respectful, reassuring, and formal tone. Emphasize safety, career outcomes, and that KVTC is a disciplined and excellent environment for their child." : "";
     const errors = [];
 
     // Load memory
@@ -414,8 +500,8 @@ export async function POST(req) {
       memoryStr = memoryArr.map((item, i) => `${i + 1}. ${item.insight}`).join('\n');
     } catch (_) { }
 
-    // Build system prompt with all KVTC knowledge + memory
-    const systemPrompt = buildSystemPrompt(db, memoryStr);
+    // Build system prompt with all KVTC knowledge + memory + parent mode
+    const systemPrompt = buildSystemPrompt(db, memoryStr) + parentPromptModifier;
 
     // Build message history for multi-turn context
     const allMessages = [

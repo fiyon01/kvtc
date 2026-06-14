@@ -37,10 +37,18 @@ function renderAIText(text) {
 
     // Numbered list
     if (/^\d+\./.test(trimmed)) {
+      const numMatch = trimmed.match(/^\d+/)[0];
+      const cleanText = trimmed.replace(/^\d+\.\s*/, '');
+      const cleanParts = cleanText.split(/(\*\*[^*]+\*\*)/g).map((part, j) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={j}>{part.slice(2, -2)}</strong>;
+        }
+        return part;
+      });
       return (
         <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', margin: '4px 0' }}>
-          <span style={{ color: '#0F6E56', fontWeight: 700, minWidth: '20px', flexShrink: 0, fontSize: '13px' }}>{trimmed.match(/^\d+/)[0]}.</span>
-          <span style={{ fontSize: '14px', color: '#333', lineHeight: 1.6 }}>{parts.join('').replace(/^\d+\.\s*/, '')}</span>
+          <span style={{ color: '#0F6E56', fontWeight: 700, minWidth: '20px', flexShrink: 0, fontSize: '13px' }}>{numMatch}.</span>
+          <span style={{ fontSize: '14px', color: '#333', lineHeight: 1.6 }}>{cleanParts}</span>
         </div>
       );
     }

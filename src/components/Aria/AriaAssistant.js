@@ -11,17 +11,29 @@ import SmartActionButtons from './SmartActionButtons';
 import CareerDiscoveryStepper from './Cards/CareerDiscoveryStepper';
 import CourseRecommendationCard from './Cards/CourseRecommendationCard';
 import CourseRequirementsCard from './Cards/CourseRequirementsCard';
+import ApplicationGuideCard from './Cards/ApplicationGuideCard';
+import CourseComparisonCard from './Cards/CourseComparisonCard';
+import FeeAdvisorCard from './Cards/FeeAdvisorCard';
+import WhatsAppHandoffCard from './Cards/WhatsAppHandoffCard';
+import IntakeAlertCard from './Cards/IntakeAlertCard';
 import ApplicationWizard from './ApplicationWizard';
 
 const STORAGE_KEY = 'aria_chat_history';
 const GREETED_KEY = 'aria_greeted';
 
-// Pre-written greeting options so ARIA feels natural, not scripted
-const GREETINGS = [
-  `Hey there! 👋 I'm **ARIA**, your personal admissions guide at Kinoo VTC.\n\nI'm here to help you explore our courses, understand fees, find the right career path, and guide you through the entire admission process.\n\nWhat brings you here today? 😊`,
-  `Hello! Welcome to Kinoo VTC 🎓\n\nI'm **ARIA** — think of me as your friendly admissions officer, always here and available 24/7.\n\nWhether you want to know about our courses, fees, how to apply, or which programme suits you best — I've got you covered! Where would you like to start?`,
-  `Hi there! So glad you stopped by 😊\n\nI'm **ARIA**, Kinoo VTC's admissions assistant. I know everything about our programmes, fees, requirements, and career opportunities.\n\nAre you looking to join us, or just exploring your options? Either way — I'm here to help! 💪`
-];
+const getDynamicGreeting = () => {
+  const hour = new Date().getHours();
+  let timeOfDay = "Good morning";
+  if (hour >= 12 && hour < 17) timeOfDay = "Good afternoon";
+  else if (hour >= 17) timeOfDay = "Good evening";
+
+  const GREETINGS = [
+    `${timeOfDay}! 👋 I'm **ARIA**, your personal admissions guide at Kinoo VTC.\n\nI'm here to help you explore our courses, understand fees, find the right career path, and guide you through the entire admission process.\n\nWhat brings you here today? 😊`,
+    `Hello and ${timeOfDay.toLowerCase()}! Welcome to Kinoo VTC 🎓\n\nI'm **ARIA** — think of me as your friendly admissions officer, always here and available 24/7.\n\nWhether you want to know about our courses, fees, how to apply, or which programme suits you best — I've got you covered! Where would you like to start?`,
+    `${timeOfDay}! So glad you stopped by 😊\n\nI'm **ARIA**, Kinoo VTC's admissions assistant. I know everything about our programmes, fees, requirements, and career opportunities.\n\nAre you looking to join us, or just exploring your options? Either way — I'm here to help! 💪`
+  ];
+  return GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+};
 
 export default function AriaAssistant() {
   const [messages, setMessages] = useState([]);
@@ -35,13 +47,39 @@ export default function AriaAssistant() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Load chat history from localStorage on mount
+  // Load chat history from localStorage on mount and check for follow-up
   useEffect(() => {
+    let parsedMessages = [];
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setMessages(JSON.parse(saved));
+      if (saved) {
+        parsedMessages = JSON.parse(saved);
+        setMessages(parsedMessages);
+      }
     } catch (_) {}
+    
     setLoaded(true);
+
+    // AI Follow-Up System (Feature 16)
+    if (parsedMessages.length > 0) {
+      const lastMsg = parsedMessages[parsedMessages.length - 1];
+      const timeSinceLastMsg = Date.now() - new Date(lastMsg.timestamp || Date.now()).getTime();
+      
+      // If the user returns after 5 minutes and hasn't been followed up recently
+      if (timeSinceLastMsg > 5 * 60 * 1000 && lastMsg.provider !== 'ARIA Follow-Up') {
+        setIsLoading(true);
+        setTimeout(() => {
+          setIsLoading(false);
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            response_type: 'text',
+            text: `Welcome back! 👋 Are you ready to start your application, or do you have more questions about our courses?`,
+            provider: 'ARIA Follow-Up',
+            timestamp: new Date().toISOString()
+          }]);
+        }, 1500);
+      }
+    }
   }, []);
 
   // Auto-greet on first visit or when chat is cleared
@@ -51,8 +89,8 @@ export default function AriaAssistant() {
     const hasSavedChat = !!localStorage.getItem(STORAGE_KEY);
     if (alreadyGreeted || hasSavedChat) return;
 
-    // Pick a random greeting
-    const greeting = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+    // Pick a random time-aware greeting
+    const greeting = getDynamicGreeting();
 
     // Show typing indicator briefly, then deliver greeting
     setIsLoading(true);
@@ -104,6 +142,12 @@ export default function AriaAssistant() {
       });
       
       const data = await response.json();
+      
+      // Typing effect: simulate human reading/typing speed based on response length
+      const textLength = data.text ? data.text.length : 100;
+      const readingDelay = Math.min(1800, Math.max(600, textLength * 5));
+      await new Promise(resolve => setTimeout(resolve, readingDelay));
+
       data.timestamp = new Date().toISOString();
       
       setMessages(prev => [...prev, { role: 'assistant', ...data }]);
@@ -221,6 +265,31 @@ export default function AriaAssistant() {
                         {idx === messages.length - 1 && (
                           <ApplicationWizard onComplete={handleWizardComplete} />
                         )}
+                      </>
+                    ) : msg.response_type === 'application_guide' ? (
+                      <>
+                        <ResponseRail data={msg} onAction={handleAction} />
+                        <ApplicationGuideCard data={msg} onAction={handleAction} />
+                      </>
+                    ) : msg.response_type === 'course_comparison' ? (
+                      <>
+                        <ResponseRail data={msg} onAction={handleAction} />
+                        <CourseComparisonCard data={msg} onAction={handleAction} />
+                      </>
+                    ) : msg.response_type === 'fee_advisor' ? (
+                      <>
+                        <ResponseRail data={msg} onAction={handleAction} />
+                        <FeeAdvisorCard data={msg} onAction={handleAction} />
+                      </>
+                    ) : msg.response_type === 'whatsapp_handoff' ? (
+                      <>
+                        <ResponseRail data={msg} onAction={handleAction} />
+                        <WhatsAppHandoffCard data={msg} onAction={handleAction} />
+                      </>
+                    ) : msg.response_type === 'intake_alert' ? (
+                      <>
+                        <ResponseRail data={msg} onAction={handleAction} />
+                        <IntakeAlertCard data={msg} onAction={handleAction} />
                       </>
                     ) : (
                       <ResponseRail data={msg} onAction={handleAction} />

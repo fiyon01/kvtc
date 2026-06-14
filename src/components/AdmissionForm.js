@@ -605,11 +605,17 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", prefille
   const [reviewCourse, setReviewCourse] = useState(null);
   const [confirmedCourse, setConfirmedCourse] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({
-    name: prefilledName, idNo: prefilledIdNo, dob:"", tel: prefilledPhone, homeAddress:"", residentialArea:"",
-    kinName: prefilledKinName, kinIdNo:"", kinTel: prefilledKinTel, relationship:"",
-    course: selectedCoursePre, duration:"", examBody:"", startDate:"",
-    signatureData:"", signDate:"", applicantPhoto:"",
+  const [form, setForm] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kvtc_admission_form');
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    return {
+      name: prefilledName, idNo: prefilledIdNo, dob:"", tel: prefilledPhone, homeAddress:"", residentialArea:"",
+      kinName: prefilledKinName, kinIdNo:"", kinTel: prefilledKinTel, relationship:"",
+      course: selectedCoursePre, duration:"", examBody:"", startDate:"",
+      signatureData:"", signDate:"", applicantPhoto:"",
+    };
   });
   const formRef = useRef();
   
@@ -618,6 +624,12 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", prefille
   const admissionAmount = feeStructure?.admissionFees?.[0]?.amount || 500;
 
   const set = useCallback((k,v) => setForm(f=>({...f,[k]:v})), []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('kvtc_admission_form', JSON.stringify(form));
+    } catch(e) {}
+  }, [form]);
 
   // Auto-fill duration and exam body when course changes
   useEffect(() => {
@@ -793,6 +805,8 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", prefille
       });
       const emailData = await emailRes.json();
       if (!emailRes.ok || !emailData.success) throw new Error(emailData.message || "Failed to submit application");
+      
+      try { localStorage.removeItem('kvtc_admission_form'); } catch(e) {}
       
       if (onApplicationSuccess) onApplicationSuccess(form.name, userEmail);
       
