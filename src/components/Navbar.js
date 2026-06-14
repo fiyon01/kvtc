@@ -94,7 +94,6 @@ export default function Navbar() {
     { name: 'About', href: '/about' },
     links.find(link => link.name === 'Departments'),
     { name: 'Courses', href: '/courses' },
-    { name: 'Search', href: '/courses?focus=search', isSearch: true },
     { name: 'Admissions', href: '/admissions' },
     { name: 'Contact', href: '/contact' },
     {
