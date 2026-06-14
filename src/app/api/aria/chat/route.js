@@ -250,7 +250,7 @@ async function callHuggingFace(systemPrompt, messages) {
   }));
 
   const res = await fetch(
-    'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3/v1/chat/completions',
+    'https://api-inference.huggingface.co/v1/chat/completions',
     {
       method: 'POST',
       headers: { Authorization: `Bearer ${hfKey}`, 'Content-Type': 'application/json' },
@@ -313,7 +313,7 @@ async function callGemini(systemPrompt, messages) {
   }));
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -514,8 +514,8 @@ export async function POST(req) {
 
     let result = null;
     for (const [name, fn] of [
-      ['Groq', callGroq],
       ['Gemini', callGemini],
+      ['Groq', callGroq],
       ['Mistral (HuggingFace)', callHuggingFace]
     ]) {
       try {
