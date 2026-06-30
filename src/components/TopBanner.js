@@ -21,6 +21,7 @@ export default function TopBanner() {
         if (!data?.intake?.isOngoing) return;
         setYearText(data.intake.yearText || '2026');
         setVisible(true);
+        window.dispatchEvent(new Event('topBannerShown'));
 
         const end = new Date(data.intake.endDate || '2026-12-31').getTime();
         
@@ -29,6 +30,7 @@ export default function TopBanner() {
           if (diff <= 0) { 
             setTimeLeft(null); 
             setVisible(false); 
+            window.dispatchEvent(new Event('topBannerDismissed'));
             return; 
           }
           setTimeLeft({

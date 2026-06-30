@@ -35,6 +35,10 @@ const supabase = supabaseUrl && supabaseKey && !supabaseUrl.startsWith('your_')
   ? createClient(supabaseUrl, supabaseKey)
   : null;
 
+function isSupabaseAdmin(user) {
+  return user?.app_metadata?.role === 'admin' || user?.user_metadata?.role === 'admin';
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -60,7 +64,7 @@ export async function POST(req) {
           password: body.password,
         });
 
-        if (error || !data.session) {
+        if (error || !data.session || !isSupabaseAdmin(data.user)) {
           return NextResponse.json({ success: false, error: 'Invalid email or password' }, { status: 401 });
         }
 
@@ -87,6 +91,51 @@ export async function POST(req) {
 
     if (!isAdminRequest(req, currentData.security?.password)) {
       return NextResponse.json({ error: 'Admin authentication required' }, { status: 401 });
+    }
+
+    if (body.action === 'resetAdminPassword') {
+      const nextPassword = String(body.password || '');
+      const email = String(body.email || '').trim().toLowerCase();
+
+      if (nextPassword.length < 8) {
+        return NextResponse.json({ success: false, error: 'Password must be at least 8 characters.' }, { status: 400 });
+      }
+
+      if (supabase) {
+        if (!email) {
+          return NextResponse.json({ success: false, error: 'Admin email is required.' }, { status: 400 });
+        }
+
+        const { data: users, error: listError } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+        if (listError) throw listError;
+
+        const adminUser = users?.users?.find(user => user.email?.toLowerCase() === email);
+        if (!adminUser || !isSupabaseAdmin(adminUser)) {
+          return NextResponse.json({ success: false, error: 'Admin user was not found.' }, { status: 404 });
+        }
+
+        const { error: updateError } = await supabase.auth.admin.updateUserById(adminUser.id, {
+          password: nextPassword,
+          user_metadata: {
+            ...(adminUser.user_metadata || {}),
+            role: 'admin',
+          },
+          app_metadata: {
+            ...(adminUser.app_metadata || {}),
+            role: 'admin',
+          },
+        });
+
+        if (updateError) throw updateError;
+        return NextResponse.json({ success: true });
+      }
+
+      const newData = {
+        ...currentData,
+        security: { ...(currentData.security || {}), password: nextPassword },
+      };
+      fs.writeFileSync(dbPath, JSON.stringify(newData, null, 2));
+      return NextResponse.json({ success: true });
     }
 
     const newData = {

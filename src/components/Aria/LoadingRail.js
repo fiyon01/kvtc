@@ -1,15 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Check, Search, BookOpen, CreditCard, Compass, Cpu, Book } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Sparkles, Search, ShieldCheck, GraduationCap } from 'lucide-react';
 
-const LOADING_STEPS = [
-  { text: "Reading your message...", icon: Book },
-  { text: "Searching the course catalog...", icon: Search },
-  { text: "Checking admission requirements...", icon: BookOpen },
-  { text: "Reviewing fees and payment options...", icon: CreditCard },
-  { text: "Mapping career opportunities...", icon: Compass },
-  { text: "Preparing your personalized answer...", icon: Cpu }
+const THINKING_STEPS = [
+  { text: 'Reading your request', icon: Search },
+  { text: 'Checking verified KVTC records', icon: ShieldCheck },
+  { text: 'Preparing a helpful answer', icon: GraduationCap },
 ];
 
 export default function LoadingRail() {
@@ -17,146 +14,174 @@ export default function LoadingRail() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setStep((prev) => {
-        if (prev < LOADING_STEPS.length - 1) {
-          return prev + 1;
-        }
-        return prev;
-      });
-    }, 1200); // slightly faster
+      setStep(current => (current + 1) % THINKING_STEPS.length);
+    }, 1100);
 
     return () => clearInterval(interval);
   }, []);
 
+  const ActiveIcon = THINKING_STEPS[step].icon;
+
   return (
-    <div className="loading-rail">
-      <div className="rail-container">
-        <div className="vertical-line"></div>
-        {LOADING_STEPS.map((stepObj, idx) => {
-          const isCompleted = idx < step;
-          const isActive = idx === step;
-          const isUpcoming = idx > step;
+    <div className="thinking-card" role="status" aria-live="polite">
+      <div className="orb-wrap" aria-hidden="true">
+        <div className="orb-ring" />
+        <div className="orb-core">
+          <Sparkles size={18} />
+        </div>
+      </div>
 
-          if (isUpcoming && idx > step + 1) return null; // Only show one upcoming step
-
-          const Icon = stepObj.icon;
-
-          return (
-            <div key={idx} className={`rail-step ${isCompleted ? 'completed' : isActive ? 'active' : 'upcoming'}`}>
-              <div className="rail-node">
-                {isCompleted ? (
-                   <Check size={14} color="white" strokeWidth={3} />
-                ) : isActive ? (
-                   <div className="pulse-icon"><Icon size={14} color="#0F6E56" /></div>
-                ) : (
-                   <Icon size={14} color="#ccc" />
-                )}
-              </div>
-              <div className="rail-content">
-                <p>{stepObj.text}</p>
-              </div>
-            </div>
-          );
-        })}
+      <div className="thinking-copy">
+        <div className="thinking-eyebrow">ARIA is thinking</div>
+        <div className="thinking-line">
+          <ActiveIcon size={15} />
+          <span>{THINKING_STEPS[step].text}</span>
+        </div>
+        <div className="thinking-meter">
+          <span />
+          <span />
+          <span />
+        </div>
       </div>
 
       <style jsx>{`
-        .loading-rail {
-          padding: 10px;
-          max-width: 400px;
-        }
-
-        .rail-container {
-          position: relative;
-          padding-left: 24px;
-        }
-
-        .vertical-line {
-          position: absolute;
-          left: 11px;
-          top: 10px;
-          bottom: 10px;
-          width: 2px;
-          background: #e0e0e0;
-          z-index: 1;
-        }
-
-        .rail-step {
+        .thinking-card {
+          width: min(420px, calc(100% - 12px));
           display: flex;
           align-items: center;
-          gap: 16px;
-          margin-bottom: 20px;
+          gap: 14px;
+          margin: 12px 0 6px;
+          padding: 15px 16px;
+          border-radius: 18px;
+          background:
+            radial-gradient(circle at 18% 10%, rgba(36, 90, 135, 0.15), transparent 34%),
+            linear-gradient(135deg, #ffffff 0%, #f6fbff 52%, #f4fff9 100%);
+          border: 1px solid rgba(36, 90, 135, 0.16);
+          box-shadow: 0 16px 40px rgba(15, 42, 70, 0.1);
+          font-family: var(--font-inter, system-ui, sans-serif);
+          animation: cardIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .orb-wrap {
           position: relative;
-          z-index: 2;
+          width: 48px;
+          height: 48px;
+          flex: 0 0 48px;
+          display: grid;
+          place-items: center;
         }
 
-        .rail-step:last-child {
-          margin-bottom: 0;
-        }
-
-        .rail-node {
-          width: 24px;
-          height: 24px;
+        .orb-ring {
+          position: absolute;
+          inset: 0;
           border-radius: 50%;
-          background: #f0f0f0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          background: conic-gradient(from 0deg, #245a87, #0f6e56, #ef9f27, #245a87);
+          animation: spin 1.9s linear infinite;
+          opacity: 0.95;
+        }
+
+        .orb-ring::after {
+          content: '';
           position: absolute;
-          left: -24px;
-          border: 2px solid #fff;
+          inset: 4px;
+          border-radius: inherit;
+          background: #fff;
         }
 
-        .completed .rail-node {
-          background: #4ade80;
+        .orb-core {
+          position: relative;
+          z-index: 1;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          color: #245a87;
+          background: linear-gradient(135deg, #eaf4ff, #f4fff9);
+          box-shadow: inset 0 0 0 1px rgba(36, 90, 135, 0.12);
         }
 
-        .active .rail-node {
-          background: #E1F5EE;
-          border-color: #0F6E56;
+        .thinking-copy {
+          flex: 1;
+          min-width: 0;
         }
 
-        .upcoming .rail-node {
-          background: #f8f7f4;
-          border-color: #e0e0e0;
+        .thinking-eyebrow {
+          font-size: 11px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #245a87;
+          font-weight: 800;
+          margin-bottom: 5px;
         }
 
-        .pulse-icon {
+        .thinking-line {
           display: flex;
           align-items: center;
-          justify-content: center;
-          animation: pulse 1.5s infinite;
-        }
-
-        .rail-content p {
-          margin: 0;
+          gap: 8px;
+          color: #223744;
           font-size: 14px;
-          font-weight: 500;
-          transition: color 0.3s;
+          font-weight: 700;
+          line-height: 1.3;
         }
 
-        .completed .rail-content p {
-          color: #999;
+        .thinking-line :global(svg) {
+          color: #0f6e56;
+          flex-shrink: 0;
         }
 
-        .active .rail-content p {
-          color: #0F6E56;
-          animation: text-pulse 1.5s infinite;
+        .thinking-meter {
+          display: flex;
+          gap: 5px;
+          margin-top: 11px;
         }
 
-        .upcoming .rail-content p {
-          color: #bbb;
+        .thinking-meter span {
+          width: 24px;
+          height: 4px;
+          border-radius: 999px;
+          background: #d9e7ef;
+          animation: meter 1.2s ease-in-out infinite;
         }
 
-        @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(15, 110, 86, 0.4); }
-          70% { box-shadow: 0 0 0 6px rgba(15, 110, 86, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(15, 110, 86, 0); }
+        .thinking-meter span:nth-child(2) { animation-delay: 0.16s; }
+        .thinking-meter span:nth-child(3) { animation-delay: 0.32s; }
+
+        @keyframes cardIn {
+          from { opacity: 0; transform: translateY(10px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        @keyframes text-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.6; }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes meter {
+          0%, 100% { background: #d9e7ef; transform: scaleX(0.75); }
+          50% { background: #0f6e56; transform: scaleX(1.08); }
+        }
+
+        @media (max-width: 520px) {
+          .thinking-card {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 16px;
+          }
+
+          .orb-wrap {
+            width: 42px;
+            height: 42px;
+            flex-basis: 42px;
+          }
+
+          .orb-core {
+            width: 30px;
+            height: 30px;
+          }
+
+          .thinking-line {
+            font-size: 13px;
+          }
         }
       `}</style>
     </div>

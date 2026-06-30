@@ -15,12 +15,12 @@ export default function AriaHeader({ onClearChat, hasMessages }) {
       
       <div className="header-info">
         <div className="logo-area">
-          <img src="/kvtc_logo.png" alt="KVTC Logo" className="logo" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
-          <div className="logo-fallback">K</div>
+          <img src="/aria-avatar.png" alt="ARIA assistant" className="logo" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+          <div className="logo-fallback">A</div>
         </div>
         <div className="text-info">
           <h2>Kinoo VTC</h2>
-          <p>ARIA Admissions Assistant</p>
+          <p>ARIA Virtual Admissions Assistant</p>
         </div>
       </div>
       
@@ -86,15 +86,25 @@ export default function AriaHeader({ onClearChat, hasMessages }) {
         }
 
         .logo-area {
-          width: 40px;
-          height: 40px;
+          width: 44px;
+          height: 44px;
           position: relative;
+          border-radius: 50%;
+          padding: 3px;
+          background: #fff;
+          border: 1px solid rgba(15,110,86,0.14);
+          box-shadow: 0 8px 22px rgba(15,110,86,0.14);
+          overflow: hidden;
         }
 
         .logo {
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
+          object-position: center;
+          border-radius: 50%;
+          transform: scale(1.2);
+          display: block;
         }
 
         .logo-fallback {
@@ -103,7 +113,7 @@ export default function AriaHeader({ onClearChat, hasMessages }) {
           height: 100%;
           background: #0F6E56;
           color: white;
-          border-radius: 8px;
+          border-radius: 50%;
           align-items: center;
           justify-content: center;
           font-weight: bold;

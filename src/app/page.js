@@ -100,7 +100,7 @@ function StatItem({ value, suffix = '', label }) {
     return () => obs.disconnect();
   }, []);
   return (
-    <div ref={ref} style={{ color: '#fff' }}>
+    <div ref={ref} className="hero-stat-card">
       <strong style={{ display: 'block', fontFamily: 'var(--serif)', fontSize: '2.2rem', lineHeight: 1 }}>
         {count}{suffix}
       </strong>
@@ -456,7 +456,7 @@ export default function Home() {
         </h1>
 
         <p style={{ color: 'rgba(255,255,255,0.88)', fontSize: '1.1rem', maxWidth: '520px', marginBottom: '40px', animation: 'heroFadeUp 0.8s 0.35s both' }}>
-          Kiambu County's premier public vocational training centre — NITA & KNEC-certified courses in 13+ disciplines. Affordable. Practical. Life-changing.
+          Kiambu County&apos;s premier public vocational training centre — NITA & KNEC-certified courses in 13+ disciplines. Affordable. Practical. Life-changing.
         </p>
 
         <form className="home-course-search" onSubmit={submitCourseSearch}>
@@ -485,7 +485,10 @@ export default function Home() {
 
         <div className="hero-actions-container" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '60px', animation: 'heroFadeUp 0.8s 0.5s both' }}>
           <Link href="/aria" className="hero-btn" style={{ background: 'linear-gradient(135deg, #0F6E56, #1D9E75)', color: '#fff', padding: '16px 36px', borderRadius: '10px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', border: '1.5px solid #0F6E56', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: '8px', transition: 'all 0.2s', boxShadow: '0 8px 24px rgba(15,110,86,0.3)' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-            ✨ Ask ARIA
+            <span className="hero-aria-icon" aria-hidden="true">
+              <img src="/aria-avatar.png" alt="" />
+            </span>
+            Ask ARIA
           </Link>
           <Link href="/apply" className="hero-btn" style={{ background: '#EF9F27', color: '#1a1a1a', padding: '16px 36px', borderRadius: '10px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: '8px', boxShadow: '0 8px 24px rgba(239,159,39,0.25)', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
             Apply Now
@@ -497,7 +500,7 @@ export default function Home() {
         </div>
 
         {/* Animated Stats */}
-        <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap', animation: 'heroFadeUp 0.8s 0.65s both' }}>
+        <div className="hero-stats-grid">
           <StatItem value={13} suffix="+" label="Courses Offered" />
           <StatItem value={27} suffix="K" label="Annual Fees (KSh)" />
           <StatItem value={100} suffix="%" label="Practical Training" />
@@ -573,6 +576,37 @@ export default function Home() {
             text-decoration: none;
             backdrop-filter: blur(7px);
           }
+          .hero-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, max-content));
+            gap: 40px;
+            animation: heroFadeUp 0.8s 0.65s both;
+          }
+          .hero-stat-card {
+            color: #fff;
+          }
+          .hero-aria-icon {
+            width: 32px;
+            height: 32px;
+            display: inline-grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 999px;
+            background: #fff;
+            border: 1px solid rgba(255,255,255,.45);
+            box-shadow: 0 5px 14px rgba(5,45,35,.22);
+            overflow: hidden;
+            padding: 2px;
+          }
+          .hero-aria-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            object-fit: cover;
+            object-position: center;
+            transform: scale(1.2);
+            display: block;
+          }
           @media(max-width:560px) {
             .home-course-search { margin-top: -18px; }
             .home-course-search > div { min-height: 52px; padding-left: 13px; }
@@ -581,6 +615,32 @@ export default function Home() {
             .home-course-search nav { gap: 5px; }
             .hero-actions-container { flex-direction: column !important; width: 100%; align-items: stretch; }
             .hero-actions-container .hero-btn { width: 100% !important; justify-content: center !important; }
+            .hero-stats-grid {
+              width: 100%;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 10px;
+            }
+            .hero-stat-card {
+              min-height: 92px;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              padding: 15px 13px;
+              border: 1px solid rgba(255,255,255,.2);
+              border-radius: 15px;
+              background: linear-gradient(145deg, rgba(255,255,255,.15), rgba(255,255,255,.07));
+              box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 12px 26px rgba(8,38,31,.12);
+              backdrop-filter: blur(10px);
+            }
+            .hero-stat-card strong {
+              font-size: 1.75rem !important;
+              margin-bottom: 7px;
+            }
+            .hero-stat-card span {
+              font-size: 9px !important;
+              line-height: 1.35;
+              letter-spacing: .65px !important;
+            }
           }
           @media(max-width:380px) {
             .home-course-search button { width: 48px; padding: 0; font-size: 0; }
@@ -705,24 +765,24 @@ export default function Home() {
       </div>
 
       {/* ── ABOUT SNIPPET ── */}
-      <section style={{ padding: '96px 8%', background: '#f8f7f4' }}>
+      <section className="home-about-section" style={{ padding: '96px 8%', background: '#f8f7f4' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center', maxWidth: '1200px', margin: '0 auto' }} className="about-grid-resp">
           <FadeIn style={{ position: 'relative' }}>
-            <div style={{ borderRadius: '24px', overflow: 'hidden', boxShadow: '0 24px 64px rgba(0,0,0,0.15)', aspectRatio: '4/3' }}>
+            <div className="about-image-frame" style={{ borderRadius: '24px', overflow: 'hidden', boxShadow: '0 24px 64px rgba(0,0,0,0.15)', aspectRatio: '4/3' }}>
               <img src="/kinoo_vtc_realistic.png" alt="Exterior of Kinoo VTC" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             {isActive && (
-              <div style={{ position: 'absolute', bottom: '-20px', right: '-20px', background: '#fff', borderRadius: '14px', padding: '20px 24px', boxShadow: '0 16px 64px rgba(0,0,0,0.12)', textAlign: 'center' }}>
+              <div className="about-intake-card" style={{ position: 'absolute', bottom: '-20px', right: '-20px', background: '#fff', borderRadius: '14px', padding: '20px 24px', boxShadow: '0 16px 64px rgba(0,0,0,0.12)', textAlign: 'center' }}>
                 <strong style={{ display: 'block', fontFamily: 'var(--serif)', fontSize: '2.2rem', color: '#0F6E56', lineHeight: 1 }}>{intake.yearText}</strong>
                 <span style={{ fontSize: '12px', color: '#888' }}>Intake Open</span>
               </div>
             )}
           </FadeIn>
 
-          <FadeIn delay={0.2}>
+          <FadeIn delay={0.2} style={{ minWidth: 0 }}>
             <span style={{ display: 'inline-block', fontSize: '11px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: '#0F6E56', background: '#E1F5EE', padding: '6px 14px', borderRadius: '100px', marginBottom: '16px' }}>About Us</span>
-            <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#1a1a1a', lineHeight: 1.2, marginBottom: '20px' }}>Shaping Tomorrow's <em style={{ fontStyle: 'italic', color: '#0F6E56' }}>Skilled Workforce</em></h2>
-            <p style={{ color: '#888', fontSize: '15px', marginBottom: '12px' }}>
+            <h2 className="about-home-title" style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#1a1a1a', lineHeight: 1.2, marginBottom: '20px' }}>Shaping Tomorrow's <em style={{ fontStyle: 'italic', color: '#0F6E56' }}>Skilled Workforce</em></h2>
+            <p className="about-home-intro" style={{ color: '#888', fontSize: '15px', marginBottom: '12px' }}>
               Kinoo VTC is a public institution under the <strong style={{ color: '#1a1a1a' }}>County Government of Kiambu</strong>, located in Kikuyu along the Nairobi-Nakuru highway. We equip trainees with practical skills that open real doors in Kenya's economy.
             </p>
             {[
@@ -731,14 +791,14 @@ export default function Home() {
               'Subsidised government fees — just KSh 27,000/year',
               'Short-term courses from 1–3 months for quick employment',
             ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '12px' }}>
+              <div key={i} className="about-home-point" style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <div style={{ marginTop: '2px', flexShrink: 0 }}>
                   <IconCheckSmall />
                 </div>
                 <span style={{ fontSize: '15px', color: '#555' }}>{item}</span>
               </div>
             ))}
-            <div style={{ display: 'flex', gap: '10px', marginTop: '28px', flexWrap: 'wrap' }}>
+            <div className="about-home-badges" style={{ display: 'flex', gap: '10px', marginTop: '28px', flexWrap: 'wrap' }}>
               {['NITA Registered', 'KNEC Exam Centre', 'County Government'].map((b, i) => (
                 <span key={i} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '10px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, color: '#1a1a1a', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: ['#0F6E56', '#EF9F27', '#378ADD'][i] }} />
@@ -746,30 +806,152 @@ export default function Home() {
                 </span>
               ))}
             </div>
-            <div style={{ marginTop: '32px' }}>
-              <Link href="/about" style={{ background: '#0F6E56', color: '#fff', padding: '14px 28px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>Learn More About Us</Link>
+            <div className="about-home-action-wrap" style={{ marginTop: '32px' }}>
+              <Link className="about-home-action" href="/about" style={{ background: '#0F6E56', color: '#fff', padding: '14px 28px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>Learn More About Us</Link>
             </div>
           </FadeIn>
         </div>
 
         {/* Short Courses Banner */}
         <FadeIn delay={0.3} style={{ marginTop: '64px' }}>
-          <div style={{ background: 'linear-gradient(to right, #1a1a1a, #2a2a2a)', borderRadius: '20px', padding: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', maxWidth: '1200px', margin: '0 auto', boxShadow: '0 24px 48px rgba(0,0,0,0.1)' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+          <div className="fast-track-card" style={{ background: 'linear-gradient(to right, #1a1a1a, #2a2a2a)', borderRadius: '20px', padding: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', maxWidth: '1200px', margin: '0 auto', boxShadow: '0 24px 48px rgba(0,0,0,0.1)' }}>
+            <div className="fast-track-copy">
+              <div className="fast-track-meta" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                 <span style={{ background: '#EF9F27', color: '#1a1a1a', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>Part-Time & Short Courses</span>
                 <span style={{ color: '#4ade80', fontSize: '14px', fontWeight: 600 }}>Duration: 1–3 Months</span>
               </div>
-              <h3 style={{ fontFamily: 'var(--serif)', fontSize: '2.2rem', color: '#fff', marginBottom: '8px' }}>Fast-Track Your Career</h3>
+              <h3 className="fast-track-title" style={{ fontFamily: 'var(--serif)', fontSize: '2.2rem', color: '#fff', marginBottom: '8px' }}>Fast-Track Your Career</h3>
               <p style={{ color: '#aaa', fontSize: '15px', maxWidth: '500px' }}>Can't commit to a full year? We offer intensive, highly practical short courses tailored for working adults and those looking for quick skills.</p>
             </div>
-            <Link href="/courses?category=short" style={{ background: '#0F6E56', color: '#fff', padding: '16px 32px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)' }}>
+            <Link className="fast-track-action" href="/courses?category=short" style={{ background: '#0F6E56', color: '#fff', padding: '16px 32px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)' }}>
               Explore Short Courses →
             </Link>
           </div>
         </FadeIn>
 
-        <style>{`.about-grid-resp { } @media(max-width:900px){.about-grid-resp{grid-template-columns:1fr !important;}}`}</style>
+        <style>{`
+          .about-grid-resp { }
+          @media(max-width:900px) {
+            .about-grid-resp { grid-template-columns:1fr !important; }
+          }
+          @media(max-width:560px) {
+            .home-about-section {
+              padding: 70px 8% !important;
+              overflow: hidden;
+            }
+            .about-grid-resp {
+              gap: 42px !important;
+            }
+            .about-image-frame {
+              border-radius: 18px !important;
+              box-shadow: 0 18px 42px rgba(23,44,52,.16) !important;
+            }
+            .about-intake-card {
+              right: 12px !important;
+              bottom: 12px !important;
+              padding: 11px 15px !important;
+              border-radius: 12px !important;
+              box-shadow: 0 10px 28px rgba(20,42,50,.18) !important;
+              text-align: left !important;
+            }
+            .about-intake-card strong {
+              font-size: 1.45rem !important;
+            }
+            .about-home-title {
+              max-width: 300px;
+              font-size: 2rem !important;
+              line-height: 1.08 !important;
+              margin-bottom: 18px !important;
+            }
+            .about-home-intro {
+              font-size: 14px !important;
+              line-height: 1.75;
+              margin-bottom: 20px !important;
+            }
+            .about-home-point {
+              gap: 10px !important;
+              margin-bottom: 10px !important;
+              padding: 11px 12px;
+              border: 1px solid rgba(15,110,86,.09);
+              border-radius: 12px;
+              background: rgba(255,255,255,.7);
+            }
+            .about-home-point > span {
+              font-size: 13px !important;
+              line-height: 1.5;
+            }
+            .about-home-badges {
+              display: grid !important;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 8px !important;
+              margin-top: 20px !important;
+            }
+            .about-home-badges > span {
+              min-width: 0;
+              padding: 8px 10px !important;
+              font-size: 10px !important;
+              line-height: 1.3;
+            }
+            .about-home-badges > span:last-child {
+              grid-column: 1 / -1;
+            }
+            .about-home-action-wrap {
+              margin-top: 24px !important;
+            }
+            .about-home-action {
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 14px 18px !important;
+            }
+            .fast-track-card {
+              padding: 25px 22px !important;
+              gap: 22px !important;
+              border-radius: 18px !important;
+              background:
+                radial-gradient(circle at 100% 0%, rgba(47,121,183,.22), transparent 42%),
+                linear-gradient(145deg, #17242b, #11191d) !important;
+              box-shadow: 0 20px 42px rgba(18,34,40,.18) !important;
+            }
+            .fast-track-copy { width: 100%; }
+            .fast-track-meta {
+              align-items: flex-start !important;
+              flex-direction: column;
+              gap: 9px !important;
+              margin-bottom: 18px !important;
+            }
+            .fast-track-meta > span:first-child {
+              max-width: 100%;
+              font-size: 10px !important;
+              letter-spacing: .8px !important;
+              line-height: 1.35;
+            }
+            .fast-track-meta > span:last-child {
+              font-size: 12px !important;
+            }
+            .fast-track-title {
+              max-width: 260px;
+              font-size: 1.85rem !important;
+              line-height: 1.08;
+              margin-bottom: 12px !important;
+            }
+            .fast-track-copy p {
+              font-size: 14px !important;
+              line-height: 1.65;
+            }
+            .fast-track-action {
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 15px 20px !important;
+              border-radius: 12px !important;
+              background: linear-gradient(135deg, #0F6E56, #1D8B6D) !important;
+              box-shadow: 0 10px 24px rgba(15,110,86,.24);
+            }
+          }
+        `}</style>
       </section>
 
       {/* ── WHY KINOO ── */}

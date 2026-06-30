@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1781510081660,
+    "question": "what about catering",
+    "matched_course": null,
+    "created_at": "2026-06-15T07:54:41.660Z"
+  },
+  {
+    "id": 1781510125467,
+    "question": "food and beverage",
+    "matched_course": null,
+    "created_at": "2026-06-15T07:55:25.467Z"
+  },
+  {
+    "id": 1781510161493,
+    "question": "yes course content and requirements",
+    "matched_course": null,
+    "created_at": "2026-06-15T07:56:01.493Z"
+  },
+  {
+    "id": 1781510231826,
+    "question": "not yet",
+    "matched_course": null,
+    "created_at": "2026-06-15T07:57:11.826Z"
+  },
+  {
+    "id": 1781510262112,
+    "question": "recommend me a course ,i love mathematics",
+    "matched_course": null,
+    "created_at": "2026-06-15T07:57:42.112Z"
+  },
+  {
+    "id": 1781510302402,
+    "question": "yes",
+    "matched_course": null,
+    "created_at": "2026-06-15T07:58:22.402Z"
+  }
+]

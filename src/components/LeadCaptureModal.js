@@ -15,6 +15,11 @@ export default function LeadCaptureModal() {
   const timerRef                = useRef(null);
   const courseList              = db?.courses || [];
 
+  const dismiss = () => {
+    setVisible(false);
+    sessionStorage.setItem(STORAGE_KEY, '1');
+  };
+
   useEffect(() => {
     // Don't show if already captured this session
     if (sessionStorage.getItem(STORAGE_KEY)) return;
@@ -43,10 +48,22 @@ export default function LeadCaptureModal() {
     };
   }, []);
 
-  const dismiss = () => {
-    setVisible(false);
-    sessionStorage.setItem(STORAGE_KEY, '1');
-  };
+  useEffect(() => {
+    if (!visible) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') dismiss();
+    };
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [visible]);
 
   const handleChange = (e) => {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
@@ -86,6 +103,7 @@ export default function LeadCaptureModal() {
     <>
       {/* Backdrop */}
       <div
+        className="lead-capture-backdrop"
         onClick={dismiss}
         style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
@@ -95,7 +113,12 @@ export default function LeadCaptureModal() {
       />
 
       {/* Modal */}
-      <div style={{
+      <div
+        className="lead-capture-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="lead-capture-title"
+        style={{
         position: 'fixed', 
         bottom: '24px', 
         left: '50%',
@@ -130,7 +153,7 @@ export default function LeadCaptureModal() {
           >✕</button>
 
           <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎓</div>
-          <h3 style={{ color: '#fff', margin: '0 0 6px', fontSize: '18px', fontWeight: 800, lineHeight: 1.2 }}>
+          <h3 id="lead-capture-title" style={{ color: '#fff', margin: '0 0 6px', fontSize: '18px', fontWeight: 800, lineHeight: 1.2 }}>
             {step === 'success' ? 'You\'re on the list! 🎉' : 'Before you go…'}
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.85)', margin: 0, fontSize: '13px', lineHeight: 1.5 }}>
@@ -165,7 +188,7 @@ export default function LeadCaptureModal() {
                 </div>
 
                 <div>
-                  <label style={labelStyle}>Course You're Interested In</label>
+                  <label style={labelStyle}>Course You&apos;re Interested In</label>
                   <select
                     name="course" value={form.course} onChange={handleChange}
                     style={{ ...inputStyle, cursor: 'pointer' }}
@@ -244,6 +267,47 @@ export default function LeadCaptureModal() {
         @keyframes lcSlideUp { 
           from { opacity: 0; transform: translate(-50%, 40px) scale(0.95); } 
           to { opacity: 1; transform: translate(-50%, 0) scale(1); } 
+        }
+        .lead-capture-modal {
+          top: 50% !important;
+          bottom: auto !important;
+          max-height: calc(100dvh - 40px);
+          overflow-x: hidden !important;
+          overflow-y: auto !important;
+          overscroll-behavior: contain;
+          box-sizing: border-box;
+          transform: translate(-50%, -50%) !important;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(15,110,86,.3) transparent;
+          animation: lcModalIn .35s cubic-bezier(0.16,1,0.3,1) !important;
+        }
+        @keyframes lcModalIn {
+          from { opacity: 0; transform: translate(-50%, calc(-50% + 24px)) scale(.96); }
+          to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        @media (max-width: 560px) {
+          .lead-capture-backdrop {
+            backdrop-filter: blur(3px) !important;
+          }
+          .lead-capture-modal {
+            top: auto !important;
+            bottom: max(10px, env(safe-area-inset-bottom)) !important;
+            width: calc(100vw - 20px) !important;
+            max-height: calc(100dvh - 20px);
+            border-radius: 20px !important;
+            transform: translateX(-50%) !important;
+            animation: lcSheetIn .35s cubic-bezier(0.16,1,0.3,1) !important;
+          }
+          .lead-capture-modal > div:first-child {
+            padding: 20px 20px 17px !important;
+          }
+          .lead-capture-modal > div:nth-child(2) {
+            padding: 18px 20px 20px !important;
+          }
+        }
+        @keyframes lcSheetIn {
+          from { opacity: 0; transform: translate(-50%, 24px) scale(.98); }
+          to { opacity: 1; transform: translate(-50%, 0) scale(1); }
         }
       `}</style>
     </>

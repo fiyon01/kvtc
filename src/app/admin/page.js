@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Settings, Wallet, Building, LayoutGrid, GraduationCap, Calendar, FileText, Image as ImageIcon, HelpCircle, Phone, Mail, FileCheck, BarChart3, Lock } from 'lucide-react';
+import { Settings, Wallet, Building, LayoutGrid, GraduationCap, Calendar, FileText, Image as ImageIcon, HelpCircle, Phone, Mail, FileCheck, BarChart3, Lock, BrainCircuit } from 'lucide-react';
+import AriaInsightsPanel from '@/components/admin/AriaInsightsPanel';
 
 const COURSES_PER_PAGE = 6;
 
@@ -20,6 +21,7 @@ export default function AdminDashboard() {
   const [funnel, setFunnel] = useState({ loading: true, page_visits: 0, aria_chats: 0, apply_starts: 0, apply_completes: 0, enrolled: 0 });
   const [leads, setLeads] = useState({ loading: true, list: [], total: 0 });
   const [enrolledInput, setEnrolledInput] = useState('');
+  const [passwordReset, setPasswordReset] = useState({ password: '', confirm: '', loading: false, message: '', error: '' });
 
   const refreshAnalytics = () => {
     setAnalytics(a => ({ ...a, loading: true }));
@@ -107,10 +109,11 @@ export default function AdminDashboard() {
         body: JSON.stringify({ action: 'login', email: auth.email, password: auth.password })
       });
       if (res.ok) {
+        const loginData = await res.json();
         const dataRes = await fetch('/api/data', { cache: 'no-store' });
         if (!dataRes.ok) throw new Error('Could not load protected data');
         setDb(await dataRes.json());
-        setAuth(a => ({ ...a, authenticated: true, loading: false }));
+        setAuth(a => ({ ...a, authenticated: true, email: loginData.user || a.email, loading: false }));
       } else {
         setAuth(a => ({ ...a, error: 'Incorrect password.', loading: false }));
       }
@@ -127,6 +130,42 @@ export default function AdminDashboard() {
     }).catch(() => {});
     setDb(null);
     setAuth({ authenticated: false, email: '', password: '', error: '', loading: false });
+  };
+
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+    setPasswordReset(state => ({ ...state, loading: true, message: '', error: '' }));
+
+    if (passwordReset.password.length < 8) {
+      setPasswordReset(state => ({ ...state, loading: false, error: 'Password must be at least 8 characters.' }));
+      return;
+    }
+
+    if (passwordReset.password !== passwordReset.confirm) {
+      setPasswordReset(state => ({ ...state, loading: false, error: 'Passwords do not match.' }));
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'resetAdminPassword',
+          email: auth.email,
+          password: passwordReset.password,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Password reset failed.');
+      }
+
+      setPasswordReset({ password: '', confirm: '', loading: false, message: 'Password updated successfully.', error: '' });
+    } catch (err) {
+      setPasswordReset(state => ({ ...state, loading: false, error: err.message || 'Password reset failed.' }));
+    }
   };
 
   // ── Login Screen ──
@@ -172,6 +211,7 @@ export default function AdminDashboard() {
     { id: 'letter', label: 'Admission Letter', icon: <Mail size={16} /> },
     { id: 'applications', label: 'Applications & Payments', icon: <FileCheck size={16} /> },
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={16} /> },
+    { id: 'aria', label: 'ARIA Knowledge', icon: <BrainCircuit size={16} /> },
     { id: 'security', label: 'Security', icon: <Lock size={16} /> },
   ];
 
@@ -264,7 +304,7 @@ export default function AdminDashboard() {
                 <h3 style={{ fontSize: '16px', marginBottom: '16px', fontWeight: 600 }}>Intake Banner Control</h3>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', cursor: 'pointer' }}>
                   <input type="checkbox" checked={db.intake.isOngoing} onChange={e => setDb({...db, intake: {...db.intake, isOngoing: e.target.checked}})} style={{ width: '20px', height: '20px', accentColor: '#0F6E56' }} />
-                  <span style={{ fontWeight: 500 }}>Show "Intake Ongoing" Banner on Homepage</span>
+                  <span style={{ fontWeight: 500 }}>Show &quot;Intake Ongoing&quot; Banner on Homepage</span>
                 </label>
                 <label style={labelStyle}>Intake Year / Term Text</label>
                 <input type="text" value={db.intake.yearText} onChange={e => setDb({...db, intake: {...db.intake, yearText: e.target.value}})} style={inputStyle} placeholder="e.g. 2026 or May 2026" />
@@ -295,7 +335,7 @@ export default function AdminDashboard() {
                 <h3 style={{ fontWeight: 700, fontSize: '15px', marginBottom: '16px' }}>Fee Structure Year Label</h3>
                 <label style={labelStyle}>Year / Session Label</label>
                 <input type="text" value={db.feeStructure.year} onChange={e => setDb({...db, feeStructure: {...db.feeStructure, year: e.target.value}})} style={inputStyle} placeholder="e.g. 2026" />
-                <p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>Displayed as: "Subsidised Fee Structure – {db.feeStructure.year}"</p>
+                <p style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>Displayed as: &quot;Subsidised Fee Structure – {db.feeStructure.year}&quot;</p>
               </div>
 
               {/* Term Vote Heads */}
@@ -607,7 +647,7 @@ export default function AdminDashboard() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <h2 style={{ fontFamily: 'var(--serif)', margin: 0, fontSize: '22px' }}>Gallery Manager</h2>
-                  <p style={{ color: '#888', margin: '4px 0 0', fontSize: '13px' }}>Images shown in the "Life at Kinoo VTC" section.</p>
+                  <p style={{ color: '#888', margin: '4px 0 0', fontSize: '13px' }}>Images shown in the &quot;Life at Kinoo VTC&quot; section.</p>
                 </div>
                 <button onClick={() => setDb({...db, gallery: [...db.gallery, { id: 'img-'+Date.now(), src: '', label: 'New Image', span: false }]})} style={{...btnStyle, background: '#1a1a1a'}}>+ Add Image</button>
               </div>
@@ -795,7 +835,7 @@ export default function AdminDashboard() {
                   <div style={{ textAlign: 'center', padding: '60px', background: '#f8f7f4', borderRadius: '16px', color: '#888' }}>
                     <div style={{ fontSize: '48px', marginBottom: '16px' }}>📅</div>
                     <p style={{ fontWeight: 600, marginBottom: '8px', color: '#555' }}>No events yet</p>
-                    <p style={{ fontSize: '14px' }}>Click "+ Add New Event" above to create the first event.</p>
+                    <p style={{ fontSize: '14px' }}>Click &quot;+ Add New Event&quot; above to create the first event.</p>
                   </div>
                 )}
 
@@ -1140,15 +1180,26 @@ export default function AdminDashboard() {
           )}
 
           {/* ── SECURITY ── */}
+          {activeTab === 'aria' && <AriaInsightsPanel />}
+
           {activeTab === 'security' && (
             <div>
               <h2 style={{ fontFamily: 'var(--serif)', marginBottom: '8px', fontSize: '22px' }}>Security Settings</h2>
-              <p style={{ color: '#888', marginBottom: '24px' }}>Change the admin password. Remember to click "Save All" after updating.</p>
-              <div style={{ background: '#f8f7f4', padding: '24px', borderRadius: '12px', maxWidth: '420px' }}>
+              <p style={{ color: '#888', marginBottom: '24px' }}>Reset the password for the currently signed-in admin account.</p>
+              <form onSubmit={handlePasswordReset} style={{ background: '#f8f7f4', padding: '24px', borderRadius: '12px', maxWidth: '460px' }}>
+                <label style={labelStyle}>Admin Email</label>
+                <input type="email" value={auth.email || ''} onChange={e => setAuth(state => ({ ...state, email: e.target.value }))} placeholder="admin@example.com" style={{ ...inputStyle, background: '#fff', color: '#555' }} />
                 <label style={labelStyle}>New Password</label>
-                <input type="password" placeholder="Enter new password..." onChange={e => setDb({...db, security: { password: e.target.value }})} style={inputStyle} />
-                <p style={{ fontSize: '12px', color: '#888', margin: 0 }}>⚠️ Write it down somewhere safe before saving.</p>
-              </div>
+                <input type="password" value={passwordReset.password} placeholder="Enter new password..." onChange={e => setPasswordReset(state => ({ ...state, password: e.target.value, message: '', error: '' }))} style={inputStyle} />
+                <label style={labelStyle}>Confirm Password</label>
+                <input type="password" value={passwordReset.confirm} placeholder="Repeat new password..." onChange={e => setPasswordReset(state => ({ ...state, confirm: e.target.value, message: '', error: '' }))} style={inputStyle} />
+                {passwordReset.error && <p style={{ color: '#b42318', background: '#fff1f0', border: '1px solid #ffd2cc', borderRadius: 8, padding: '10px 12px', fontSize: 13, margin: '0 0 12px' }}>{passwordReset.error}</p>}
+                {passwordReset.message && <p style={{ color: '#0F6E56', background: '#eaf7f2', border: '1px solid #bfe5d7', borderRadius: 8, padding: '10px 12px', fontSize: 13, margin: '0 0 12px' }}>{passwordReset.message}</p>}
+                <button type="submit" disabled={passwordReset.loading} style={{ ...btnStyle, width: '100%', justifyContent: 'center', padding: '13px 18px' }}>
+                  {passwordReset.loading ? 'Updating...' : 'Update Admin Password'}
+                </button>
+                <p style={{ fontSize: '12px', color: '#888', margin: '12px 0 0' }}>Use at least 8 characters. The change applies immediately after success.</p>
+              </form>
             </div>
           )}
 

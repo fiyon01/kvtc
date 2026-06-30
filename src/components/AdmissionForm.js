@@ -596,7 +596,22 @@ const Sec = ({t}) => (
 );
 
 // ═════════════════════════════════════════════════════════════
-export default function AdmissionForm({ dbData, selectedCoursePre = "", prefilledName = "", prefilledPhone = "", prefilledIdNo = "", prefilledKinName = "", prefilledKinTel = "", onApplicationSuccess }) {
+export default function AdmissionForm({
+  dbData,
+  selectedCoursePre = "",
+  prefilledName = "",
+  prefilledPhone = "",
+  prefilledIdNo = "",
+  prefilledDob = "",
+  prefilledHomeAddress = "",
+  prefilledResidentialArea = "",
+  prefilledKinName = "",
+  prefilledKinIdNo = "",
+  prefilledKinTel = "",
+  prefilledRelationship = "",
+  prefilledStartDate = "",
+  onApplicationSuccess
+}) {
   const { showToast } = useToast();
   const [kvtcLogo, setKvtcLogo] = useState(KVTC_LOGO);
   const [cgokLogo, setCgokLogo] = useState("/cgok-logo.png"); // Use the public folder logo
@@ -611,12 +626,13 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", prefille
       if (saved) return JSON.parse(saved);
     } catch(e) {}
     return {
-      name: prefilledName, idNo: prefilledIdNo, dob:"", tel: prefilledPhone, homeAddress:"", residentialArea:"",
-      kinName: prefilledKinName, kinIdNo:"", kinTel: prefilledKinTel, relationship:"",
-      course: selectedCoursePre, duration:"", examBody:"", startDate:"",
+      name: prefilledName, idNo: prefilledIdNo, dob: prefilledDob, tel: prefilledPhone, homeAddress: prefilledHomeAddress, residentialArea: prefilledResidentialArea,
+      kinName: prefilledKinName, kinIdNo: prefilledKinIdNo, kinTel: prefilledKinTel, relationship: prefilledRelationship,
+      course: selectedCoursePre, duration:"", examBody:"", startDate: prefilledStartDate,
       signatureData:"", signDate:"", applicantPhoto:"",
     };
   });
+  const prefillAppliedRef = useRef(false);
   const formRef = useRef();
   
   const courseList = dbData?.courses || [];
@@ -624,6 +640,46 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", prefille
   const admissionAmount = feeStructure?.admissionFees?.[0]?.amount || 500;
 
   const set = useCallback((k,v) => setForm(f=>({...f,[k]:v})), []);
+
+  useEffect(() => {
+    if (prefillAppliedRef.current) return;
+    prefillAppliedRef.current = true;
+    const prefills = {
+      name: prefilledName,
+      idNo: prefilledIdNo,
+      dob: prefilledDob,
+      tel: prefilledPhone,
+      homeAddress: prefilledHomeAddress,
+      residentialArea: prefilledResidentialArea,
+      kinName: prefilledKinName,
+      kinIdNo: prefilledKinIdNo,
+      kinTel: prefilledKinTel,
+      relationship: prefilledRelationship,
+      course: selectedCoursePre,
+      startDate: prefilledStartDate,
+    };
+
+    setForm(current => {
+      const next = { ...current };
+      for (const [field, value] of Object.entries(prefills)) {
+        if (value && !next[field]) next[field] = value;
+      }
+      return next;
+    });
+  }, [
+    prefilledName,
+    prefilledIdNo,
+    prefilledDob,
+    prefilledPhone,
+    prefilledHomeAddress,
+    prefilledResidentialArea,
+    prefilledKinName,
+    prefilledKinIdNo,
+    prefilledKinTel,
+    prefilledRelationship,
+    selectedCoursePre,
+    prefilledStartDate,
+  ]);
 
   useEffect(() => {
     try {
@@ -1099,7 +1155,7 @@ export default function AdmissionForm({ dbData, selectedCoursePre = "", prefille
             <span style={{fontWeight:900}}>VISION:</span>
             <span>A leading institution that prepares our students to be work ready, life ready and world ready.</span>
             <span style={{fontWeight:900}}>MOTTO:</span>
-            <span style={{fontStyle:"italic"}}>"Serve with skills."</span>
+            <span style={{fontStyle:"italic"}}>&ldquo;Serve with skills.&rdquo;</span>
           </div>
         </div>
       </div>

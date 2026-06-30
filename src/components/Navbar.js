@@ -3,15 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-const BANNER_HEIGHT = 46; // must match TopBanner.js
+import { BANNER_HEIGHT } from './TopBanner';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileMenuMounted, setMobileMenuMounted] = useState(false);
   const [mobileDepartmentsOpen, setMobileDepartmentsOpen] = useState(false);
-  const [bannerVisible, setBannerVisible] = useState(true);
+  const [bannerVisible, setBannerVisible] = useState(false);
   const mobileCloseTimer = useRef(null);
   const pathname = usePathname();
 
@@ -31,15 +30,16 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    // Restore dismissed state from session
-    if (sessionStorage.getItem('topBannerDismissed')) {
-      setBannerVisible(false);
-    }
+    if (sessionStorage.getItem('topBannerDismissed')) return;
+
+    const onShow = () => setBannerVisible(true);
     const onDismiss = () => setBannerVisible(false);
+    window.addEventListener('topBannerShown', onShow);
     window.addEventListener('topBannerDismissed', onDismiss);
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => {
+      window.removeEventListener('topBannerShown', onShow);
       window.removeEventListener('topBannerDismissed', onDismiss);
       window.removeEventListener('scroll', handleScroll);
     };
@@ -63,9 +63,11 @@ export default function Navbar() {
   }, [mobileMenuMounted]);
 
   useEffect(() => {
-    setMobileOpen(false);
-    setMobileMenuMounted(false);
-    setMobileDepartmentsOpen(false);
+    queueMicrotask(() => {
+      setMobileOpen(false);
+      setMobileMenuMounted(false);
+      setMobileDepartmentsOpen(false);
+    });
   }, [pathname]);
 
   useEffect(() => () => {

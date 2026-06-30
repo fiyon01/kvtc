@@ -1,17 +1,19 @@
 "use client";
 
 import React from 'react';
-import { Sparkles } from 'lucide-react';
 
 export default function WelcomeCard() {
   return (
     <div className="welcome-card">
       <div className="avatar-wrapper">
-        <div className="avatar">A</div>
-        <div className="sparkle"><Sparkles size={16} color="#EF9F27" fill="#EF9F27" /></div>
+        <img
+          className="avatar"
+          src="/aria-avatar.png"
+          alt="ARIA virtual admissions assistant"
+        />
       </div>
       <h3>Hello and welcome to Kinoo VTC!</h3>
-      <p>I'm <strong>ARIA</strong>, your personal admissions and career guidance assistant.</p>
+      <p>I&apos;m <strong>ARIA</strong>, Kinoo VTC&apos;s virtual admissions and career guidance assistant.</p>
       
       <style jsx>{`
         .welcome-card {
@@ -26,32 +28,25 @@ export default function WelcomeCard() {
 
         .avatar-wrapper {
           position: relative;
-          width: 64px;
-          height: 64px;
+          width: 74px;
+          height: 74px;
           margin: 0 auto 16px;
+          border-radius: 50%;
+          padding: 4px;
+          background: #fff;
+          border: 1px solid rgba(15,110,86,0.14);
+          box-shadow: 0 14px 32px rgba(15,110,86,0.18);
+          overflow: hidden;
         }
 
         .avatar {
           width: 100%;
           height: 100%;
-          background: linear-gradient(135deg, #0F6E56, #1D9E75);
-          color: white;
           border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: var(--serif);
-          font-size: 28px;
-          font-weight: bold;
-          box-shadow: 0 8px 20px rgba(15,110,86,0.3);
-        }
-
-        .sparkle {
-          position: absolute;
-          top: -4px;
-          right: -4px;
-          font-size: 16px;
-          animation: float 3s ease-in-out infinite;
+          object-fit: cover;
+          object-position: center;
+          transform: scale(1.22);
+          display: block;
         }
 
         h3 {
@@ -68,10 +63,6 @@ export default function WelcomeCard() {
           line-height: 1.5;
         }
 
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
-        }
       `}</style>
     </div>
   );

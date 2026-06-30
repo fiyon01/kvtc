@@ -81,10 +81,7 @@ export default function ResponseRail({ data, onAction }) {
       <div className="ai-text-response">
         {/* Avatar */}
         <div className="ai-avatar">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2z"/>
-            <path d="M20 21a8 8 0 1 0-16 0"/>
-          </svg>
+          <img src="/aria-avatar.png" alt="" aria-hidden="true" />
         </div>
 
         {/* Bubble */}
@@ -92,7 +89,7 @@ export default function ResponseRail({ data, onAction }) {
           {/* ARIA name tag */}
           <div className="ai-name-tag">
             <span className="ai-name">ARIA</span>
-            <span className="ai-role">· Admissions Guide</span>
+            <span className="ai-role">· Virtual Admissions Assistant</span>
           </div>
 
           {/* Content */}
@@ -123,16 +120,29 @@ export default function ResponseRail({ data, onAction }) {
           }
 
           .ai-avatar {
-            width: 34px;
-            height: 34px;
-            background: linear-gradient(135deg, #0F6E56 0%, #1a9e6e 100%);
+            width: 38px;
+            height: 38px;
+            background: #fff;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 3px 10px rgba(15,110,86,0.3);
+            border: 1px solid rgba(15,110,86,0.16);
+            box-shadow: 0 6px 16px rgba(15,110,86,0.16);
             margin-top: 2px;
+            overflow: hidden;
+            padding: 2px;
+          }
+
+          .ai-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
+            transform: scale(1.22);
+            display: block;
           }
 
           .ai-bubble {

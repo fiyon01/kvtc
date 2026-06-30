@@ -523,8 +523,14 @@ function ApplyInner({ dbData }) {
                 prefilledName={searchParams.get('name') || ''}
                 prefilledPhone={searchParams.get('phone') || ''}
                 prefilledIdNo={searchParams.get('idNo') || ''}
+                prefilledDob={searchParams.get('dob') || ''}
+                prefilledHomeAddress={searchParams.get('homeAddress') || ''}
+                prefilledResidentialArea={searchParams.get('residentialArea') || ''}
                 prefilledKinName={searchParams.get('kinName') || ''}
+                prefilledKinIdNo={searchParams.get('kinIdNo') || ''}
                 prefilledKinTel={searchParams.get('kinTel') || ''}
+                prefilledRelationship={searchParams.get('relationship') || ''}
+                prefilledStartDate={searchParams.get('startDate') || ''}
                 onApplicationSuccess={(name, email) => handleSuccess(name, email)}
               />
             </div>

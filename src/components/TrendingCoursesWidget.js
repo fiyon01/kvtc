@@ -1,12 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Flame, TrendingUp, ChevronRight, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Flame, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function TrendingCoursesWidget() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const scrollRef = useRef(null);
+
+  const scrollCourses = (direction) => {
+    scrollRef.current?.scrollBy({
+      left: direction === 'next' ? 300 : -300,
+      behavior: 'smooth',
+    });
+  };
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -39,14 +47,35 @@ export default function TrendingCoursesWidget() {
           </div>
           <span className="tw-title">Trending Searches</span>
         </div>
-        <div className="tw-live-badge">
-          <span className="pulse-dot" />
-          LIVE
+        <div className="tw-header-actions">
+          <span className="tw-scroll-hint">
+            <span className="tw-scroll-hint-desktop">Scroll to explore</span>
+            <span className="tw-scroll-hint-mobile">Swipe to explore</span>
+            <ChevronRight size={14} aria-hidden="true" />
+          </span>
+          <div className="tw-scroll-buttons" aria-label="Scroll trending searches">
+            <button type="button" onClick={() => scrollCourses('previous')} aria-label="Show previous trending searches">
+              <ChevronLeft size={16} />
+            </button>
+            <button type="button" onClick={() => scrollCourses('next')} aria-label="Show more trending searches">
+              <ChevronRight size={16} />
+            </button>
+          </div>
+          <div className="tw-live-badge">
+            <span className="pulse-dot" />
+            LIVE
+          </div>
         </div>
       </div>
 
-      <div className="tw-scroll-container hide-scrollbar">
-        <div className="tw-track">
+      <div className="tw-scroll-shell">
+        <div
+          ref={scrollRef}
+          className="tw-scroll-container hide-scrollbar"
+          tabIndex="0"
+          aria-label="Trending course searches. Scroll horizontally to explore."
+        >
+          <div className="tw-track">
           {courses.map((item, index) => {
             const isTop = index === 0;
             return (
@@ -73,6 +102,10 @@ export default function TrendingCoursesWidget() {
               </Link>
             );
           })}
+          </div>
+        </div>
+        <div className="tw-edge-cue" aria-hidden="true">
+          <ChevronRight size={18} />
         </div>
       </div>
 
@@ -143,6 +176,49 @@ export default function TrendingCoursesWidget() {
           text-transform: uppercase;
           border: 1px solid rgba(239, 68, 68, 0.1);
         }
+        .tw-header-actions,
+        .tw-scroll-hint,
+        .tw-scroll-buttons {
+          display: flex;
+          align-items: center;
+        }
+        .tw-header-actions {
+          gap: 12px;
+        }
+        .tw-scroll-hint {
+          gap: 3px;
+          color: #64748b;
+          font-size: 11px;
+          font-weight: 700;
+        }
+        .tw-scroll-hint-mobile {
+          display: none;
+        }
+        .tw-scroll-buttons {
+          gap: 6px;
+        }
+        .tw-scroll-buttons button {
+          width: 32px;
+          height: 32px;
+          display: grid;
+          place-items: center;
+          border: 1px solid #dbe5e9;
+          border-radius: 10px;
+          background: #fff;
+          color: #31505d;
+          cursor: pointer;
+          transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .tw-scroll-buttons button:hover {
+          color: #0F6E56;
+          border-color: rgba(15, 110, 86, 0.35);
+          transform: translateY(-1px);
+        }
+        .tw-scroll-buttons button:focus-visible,
+        .tw-scroll-container:focus-visible {
+          outline: 3px solid rgba(47, 121, 183, 0.28);
+          outline-offset: 3px;
+        }
         .pulse-dot {
           width: 6px;
           height: 6px;
@@ -153,12 +229,30 @@ export default function TrendingCoursesWidget() {
         }
 
         /* ── Track & Scroll ── */
+        .tw-scroll-shell {
+          position: relative;
+        }
         .tw-scroll-container {
           width: 100%;
           overflow-x: auto;
           padding: 8px 0 24px;
           scroll-behavior: smooth;
+          scroll-snap-type: x proximity;
           -webkit-overflow-scrolling: touch;
+        }
+        .tw-edge-cue {
+          position: absolute;
+          top: 8px;
+          right: 0;
+          bottom: 24px;
+          width: 58px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          padding-right: 6px;
+          color: #0F6E56;
+          pointer-events: none;
+          background: linear-gradient(90deg, rgba(255,255,255,0), #fff 72%);
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -167,6 +261,7 @@ export default function TrendingCoursesWidget() {
           display: flex;
           gap: 16px;
           width: max-content;
+          padding-right: 44px;
         }
 
         /* ── Premium Card Design ── */
@@ -185,6 +280,7 @@ export default function TrendingCoursesWidget() {
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           overflow: hidden;
           isolation: isolate;
+          scroll-snap-align: start;
         }
 
         /* Hover states */
@@ -305,14 +401,31 @@ export default function TrendingCoursesWidget() {
         }
 
         /* ── Media Queries ── */
-        @media (min-width: 1024px) {
-          .tw-track {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            width: 100%;
+        @media (max-width: 640px) {
+          .tw-section {
+            padding: 18px 16px;
+            margin-bottom: 26px;
+          }
+          .tw-header {
+            align-items: flex-start;
+            margin-bottom: 12px;
+          }
+          .tw-header-actions {
+            gap: 8px;
+          }
+          .tw-scroll-hint-desktop,
+          .tw-scroll-buttons,
+          .tw-live-badge {
+            display: none;
+          }
+          .tw-scroll-hint-mobile {
+            display: inline;
           }
           .tw-premium-card {
-            width: 100%;
+            width: min(78vw, 270px);
+          }
+          .tw-track {
+            gap: 12px;
           }
         }
 

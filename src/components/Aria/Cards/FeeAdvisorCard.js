@@ -1,114 +1,112 @@
+"use client";
+
 import React from 'react';
+import { Banknote, Building2, CheckCircle2, Info } from 'lucide-react';
 
-const FeeAdvisorCard = ({ onAction }) => {
-  const styles = {
-    card: {
-      background: 'linear-gradient(135deg, #10b981, #047857)',
-      color: '#ffffff',
-      borderRadius: '16px',
-      padding: '24px',
-      boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.4)',
-      fontFamily: '"Inter", system-ui, sans-serif',
-      maxWidth: '450px',
-      margin: '0 auto',
-      transition: 'transform 0.3s ease',
-    },
-    title: {
-      fontSize: '1.25rem',
-      fontWeight: '700',
-      marginBottom: '12px',
-      marginTop: '0'
-    },
-    text: {
-      fontSize: '0.95rem',
-      lineHeight: '1.6',
-      marginBottom: '24px',
-      opacity: '0.95'
-    },
-    termsContainer: {
-      display: 'flex',
-      gap: '12px',
-      marginBottom: '28px',
-    },
-    termBox: {
-      flex: 1,
-      background: 'rgba(255, 255, 255, 0.15)',
-      padding: '12px 8px',
-      borderRadius: '12px',
-      textAlign: 'center',
-      backdropFilter: 'blur(8px)',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
-      transition: 'background 0.2s ease',
-    },
-    termTitle: {
-      display: 'block',
-      fontWeight: '600',
-      fontSize: '0.9rem',
-    },
-    button: {
-      background: '#ffffff',
-      color: '#047857',
-      border: 'none',
-      padding: '14px 24px',
-      borderRadius: '12px',
-      fontSize: '1rem',
-      fontWeight: '700',
-      cursor: 'pointer',
-      width: '100%',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-    }
-  };
-
+export default function FeeAdvisorCard() {
   return (
-    <div 
-      style={styles.card}
-      onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-      onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-    >
-      <h3 style={styles.title}>Flexible Fee Payment</h3>
-      <p style={styles.text}>
-        At Kinoo VTC, courses are subsidized by the government (KSh 27,000/year). You don't have to pay everything at once!
-      </p>
-      <div style={styles.termsContainer}>
-        <div 
-          style={styles.termBox}
-          onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)'}
-          onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'}
-        >
-          <span style={styles.termTitle}>Term 1</span>
-        </div>
-        <div 
-          style={styles.termBox}
-          onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)'}
-          onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'}
-        >
-          <span style={styles.termTitle}>Term 2</span>
-        </div>
-        <div 
-          style={styles.termBox}
-          onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)'}
-          onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'}
-        >
-          <span style={styles.termTitle}>Term 3</span>
+    <div className="fee-card">
+      <div className="fee-heading">
+        <div className="fee-icon"><Banknote size={20} /></div>
+        <div>
+          <h3>Current Fee Reference</h3>
+          <p>Use these figures when planning your admission payments.</p>
         </div>
       </div>
-      <button 
-        style={styles.button}
-        onClick={() => onAction && onAction('send_message', 'Help me choose a course')}
-        onMouseOver={(e) => {
-          e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = '0 8px 12px -1px rgba(0, 0, 0, 0.15)';
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-        }}
-      >
-        Help me choose a course
-      </button>
+
+      <div className="fee-grid">
+        <div className="fee-item">
+          <span>Application</span>
+          <strong>KSh 500</strong>
+        </div>
+        <div className="fee-item">
+          <span>Admission charges</span>
+          <strong>KSh 3,450</strong>
+        </div>
+        <div className="fee-item">
+          <span>Tuition per term</span>
+          <strong>KSh 9,000</strong>
+        </div>
+      </div>
+
+      <div className="fee-note">
+        <Info size={15} />
+        <span>ARIA can explain the published fees but cannot approve a payment arrangement.</span>
+      </div>
+
+      <div className="fee-footer">
+        <CheckCircle2 size={14} />
+        <span>Confirm bursaries or special arrangements with Admissions.</span>
+        <Building2 size={14} />
+      </div>
+
+      <style jsx>{`
+        .fee-card {
+          max-width: 450px;
+          margin-top: 10px;
+          padding: 18px;
+          border: 1px solid #dce8e4;
+          border-radius: 16px;
+          background: linear-gradient(145deg, #ffffff, #f5faf8);
+          box-shadow: 0 8px 24px rgba(20, 56, 48, 0.08);
+          font-family: var(--font-inter, system-ui, sans-serif);
+        }
+        .fee-heading { display: flex; align-items: center; gap: 11px; }
+        .fee-icon {
+          display: grid;
+          width: 40px;
+          height: 40px;
+          flex-shrink: 0;
+          place-items: center;
+          border-radius: 11px;
+          background: #e1f3ec;
+          color: #0f6e56;
+        }
+        h3 { margin: 0 0 3px; color: #182c27; font-size: 15px; }
+        .fee-heading p { margin: 0; color: #687973; font-size: 11px; }
+        .fee-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 8px;
+          margin: 16px 0 12px;
+        }
+        .fee-item {
+          padding: 11px 8px;
+          border: 1px solid #e2ebe8;
+          border-radius: 10px;
+          background: #fff;
+          text-align: center;
+        }
+        .fee-item span { display: block; color: #71817b; font-size: 9px; }
+        .fee-item strong { display: block; margin-top: 4px; color: #173e34; font-size: 13px; }
+        .fee-note {
+          display: flex;
+          align-items: flex-start;
+          gap: 7px;
+          padding: 10px;
+          border-radius: 9px;
+          background: #edf4fa;
+          color: #38556d;
+          font-size: 11px;
+          line-height: 1.45;
+        }
+        .fee-note :global(svg) { flex-shrink: 0; margin-top: 1px; }
+        .fee-footer {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          margin-top: 11px;
+          color: #60716b;
+          font-size: 10px;
+          text-align: center;
+        }
+        @media (max-width: 480px) {
+          .fee-grid { grid-template-columns: 1fr; }
+          .fee-item { display: flex; align-items: center; justify-content: space-between; text-align: left; }
+          .fee-item strong { margin-top: 0; }
+        }
+      `}</style>
     </div>
   );
-};
-
-export default FeeAdvisorCard;
+}

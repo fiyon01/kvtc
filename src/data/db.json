@@ -1,12 +1,10 @@
 {
-  "security": {
-    "password": "admin"
-  },
   "intake": {
     "isOngoing": true,
     "yearText": "2026",
     "currentTerm": "May Intake",
-    "endDate": "2026-06-30"
+    "endDate": "2026-07-09",
+    "startDate": "2026-06-30"
   },
   "contact": {
     "phone1": "0113 582 008",
@@ -976,5 +974,8 @@
       "subscribedAt": "2026-06-14T12:14:43.610Z",
       "status": "active"
     }
-  ]
+  ],
+  "security": {
+    "password": "admin"
+  }
 }

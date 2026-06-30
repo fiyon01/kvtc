@@ -1,20 +1,40 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, CheckCircle2, User, Phone, CreditCard, Users, PhoneCall, BookOpen } from 'lucide-react';
+import { ChevronRight, CheckCircle2, User, Phone, CreditCard, Users, PhoneCall, BookOpen, CalendarDays, Home, MapPin, HeartHandshake } from 'lucide-react';
 
 const STEPS = [
   { id: 1, field: 'name',    label: 'Your full name',                            placeholder: 'e.g. John Kamau',   icon: User,      type: 'text' },
-  { id: 2, field: 'phone',   label: 'Your phone number',                         placeholder: 'e.g. 0712345678',   icon: Phone,     type: 'tel' },
-  { id: 3, field: 'idNo',    label: 'National ID or Birth Certificate number',   placeholder: 'e.g. 12345678',     icon: CreditCard, type: 'text' },
-  { id: 4, field: 'kinName', label: 'Next of Kin full name (Parent/Guardian)',   placeholder: 'e.g. Jane Kamau',   icon: Users,     type: 'text' },
-  { id: 5, field: 'kinTel',  label: "Next of Kin's phone number",               placeholder: 'e.g. 0722000000',   icon: PhoneCall, type: 'tel' },
-  { id: 6, field: 'course',  label: 'Course you want to apply for',             placeholder: 'e.g. Electrical',   icon: BookOpen,  type: 'text' },
+  { id: 2, field: 'idNo',    label: 'National ID or Birth Certificate number',   placeholder: 'e.g. 12345678',     icon: CreditCard, type: 'text' },
+  { id: 3, field: 'dob',     label: 'Date of birth',                             placeholder: '',                  icon: CalendarDays, type: 'date' },
+  { id: 4, field: 'phone',   label: 'Your phone number',                         placeholder: 'e.g. 0712345678',   icon: Phone,     type: 'tel' },
+  { id: 5, field: 'homeAddress', label: 'Home address',                          placeholder: 'e.g. P.O. Box 123', icon: Home,      type: 'text' },
+  { id: 6, field: 'residentialArea', label: 'Residential area',                  placeholder: 'e.g. Kinoo',        icon: MapPin,    type: 'text' },
+  { id: 7, field: 'kinName', label: 'Next of Kin full name (Parent/Guardian)',   placeholder: 'e.g. Jane Kamau',   icon: Users,     type: 'text' },
+  { id: 8, field: 'kinIdNo', label: 'Next of Kin ID number',                     placeholder: 'e.g. 23456789',     icon: CreditCard, type: 'text' },
+  { id: 9, field: 'kinTel',  label: "Next of Kin's phone number",               placeholder: 'e.g. 0722000000',   icon: PhoneCall, type: 'tel' },
+  { id: 10, field: 'relationship', label: 'Relationship to trainee',             placeholder: 'e.g. Parent',       icon: HeartHandshake, type: 'text' },
+  { id: 11, field: 'course',  label: 'Course you want to apply for',             placeholder: 'e.g. Electrical',   icon: BookOpen,  type: 'text' },
+  { id: 12, field: 'startDate', label: 'Preferred start date',                   placeholder: '',                  icon: CalendarDays, type: 'date' },
 ];
 
 export default function ApplicationWizard({ onComplete }) {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({ name: '', phone: '', idNo: '', kinName: '', kinTel: '', course: '' });
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    idNo: '',
+    dob: '',
+    phone: '',
+    homeAddress: '',
+    residentialArea: '',
+    kinName: '',
+    kinIdNo: '',
+    kinTel: '',
+    relationship: '',
+    course: '',
+    startDate: '',
+  });
   const [done, setDone] = useState(false);
   const inputRef = useRef(null);
 
@@ -27,9 +47,38 @@ export default function ApplicationWizard({ onComplete }) {
   const currentStep = STEPS[step - 1];
   const progress = Math.round(((step - 1) / STEPS.length) * 100);
 
+  const normalizeKenyanPhone = (value) => {
+    const digits = String(value || '').replace(/\D/g, '');
+    if (/^254(7|1)\d{8}$/.test(digits)) return `0${digits.slice(3)}`;
+    if (/^(7|1)\d{8}$/.test(digits)) return `0${digits}`;
+    return digits;
+  };
+
+  const validateStep = () => {
+    const field = currentStep.field;
+    const val = formData[field]?.trim();
+    if (!val) {
+      setError('Please fill in this field before continuing.');
+      return false;
+    }
+
+    if (field === 'phone' || field === 'kinTel') {
+      const normalized = normalizeKenyanPhone(val);
+      if (!/^(07|01)\d{8}$/.test(normalized)) {
+        setError('Enter a valid Kenyan phone number, for example 0712345678.');
+        return false;
+      }
+      if (normalized !== val) {
+        setFormData(f => ({ ...f, [field]: normalized }));
+      }
+    }
+
+    setError('');
+    return true;
+  };
+
   const advance = () => {
-    const val = formData[currentStep.field]?.trim();
-    if (!val) return;
+    if (!validateStep()) return;
     if (step < STEPS.length) {
       setStep(s => s + 1);
     } else {
@@ -86,9 +135,15 @@ export default function ApplicationWizard({ onComplete }) {
               className="awiz-input"
               placeholder={currentStep.placeholder}
               value={formData[currentStep.field]}
-              onChange={e => setFormData(f => ({ ...f, [currentStep.field]: e.target.value }))}
+              onChange={e => {
+                setError('');
+                setFormData(f => ({ ...f, [currentStep.field]: e.target.value }));
+              }}
               onKeyDown={handleKey}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'awiz-error' : undefined}
             />
+            {error && <p id="awiz-error" className="awiz-error">{error}</p>}
 
             {/* Review row – show completed answers above */}
             {step > 1 && (
@@ -107,7 +162,7 @@ export default function ApplicationWizard({ onComplete }) {
             <CheckCircle2 size={32} color="#0F6E56" />
             <div>
               <p className="awiz-success-title">All done, {formData.name.split(' ')[0]}! 🎉</p>
-              <p className="awiz-success-sub">Opening your admission form with everything filled in…</p>
+              <p className="awiz-success-sub">Opening your admission form. You will only need to attach your photo, draw your signature, review and pay.</p>
             </div>
           </div>
         )}
@@ -120,7 +175,7 @@ export default function ApplicationWizard({ onComplete }) {
           onClick={advance}
           disabled={!formData[currentStep.field]?.trim()}
         >
-          {step === STEPS.length ? 'Continue to Payment →' : 'Next'} <ChevronRight size={16} />
+          {step === STEPS.length ? 'Open Admission Form' : 'Next'} <ChevronRight size={16} />
         </button>
       )}
 
@@ -256,6 +311,17 @@ export default function ApplicationWizard({ onComplete }) {
         .awiz-input:focus {
           border-color: #0F6E56;
           box-shadow: 0 0 0 3px rgba(15,110,86,0.1);
+        }
+        .awiz-input[aria-invalid="true"] {
+          border-color: #C2410C;
+          box-shadow: 0 0 0 3px rgba(194,65,12,0.1);
+        }
+        .awiz-error {
+          margin: 8px 0 0;
+          color: #B42318;
+          font-size: 11px;
+          font-weight: 650;
+          line-height: 1.35;
         }
 
         /* Review chips */
