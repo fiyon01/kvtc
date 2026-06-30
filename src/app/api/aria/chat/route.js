@@ -146,6 +146,11 @@ function answerMentionsUnsupportedCourse(answer) {
   return /\b(diploma|tourism|massage therapy|nursing|hotel management|business administration|bookkeeping|graphic design|web development|digital marketing|software engineering|accounting)\b/i.test(answer);
 }
 
+function answerMentionsUnsafeInstitutionFact(answer) {
+  const text = String(answer || '');
+  return /kinoovtc\.ac\.tz|P\.?\s*O\.?\s*Box\s*57397|located\s+in\s+Nairobi|heart\s+of\s+Nairobi|application\s+form\]\(https?:\/\//i.test(text);
+}
+
 function llmAnswerLooksGrounded(answer, db) {
   const text = String(answer || '').toLowerCase();
   const knownCourses = db.courses || [];
@@ -195,9 +200,29 @@ function shouldUseVerifiedLocalFirst(message, db) {
   if (/\b(who|what)\s+(is|are)\s+(kvtc|kinoo vtc|kinoo vocational training centre)\b/i.test(msg)) return true;
   if (/\b(who is|who's|who)\s+(the\s+)?(principal|head|deputy)\b/i.test(msg)) return true;
   if (/\b(are you ai|are you a bot|are you human|what are you)\b/i.test(msg)) return true;
+  if (/\b(where are you|where is kvtc|location|located|directions?|address|campus|visit|contacts?|phone|email|whatsapp)\b/i.test(msg)) return true;
   if (mentionsCourse && !asksForAdvice) return true;
 
   return false;
+}
+
+function priorAssistantAskedForComparison(history = []) {
+  const lastAssistant = [...history].reverse().find(item => item.role === 'assistant');
+  const text = String(lastAssistant?.text || lastAssistant?.content || '').toLowerCase();
+  return text.includes('which two') && text.includes('compare');
+}
+
+function priorAssistantOfferedApplication(history = []) {
+  const lastAssistant = [...history].reverse().find(item => item.role === 'assistant');
+  const text = String(lastAssistant?.text || lastAssistant?.content || '').toLowerCase();
+  return text.includes('help starting an application') ||
+    text.includes('would you like the requirements or help') ||
+    text.includes('want to apply for this course') ||
+    text.includes('shall i start the application');
+}
+
+function isAffirmative(message) {
+  return /^(yes|yes please|yeah|yep|sure|ndio|sawa|okay|ok|start|start now|apply|apply now)$/i.test(String(message || '').trim());
 }
 
 // ─── Build comprehensive KVTC knowledge system prompt ─────────────────────────
@@ -770,6 +795,32 @@ export async function POST(req) {
       });
     }
 
+    if (isAffirmative(message) && priorAssistantOfferedApplication(history)) {
+      return NextResponse.json({
+        response_type: 'application_guide',
+        text: `Absolutely. You have two clean ways to apply:\n\n**1. Apply online with ARIA** - I collect the details here, open the pre-filled form, then you pay the **KSh 500** application fee through M-PESA.\n\n**2. Apply in person** - visit the KVTC campus in Kikuyu during office hours and the admissions team will guide you.\n\nFor the fastest option, choose **Start Application Now** below and I will open the guided application flow.`,
+        provider: 'ARIA Application Guide',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    const comparisonCourses = mentionedComparisonCourses(message, courseList);
+    if (comparisonCourses.length >= 2 && (
+      priorAssistantAskedForComparison(history) ||
+      /\b(compare|vs|versus|difference between|which is better)\b/i.test(message)
+    )) {
+      comparisonCourses.slice(0, 2).forEach(c =>
+        recordCourseEvent({ courseId: c.tag || c.name, eventType: 'view' })
+      );
+      return NextResponse.json({
+        response_type: 'course_comparison',
+        text: `Here is a comparison between **${comparisonCourses[0].name}** and **${comparisonCourses[1].name}**:`,
+        courses: [comparisonCourses[0], comparisonCourses[1]],
+        provider: 'ARIA Course Comparison',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     const recommendation = buildCourseRecommendation(message, db, history);
     if (recommendation) {
       recommendation.courses.forEach(course =>
@@ -823,7 +874,7 @@ export async function POST(req) {
     // ── 10. Course comparison intent ────────────────────────────────────────
     const COMPARE_PATTERNS = [/\b(compare|vs|versus|difference between|which is better)\b/i];
     if (COMPARE_PATTERNS.some(p => p.test(message))) {
-      const matchedCourses = mentionedComparisonCourses(message, courseList);
+      const matchedCourses = comparisonCourses;
       if (matchedCourses.length >= 2) {
         matchedCourses.slice(0, 2).forEach(c =>
           recordCourseEvent({ courseId: c.tag || c.name, eventType: 'view' })
@@ -974,11 +1025,17 @@ export async function POST(req) {
       result = { ...result, provider: 'ARIA Verified Course Catalogue' };
     }
 
+    if (answerMentionsUnsafeInstitutionFact(finalResponseText)) {
+      console.warn(`ARIA: Replaced unsafe institution/application claim from ${result.provider}`);
+      finalResponseText = localEngine(message, db, allMessages);
+      result = { ...result, provider: 'ARIA Verified Institution Facts' };
+    }
+
     if (shouldReplaceLlmAnswer({
       message,
       answer: finalResponseText,
       db,
-      localResponseIsReliable: useVerifiedLocalFirst,
+      localResponseIsReliable,
     })) {
       console.warn(`ARIA: Replaced an unsupported institutional answer from ${result.provider}`);
       if (localResponseIsReliable || asksForVerifiedFees(message)) {
