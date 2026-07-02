@@ -9,7 +9,7 @@ const COURSES_PER_PAGE = 6;
 
 export default function AdminDashboard() {
   const [db, setDb] = useState(null);
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState('analytics');
   const [saving, setSaving] = useState(false);
   const [auth, setAuth] = useState({ authenticated: false, email: '', password: '', error: '', loading: false });
   const [coursePage, setCoursePage] = useState(1);
@@ -198,22 +198,29 @@ export default function AdminDashboard() {
   const labelStyle = { display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px' };
 
   const tabs = [
+    { id: 'analytics', label: 'Dashboard', icon: <BarChart3 size={16} /> },
     { id: 'general', label: 'General Settings', icon: <Settings size={16} /> },
     { id: 'fees', label: 'Fee Structure', icon: <Wallet size={16} /> },
     { id: 'about', label: 'About Page', icon: <Building size={16} /> },
     { id: 'departments', label: 'Departments', icon: <LayoutGrid size={16} /> },
     { id: 'courses', label: 'Course Manager', icon: <GraduationCap size={16} /> },
-    { id: 'events', label: 'Events Manager', icon: <Calendar size={16} /> },
-    { id: 'blog', label: 'Blog Manager', icon: <FileText size={16} /> },
+    { id: 'events', label: 'Calendar Events', icon: <Calendar size={16} /> },
+    { id: 'blog', label: 'Latest News', icon: <FileText size={16} /> },
     { id: 'faqs', label: 'FAQ Manager', icon: <HelpCircle size={16} /> },
     { id: 'gallery', label: 'Gallery Manager', icon: <ImageIcon size={16} /> },
     { id: 'contact', label: 'Contact Info', icon: <Phone size={16} /> },
     { id: 'letter', label: 'Admission Letter', icon: <Mail size={16} /> },
     { id: 'applications', label: 'Applications & Payments', icon: <FileCheck size={16} /> },
-    { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={16} /> },
     { id: 'aria', label: 'ARIA Knowledge', icon: <BrainCircuit size={16} /> },
     { id: 'security', label: 'Security', icon: <Lock size={16} /> },
   ];
+  const mobilePrimaryTabs = ['analytics', 'courses', 'blog', 'applications'];
+  const mobilePrimary = tabs.filter(tab => mobilePrimaryTabs.includes(tab.id));
+  const mobileMoreGroups = [
+    { title: 'Institution', ids: ['general', 'about', 'contact', 'departments'] },
+    { title: 'Admissions', ids: ['fees', 'letter', 'events'] },
+    { title: 'Content', ids: ['faqs', 'gallery', 'aria', 'security'] },
+  ].map(group => ({ ...group, tabs: group.ids.map(id => tabs.find(tab => tab.id === id)).filter(Boolean) }));
 
   // Paginated courses
   const totalCoursePages = Math.ceil(db.courses.length / COURSES_PER_PAGE);
@@ -241,50 +248,59 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f0f2f5', fontFamily: 'var(--sans)' }}>
+    <div style={{ minHeight: '100vh', background: '#f0f2f5', fontFamily: 'var(--sans)', overflowX: 'hidden' }}>
       <style>{`
+        .admin-layout, .admin-content, .admin-content * { box-sizing: border-box; }
         @media (max-width: 768px) {
-          .admin-layout { flex-direction: column !important; padding: 0 !important; gap: 0 !important; }
-          .admin-sidebar { width: 100% !important; flex-direction: row !important; overflow-x: auto !important; padding: 8px !important; display: ${sidebarOpen ? 'flex' : 'none'} !important; flex-wrap: wrap !important; }
-          .admin-sidebar button { white-space: nowrap !important; font-size: 12px !important; padding: 8px 12px !important; }
-          .admin-content { border-radius: 0 !important; margin: 0 !important; }
+          .admin-layout { flex-direction: column !important; padding: 0 0 100px !important; gap: 0 !important; }
+          .admin-sidebar { display: none !important; }
+          .admin-content { border-radius: 0 !important; margin: 0 !important; padding: 22px 14px 30px !important; }
           .admin-header-title { font-size: 16px !important; }
-          .course-grid { grid-template-columns: 1fr 1fr !important; }
+          .course-grid { grid-template-columns: 1fr !important; }
           .contact-grid { grid-template-columns: 1fr !important; }
-          .modal-content { width: calc(100vw - 40px) !important; max-width: 100% !important; }
+          .modal-content { width: calc(100vw - 24px) !important; max-width: 100% !important; padding: 20px !important; border-radius: 22px !important; }
           .blog-grid { grid-template-columns: 1fr !important; }
+          .admin-top-actions { gap: 6px !important; }
+          .admin-top-actions a, .admin-top-actions button { padding: 8px 9px !important; font-size: 12px !important; }
+          .mobile-admin-nav { display: block !important; }
+          .mobile-more-backdrop { display: ${sidebarOpen ? 'block' : 'none'} !important; }
+          .mobile-more-sheet { transform: translateY(${sidebarOpen ? '0' : '110%'}) !important; }
+          .course-admin-list-card { display: block !important; border-radius: 22px !important; }
+          .course-admin-image { width: 100% !important; height: 150px !important; }
+          .course-admin-delete-wrap { padding: 0 16px 16px !important; }
+          .course-admin-delete { width: 100% !important; justify-content: center !important; }
         }
-        .admin-sidebar button:hover { background: rgba(15,110,86,0.1) !important; color: #0F6E56 !important; }
+        .admin-sidebar button:hover { background: rgba(255,255,255,0.09) !important; color: #fff !important; }
+        .mobile-admin-nav { display: none; }
       `}</style>
 
       {/* Header */}
       <div style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '0 24px', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1300px', margin: '0 auto', height: '64px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', fontSize: '22px' }} className="menu-btn">☰</button>
             <img src="/kvtc_logo.png" alt="KVTC" className="kvtc-logo-crop" style={{ width: '40px', height: '40px' }} />
             <h1 className="admin-header-title" style={{ fontFamily: 'var(--serif)', fontSize: '20px', margin: 0, color: '#1a1a1a' }}>Admin Dashboard</h1>
           </div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div className="admin-top-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <Link href="/" style={{ color: '#666', textDecoration: 'none', fontWeight: 500, fontSize: '13px', padding: '8px 12px', borderRadius: '8px', border: '1px solid #eee' }}>View Site</Link>
             <button onClick={handleLogout} style={{ background: '#fff', border: '1px solid #ffccc7', color: '#ff4444', cursor: 'pointer', fontWeight: 600, fontSize: '13px', padding: '8px 12px', borderRadius: '8px' }}>Logout</button>
             <button onClick={handleSave} style={{ ...btnStyle, padding: '10px 20px' }} disabled={saving}>{saving ? 'Saving...' : '💾 Save All'}</button>
           </div>
         </div>
-        <style>{`@media(max-width:768px){.menu-btn{display:block !important;}.admin-header-title{font-size:16px!important;}}`}</style>
+        <style>{`@media(max-width:768px){.admin-header-title{font-size:16px!important;}}`}</style>
       </div>
 
       <div className="admin-layout" style={{ display: 'flex', maxWidth: '1300px', margin: '0 auto', gap: '24px', padding: '24px', alignItems: 'flex-start' }}>
 
         {/* Sidebar */}
-        <div className="admin-sidebar" style={{ width: '220px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '4px', background: '#fff', borderRadius: '14px', padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', position: 'sticky', top: '88px', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
+        <div className="admin-sidebar" style={{ width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '5px', background: 'linear-gradient(180deg,#10251f,#0F3F35)', borderRadius: '20px', padding: '14px', boxShadow: '0 18px 50px rgba(4,28,22,0.18)', position: 'sticky', top: '88px', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto', border: '1px solid rgba(255,255,255,.08)' }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => { setActiveTab(t.id); setSidebarOpen(false); }} style={{
               display: 'flex', alignItems: 'center', gap: '10px',
-              textAlign: 'left', padding: '11px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-              background: activeTab === t.id ? '#0F6E56' : 'transparent',
-              color: activeTab === t.id ? '#fff' : '#555',
-              fontWeight: activeTab === t.id ? 700 : 500,
+              textAlign: 'left', padding: '12px 14px', borderRadius: '13px', border: activeTab === t.id ? '1px solid rgba(255,255,255,.28)' : '1px solid transparent', cursor: 'pointer',
+              background: activeTab === t.id ? 'linear-gradient(135deg,#1D9E75,#378ADD)' : 'transparent',
+              color: activeTab === t.id ? '#fff' : 'rgba(255,255,255,.72)',
+              fontWeight: activeTab === t.id ? 800 : 650,
               fontSize: '13px', transition: '0.2s',
             }}>
               {t.icon}
@@ -509,8 +525,8 @@ export default function AdminDashboard() {
                 {pagedCourses.map((c) => {
                   const i = db.courses.findIndex(x => x.id === c.id);
                   return (
-                    <div key={c.id} style={{ border: '1.5px solid #eee', borderRadius: '12px', overflow: 'hidden', display: 'flex', gap: '0' }}>
-                      <div style={{ width: '100px', flexShrink: 0, background: '#f0f0f0', overflow: 'hidden' }}>
+                    <div key={c.id} className="course-admin-list-card" style={{ border: '1px solid rgba(15,110,86,0.12)', borderRadius: '18px', overflow: 'hidden', display: 'flex', gap: '0', background: 'linear-gradient(135deg,#ffffff,#fbfdfc)', boxShadow: '0 10px 32px rgba(15,57,49,0.06)' }}>
+                      <div className="course-admin-image" style={{ width: '120px', flexShrink: 0, background: '#eaf3ef', overflow: 'hidden' }}>
                         <img src={c.img || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&q=60'} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '90px' }} />
                       </div>
                       <div style={{ flex: 1, padding: '14px 16px' }}>
@@ -563,8 +579,8 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                       </div>
-                      <div style={{ padding: '14px', display: 'flex', alignItems: 'center' }}>
-                        <button onClick={() => setDb({...db, courses: db.courses.filter(x => x.id !== c.id)})} style={{ background: '#fff5f5', color: '#ff4444', border: '1px solid #ffccc7', borderRadius: '8px', padding: '8px 12px', cursor: 'pointer', fontWeight: 600, fontSize: '12px' }}>Delete</button>
+                      <div className="course-admin-delete-wrap" style={{ padding: '14px', display: 'flex', alignItems: 'center' }}>
+                        <button className="course-admin-delete" onClick={() => setDb({...db, courses: db.courses.filter(x => x.id !== c.id)})} style={{ background: '#fff5f5', color: '#b42318', border: '1px solid #ffccc7', borderRadius: '10px', padding: '10px 13px', cursor: 'pointer', fontWeight: 750, fontSize: '12px', display: 'inline-flex' }}>Delete</button>
                       </div>
                     </div>
                   );
@@ -608,20 +624,30 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ── BLOG MANAGER ── */}
+          {/* ── LATEST NEWS MANAGER ── */}
           {activeTab === 'blog' && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
-                <h2 style={{ fontFamily: 'var(--serif)', margin: 0, fontSize: '22px' }}>Blog Manager</h2>
-                <button onClick={() => setDb({...db, blogs: [{ id: 'blog-'+Date.now(), slug: 'new-post-'+Date.now(), title: 'New Post Title', excerpt: 'Short summary...', content: 'Full article content here.', image: '', date: new Date().toISOString().split('T')[0] }, ...db.blogs]})} style={{...btnStyle, background: '#1a1a1a'}}>+ New Post</button>
+                <div>
+                  <h2 style={{ fontFamily: 'var(--serif)', margin: 0, fontSize: '22px' }}>Latest News Manager</h2>
+                  <p style={{ color: '#888', margin: '4px 0 0', fontSize: '13px' }}>Create articles, notices, news updates, and stories shown in the Latest News section.</p>
+                </div>
+                <button onClick={() => setDb({...db, blogs: [{ id: 'blog-'+Date.now(), slug: 'new-update-'+Date.now(), type: 'News', title: 'New Update Title', excerpt: 'Short summary...', content: 'Full article content here.', image: '', date: new Date().toISOString().split('T')[0], badge: '' }, ...(db.blogs || [])]})} style={{...btnStyle, background: '#1a1a1a'}}>+ New Update</button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {db.blogs.map((blog, i) => (
+                {(db.blogs || []).map((blog, i) => (
                   <div key={blog.id} style={{ padding: '24px', border: '1.5px solid #eee', borderRadius: '12px', position: 'relative' }}>
                     <button onClick={() => setDb({...db, blogs: db.blogs.filter(b => b.id !== blog.id)})} style={{ position: 'absolute', top: '24px', right: '24px', background: '#ff4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontSize: '12px' }}>Delete</button>
                     <div className="blog-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                       <div><label style={labelStyle}>Title</label><input type="text" value={blog.title} onChange={e => { const n=[...db.blogs]; n[i].title=e.target.value; n[i].slug=e.target.value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)+/g,''); setDb({...db,blogs:n}); }} style={inputStyle} /></div>
                       <div><label style={labelStyle}>Date</label><input type="date" value={blog.date} onChange={e => { const n=[...db.blogs]; n[i].date=e.target.value; setDb({...db,blogs:n}); }} style={inputStyle} /></div>
+                      <div>
+                        <label style={labelStyle}>Content Type</label>
+                        <select value={blog.type || 'News'} onChange={e => { const n=[...db.blogs]; n[i].type=e.target.value; setDb({...db,blogs:n}); }} style={inputStyle}>
+                          {['News', 'Article', 'Event', 'Notice', 'Student Story', 'Announcement'].map(type => <option key={type}>{type}</option>)}
+                        </select>
+                      </div>
+                      <div><label style={labelStyle}>Badge / Label</label><input type="text" value={blog.badge || ''} placeholder="e.g. Important, New, Success Story" onChange={e => { const n=[...db.blogs]; n[i].badge=e.target.value; setDb({...db,blogs:n}); }} style={inputStyle} /></div>
                     </div>
                     <label style={labelStyle}>Cover Image URL</label>
                     <div style={{ display: 'flex', gap: '8px' }}>
@@ -811,17 +837,17 @@ export default function AdminDashboard() {
             );
           })()}
 
-          {/* ── EVENTS MANAGER ── */}
+          {/* ── CALENDAR EVENTS MANAGER ── */}
           {activeTab === 'events' && (() => {
             const events = db.events || [];
-            const emptyEvent = { id: '', title: '', date: '', time: '', venue: '', category: 'Open Day', description: '', image: '', badge: '' };
+            const emptyEvent = { id: '', slug: '', title: '', date: '', time: '', venue: '', category: 'Open Day', description: '', image: '', badge: '' };
             const categories = ['Open Day', 'Exams', 'Exhibition', 'Orientation', 'Sports', 'Graduation', 'Workshop', 'Other'];
             return (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '12px' }}>
                   <div>
-                    <h2 style={{ fontFamily: 'var(--serif)', marginBottom: '6px', fontSize: '22px' }}>Events Manager</h2>
-                    <p style={{ color: '#888', fontSize: '14px' }}>Create upcoming events that automatically appear on the homepage.</p>
+                    <h2 style={{ fontFamily: 'var(--serif)', marginBottom: '6px', fontSize: '22px' }}>Calendar Events Manager</h2>
+                    <p style={{ color: '#888', fontSize: '14px' }}>Create open days, orientations, graduations, and school events. They appear inside Latest News and each gets its own reading page.</p>
                   </div>
                   <button onClick={() => {
                     const id = 'evt-' + Date.now();
@@ -852,7 +878,10 @@ export default function AdminDashboard() {
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }} className="form-r">
                         <div>
                           <label style={labelStyle}>Event Title *</label>
-                          <input style={inputStyle} value={ev.title} placeholder="e.g. 2026 Open Day" onChange={e => setDb(d => ({ ...d, events: d.events.map((x, j) => j === i ? { ...x, title: e.target.value } : x) }))} />
+                          <input style={inputStyle} value={ev.title} placeholder="e.g. 2026 Open Day" onChange={e => {
+                            const title = e.target.value;
+                            setDb(d => ({ ...d, events: d.events.map((x, j) => j === i ? { ...x, title, slug: title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)+/g,'') } : x) }));
+                          }} />
                         </div>
                         <div>
                           <label style={labelStyle}>Category</label>
@@ -1206,15 +1235,155 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      <nav className="mobile-admin-nav" aria-label="Admin mobile navigation">
+        <div className="mobile-more-backdrop" onClick={() => setSidebarOpen(false)} />
+        <div className="mobile-more-sheet" aria-hidden={!sidebarOpen}>
+          <div style={{ width: '42px', height: '4px', borderRadius: '999px', background: '#d7dfdd', margin: '0 auto 14px' }} />
+          <h3 style={{ margin: '0 0 12px', fontSize: '15px', color: '#10251f' }}>More Admin Sections</h3>
+          <div className="mobile-more-scroll">
+            {mobileMoreGroups.map(group => (
+              <section key={group.title} className="mobile-more-group">
+                <h4>{group.title}</h4>
+                <div>
+                  {group.tabs.map(tab => (
+                    <button key={tab.id} type="button" onClick={() => { setActiveTab(tab.id); setSidebarOpen(false); }} className={activeTab === tab.id ? 'active' : ''}>
+                      {tab.icon}
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </div>
+        <div className="mobile-admin-bar">
+          {mobilePrimary.map(tab => (
+            <button key={tab.id} type="button" onClick={() => { setActiveTab(tab.id); setSidebarOpen(false); }} className={activeTab === tab.id ? 'active' : ''}>
+              {tab.icon}
+              <span>{tab.id === 'analytics' ? 'Home' : tab.id === 'applications' ? 'Apps' : tab.label.replace('Latest ', '')}</span>
+            </button>
+          ))}
+          <button type="button" onClick={() => setSidebarOpen(open => !open)} className={sidebarOpen ? 'active' : ''}>
+            <LayoutGrid size={16} />
+            <span>More</span>
+          </button>
+        </div>
+        <style>{`
+          .mobile-more-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 850;
+            background: rgba(8, 22, 18, .38);
+            backdrop-filter: blur(3px);
+          }
+          .mobile-more-sheet {
+            position: fixed;
+            left: 12px;
+            right: 12px;
+            bottom: 88px;
+            z-index: 900;
+            padding: 16px;
+            max-height: min(62vh, 520px);
+            border-radius: 24px;
+            background: rgba(255,255,255,.96);
+            border: 1px solid rgba(15,110,86,.12);
+            box-shadow: 0 24px 70px rgba(4,28,22,.22);
+            transition: transform .28s cubic-bezier(.2,.8,.2,1);
+          }
+          .mobile-more-scroll {
+            max-height: calc(min(62vh, 520px) - 58px);
+            overflow-y: auto;
+            padding-right: 2px;
+          }
+          .mobile-more-group + .mobile-more-group { margin-top: 14px; }
+          .mobile-more-group h4 {
+            margin: 0 0 8px;
+            color: #71807c;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+          }
+          .mobile-more-group > div {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+          }
+          .mobile-more-sheet button {
+            min-height: 54px;
+            border: 1px solid #e7eeec;
+            border-radius: 16px;
+            background: #f8fbfa;
+            color: #52625e;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: 750;
+            text-align: left;
+          }
+          .mobile-more-sheet button.active {
+            background: #0F6E56;
+            color: #fff;
+            border-color: #0F6E56;
+          }
+          .mobile-admin-bar {
+            position: fixed;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            z-index: 950;
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 6px;
+            padding: 8px;
+            border-radius: 24px;
+            background: rgba(255,255,255,.96);
+            border: 1px solid rgba(15,110,86,.1);
+            box-shadow: 0 18px 60px rgba(4,28,22,.2);
+            backdrop-filter: blur(14px);
+          }
+          .mobile-admin-bar button {
+            min-width: 0;
+            border: 0;
+            border-radius: 17px;
+            background: transparent;
+            color: #63736f;
+            padding: 9px 3px;
+            display: grid;
+            justify-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 800;
+          }
+          .mobile-admin-bar button.active {
+            background: linear-gradient(135deg, #0F6E56, #245A87);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(15,110,86,.22);
+          }
+          .mobile-admin-bar span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+          }
+        `}</style>
+      </nav>
+
       {/* ── ADD COURSE MODAL ── */}
       {courseModal === 'add' && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setCourseModal(null)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: '20px', padding: '32px', width: '560px', maxWidth: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.2)', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 style={{ fontFamily: 'var(--serif)', margin: 0, fontSize: '22px' }}>Add New Course</h2>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(5,20,16,0.58)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setCourseModal(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ background: 'linear-gradient(180deg,#ffffff,#fbfdfc)', border: '1px solid rgba(15,110,86,.12)', borderRadius: '28px', padding: '32px', width: '720px', maxWidth: '100%', boxShadow: '0 32px 90px rgba(4,28,22,0.28)', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', gap: '18px' }}>
+              <div>
+                <span style={{ display: 'inline-block', padding: '6px 12px', borderRadius: '999px', background: '#E1F5EE', color: '#0F6E56', fontSize: '11px', fontWeight: 850, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '10px' }}>Course Setup</span>
+                <h2 style={{ fontFamily: 'var(--serif)', margin: 0, fontSize: '28px', color: '#10251f' }}>Add New Course</h2>
+                <p style={{ color: '#71807c', margin: '8px 0 0', fontSize: '13px' }}>Create a polished course record for the public website, ARIA, and application flow.</p>
+              </div>
               <button onClick={() => setCourseModal(null)} style={{ background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="blog-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
               <div style={{ gridColumn: '1/-1' }}>
                 <label style={labelStyle}>Course Name *</label>
                 <input type="text" value={newCourse.name} onChange={e => setNewCourse({...newCourse, name: e.target.value})} style={inputStyle} placeholder="e.g. Plumbing" autoFocus />

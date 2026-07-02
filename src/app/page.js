@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import useEmblaCarousel from 'embla-carousel-react';
+import AutoScroll from 'embla-carousel-auto-scroll';
 import TrendingCoursesWidget from '@/components/TrendingCoursesWidget';
 
 // --- Custom Premium Icons ---
@@ -18,13 +21,13 @@ const IconBed = () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none
 
 // --- Animated Counter Hook ---
 function useCounter(target, duration = 2000, start = false) {
+  const isNum = !isNaN(parseInt(target));
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (!start) return;
     let startTime = null;
-    const isNum = !isNaN(parseInt(target));
     const numTarget = parseInt(target);
-    if (!isNum) { setCount(target); return; }
+    if (!isNum) return;
     const step = (timestamp) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
@@ -34,8 +37,8 @@ function useCounter(target, duration = 2000, start = false) {
       else setCount(numTarget);
     };
     requestAnimationFrame(step);
-  }, [start, target, duration]);
-  return count;
+  }, [start, target, duration, isNum]);
+  return isNum ? count : target;
 }
 
 // --- Fade In on Scroll ---
@@ -380,6 +383,408 @@ function TestimonialsCarousel({ testimonials }) {
   );
 }
 
+function slugifyText(value = '') {
+  return String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+}
+
+function normalizeLatestNews(blogs = [], events = []) {
+  const blogItems = blogs.map(item => ({
+    id: item.id,
+    title: item.title,
+    excerpt: item.excerpt || item.description || '',
+    image: item.image,
+    date: item.date,
+    kind: item.type || item.category || 'Article',
+    badge: item.badge,
+    href: `/blog/${item.slug || slugifyText(item.title || item.id)}`,
+  }));
+
+  const eventItems = events.map(item => ({
+    id: item.id,
+    title: item.title,
+    excerpt: item.description || '',
+    image: item.image,
+    date: item.date,
+    kind: item.category || 'Event',
+    badge: item.badge || item.time,
+    href: `/blog/${item.slug || slugifyText(item.title || item.id)}`,
+  }));
+
+  return [...blogItems, ...eventItems]
+    .filter(item => item.title)
+    .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime())
+    .slice(0, 12);
+}
+
+function LatestNewsRail({ items }) {
+  const autoScrollPlugin = useMemo(
+    () => AutoScroll({
+      speed: 0.55,
+      startDelay: 500,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+      stopOnFocusIn: true,
+      playOnInit: true,
+    }),
+    []
+  );
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      align: 'start',
+      container: '.latest-news-track',
+      dragFree: false,
+      containScroll: false,
+      skipSnaps: false,
+    },
+    [autoScrollPlugin]
+  );
+  const [controlPulse, setControlPulse] = useState(0);
+
+  const move = direction => {
+    if (!emblaApi) return;
+    try {
+      autoScrollPlugin.stop?.();
+    } catch {
+      // AutoScroll can lose its internal context during hot reload; manual navigation should still work.
+    }
+    if (direction > 0) {
+      emblaApi.scrollNext(true);
+    } else {
+      emblaApi.scrollPrev(true);
+    }
+    setControlPulse(value => value + 1);
+  };
+
+  if (!items.length) return null;
+
+  return (
+    <section className="latest-news-section" aria-labelledby="latest-news-title">
+      <div className="latest-news-bg one" />
+      <div className="latest-news-bg two" />
+      <FadeIn style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '22px', marginBottom: '34px', position: 'relative', zIndex: 1 }}>
+        <div>
+          <span className="latest-news-eyebrow">Latest News</span>
+          <h2 id="latest-news-title">Campus Updates, Events & Stories</h2>
+          <p>Read the latest announcements, student stories, upcoming events, and important notices from Kinoo VTC.</p>
+        </div>
+        <div className="latest-news-controls" aria-label="Latest news controls">
+          <button type="button" onClick={() => move(-1)} aria-label="Previous latest news item">‹</button>
+          <button type="button" onClick={() => move(1)} aria-label="Next latest news item">›</button>
+        </div>
+      </FadeIn>
+
+      <div className="latest-news-rail-shell">
+        <div className="latest-news-mobile-controls" aria-label="Latest news mobile controls">
+          <button type="button" onClick={() => move(-1)} aria-label="Previous latest news item">â€¹</button>
+          <button type="button" onClick={() => move(1)} aria-label="Next latest news item">â€º</button>
+        </div>
+      <div
+        ref={emblaRef}
+        className="latest-news-rail"
+        data-pulse={controlPulse}
+        tabIndex={0}
+        aria-label="Scrollable latest news cards"
+      >
+        <div className="latest-news-mobile-controls" aria-label="Latest news mobile controls">
+          <button type="button" onClick={() => move(-1)} aria-label="Previous latest news item">‹</button>
+          <button type="button" onClick={() => move(1)} aria-label="Next latest news item">›</button>
+        </div>
+        <div className="latest-news-track">
+        {items.map((item, index) => {
+          const d = item.date ? new Date(item.date) : null;
+          const dateLabel = d && !Number.isNaN(d.getTime())
+            ? d.toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' })
+            : 'Latest update';
+          return (
+            <Link href={item.href} key={`${item.id}-${index}`} className="latest-news-card">
+              <div className="latest-news-image">
+                <Image src={item.image || '/hero-students.jpg'} alt={item.title} fill sizes="(max-width: 640px) 86vw, 360px" style={{ objectFit: 'cover' }} unoptimized />
+                <span>{item.kind}</span>
+              </div>
+              <div className="latest-news-body">
+                <div className="latest-news-meta">
+                  <span>{dateLabel}</span>
+                  {item.badge && <strong>{item.badge}</strong>}
+                </div>
+                <h3>{item.title}</h3>
+                <p>{item.excerpt}</p>
+                <div className="latest-news-link">Read more <span>→</span></div>
+              </div>
+            </Link>
+          );
+        })}
+        </div>
+      </div>
+
+      </div>
+
+      <div className="latest-news-hint">Use the arrows or swipe sideways. Auto-scroll pauses when you interact.</div>
+
+      <style>{`
+        .latest-news-section {
+          position: relative;
+          overflow: hidden;
+          padding: 96px 8%;
+          background: linear-gradient(135deg, #f8f7f4 0%, #eef7f4 58%, #f8fbff 100%);
+        }
+        .latest-news-bg {
+          position: absolute;
+          border-radius: 999px;
+          pointer-events: none;
+          filter: blur(2px);
+        }
+        .latest-news-bg.one {
+          width: 360px;
+          height: 360px;
+          right: -120px;
+          top: -120px;
+          background: rgba(55,138,221,.13);
+        }
+        .latest-news-bg.two {
+          width: 300px;
+          height: 300px;
+          left: -120px;
+          bottom: -130px;
+          background: rgba(15,110,86,.12);
+        }
+        .latest-news-eyebrow {
+          display: inline-block;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #245A87;
+          background: rgba(55,138,221,.12);
+          padding: 7px 15px;
+          border-radius: 999px;
+          margin-bottom: 16px;
+        }
+        .latest-news-section h2 {
+          font-family: var(--serif);
+          font-size: clamp(2rem, 4vw, 3rem);
+          color: #10251f;
+          margin: 0 0 12px;
+        }
+        .latest-news-section p {
+          color: #62716d;
+          font-size: 1.05rem;
+          max-width: 580px;
+          margin: 0;
+          line-height: 1.7;
+        }
+        .latest-news-controls { display: flex; gap: 10px; }
+        .latest-news-mobile-controls { display: none; }
+        .latest-news-controls button,
+        .latest-news-mobile-controls button {
+          width: 46px;
+          height: 46px;
+          border: 1px solid rgba(15,110,86,.18);
+          border-radius: 999px;
+          background: #fff;
+          color: #0F6E56;
+          font-size: 0;
+          line-height: 1;
+          cursor: pointer;
+          box-shadow: 0 12px 28px rgba(11,51,43,.1);
+          transition: transform .2s, box-shadow .2s, background .2s;
+        }
+        .latest-news-controls button::before,
+        .latest-news-mobile-controls button::before {
+          display: block;
+          font-size: 28px;
+          line-height: 1;
+        }
+        .latest-news-controls button:first-child::before,
+        .latest-news-mobile-controls button:first-child::before {
+          content: "\\2039";
+        }
+        .latest-news-controls button:last-child::before,
+        .latest-news-mobile-controls button:last-child::before {
+          content: "\\203A";
+        }
+        .latest-news-controls button:hover,
+        .latest-news-mobile-controls button:hover {
+          transform: translateY(-2px);
+          background: #0F6E56;
+          color: #fff;
+          box-shadow: 0 18px 40px rgba(15,110,86,.22);
+        }
+        .latest-news-rail-shell {
+          position: relative;
+          z-index: 1;
+          width: 100vw;
+          margin-left: calc(50% - 50vw);
+        }
+        .latest-news-rail {
+          position: static;
+          width: 100%;
+          padding-left: 8vw;
+          padding-right: 8vw;
+          display: block;
+          overflow: hidden;
+          scroll-behavior: auto;
+          padding-top: 8px;
+          padding-bottom: 24px;
+          scrollbar-width: none;
+        }
+        .latest-news-rail::-webkit-scrollbar { display: none; }
+        .latest-news-track {
+          display: flex;
+          gap: 22px;
+          touch-action: pan-y pinch-zoom;
+        }
+        .latest-news-card {
+          flex: 0 0 min(360px, 84vw);
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          min-height: 430px;
+          overflow: hidden;
+          background: rgba(255,255,255,.92);
+          border: 1px solid rgba(16,37,31,.08);
+          border-radius: 24px;
+          text-decoration: none;
+          box-shadow: 0 10px 36px rgba(18,45,40,.08);
+          transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+          backdrop-filter: blur(12px);
+        }
+        .latest-news-card:hover,
+        .latest-news-card:focus-visible {
+          transform: translateY(-8px);
+          border-color: rgba(55,138,221,.28);
+          box-shadow: 0 24px 70px rgba(18,45,40,.16);
+          outline: none;
+        }
+        .latest-news-image {
+          position: relative;
+          aspect-ratio: 16 / 10;
+          overflow: hidden;
+          background: #dfeae7;
+        }
+        .latest-news-image img { transition: transform .55s ease; }
+        .latest-news-card:hover .latest-news-image img { transform: scale(1.06); }
+        .latest-news-image span {
+          position: absolute;
+          top: 15px;
+          left: 15px;
+          padding: 7px 12px;
+          border-radius: 999px;
+          background: rgba(255,255,255,.93);
+          color: #0F6E56;
+          font-size: 11px;
+          font-weight: 850;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          box-shadow: 0 8px 22px rgba(0,0,0,.12);
+        }
+        .latest-news-body {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          padding: 22px;
+        }
+        .latest-news-meta {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 12px;
+          color: #74837f;
+          font-size: 12px;
+          font-weight: 700;
+        }
+        .latest-news-meta strong {
+          max-width: 140px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          color: #BA7517;
+          background: #FFF8E8;
+          padding: 4px 9px;
+          border-radius: 999px;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: .06em;
+        }
+        .latest-news-body h3 {
+          margin: 0 0 10px;
+          color: #10251f;
+          font-size: 19px;
+          line-height: 1.3;
+        }
+        .latest-news-body p {
+          flex: 1;
+          color: #667570;
+          font-size: 14px;
+          line-height: 1.65;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .latest-news-link {
+          margin-top: 18px;
+          color: #0F6E56;
+          font-size: 13px;
+          font-weight: 850;
+        }
+        .latest-news-link span { transition: transform .2s; display: inline-block; }
+        .latest-news-card:hover .latest-news-link span { transform: translateX(4px); }
+        .latest-news-hint {
+          position: relative;
+          z-index: 1;
+          color: #7b8a86;
+          font-size: 12px;
+          font-weight: 700;
+          margin-top: 4px;
+        }
+        @media(max-width: 640px) {
+          .latest-news-section { padding: 76px 5%; }
+          .latest-news-rail { padding-left: 5vw; padding-right: 5vw; }
+          .latest-news-controls { display: none; }
+          .latest-news-rail > .latest-news-mobile-controls {
+            display: none;
+          }
+          .latest-news-rail-shell > .latest-news-mobile-controls {
+            position: absolute;
+            z-index: 4;
+            top: clamp(92px, 31vw, 132px);
+            left: 6vw;
+            right: 6vw;
+            width: auto;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+          }
+          .latest-news-mobile-controls button {
+            width: 42px;
+            height: 42px;
+            pointer-events: auto;
+            background: rgba(255,255,255,.94);
+            color: #0F6E56;
+            border-color: rgba(255,255,255,.68);
+            box-shadow: 0 12px 30px rgba(7,36,30,.22);
+            backdrop-filter: blur(10px);
+          }
+          .latest-news-mobile-controls button:hover {
+            transform: translateY(-1px);
+            background: #0F6E56;
+            color: #fff;
+          }
+          .latest-news-card { flex: 0 0 90vw; min-height: 408px; border-radius: 20px; }
+          .latest-news-body { padding: 19px; }
+          .latest-news-hint { font-size: 11px; }
+        }
+      `}</style>
+    </section>
+  );
+}
+
 export default function Home() {
   const [db, setDb] = useState(null);
   const [homeCourseSearch, setHomeCourseSearch] = useState('');
@@ -411,6 +816,7 @@ export default function Home() {
   const intake = db?.intake || { isOngoing: true, yearText: "2026" };
 
   const events = db?.events || [];
+  const latestNews = normalizeLatestNews(db?.blogs || [], events);
   const submitCourseSearch = (event) => {
     event.preventDefault();
     const query = homeCourseSearch.trim();
@@ -455,9 +861,18 @@ export default function Home() {
           </em>
         </h1>
 
-        <p style={{ color: 'rgba(255,255,255,0.88)', fontSize: '1.1rem', maxWidth: '520px', marginBottom: '40px', animation: 'heroFadeUp 0.8s 0.35s both' }}>
-          Kiambu County&apos;s premier public vocational training centre — NITA & KNEC-certified courses in 13+ disciplines. Affordable. Practical. Life-changing.
+        <p className="hero-lead-copy" style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.1rem', maxWidth: '620px', marginBottom: '18px', animation: 'heroFadeUp 0.8s 0.35s both' }}>
+          Start your practical career journey with NITA and KNEC-certified training across 13+ disciplines. Affordable. Hands-on. Built for real opportunities.
         </p>
+
+        <div className="hero-intake-strip" aria-label="Annual intake months">
+          <span className="hero-intake-kicker">Intakes open every year</span>
+          <div>
+            {['January', 'May', 'September'].map(month => (
+              <span key={month}>{month}</span>
+            ))}
+          </div>
+        </div>
 
         <form className="home-course-search" onSubmit={submitCourseSearch}>
           <div>
@@ -521,8 +936,46 @@ export default function Home() {
           }
           .home-course-search {
             width: min(680px, 100%);
-            margin: -14px 0 30px;
+            margin: 0 0 30px;
             animation: heroFadeUp .8s .43s both;
+          }
+          .hero-intake-strip {
+            width: fit-content;
+            max-width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 30px;
+            padding: 8px 10px 8px 16px;
+            border: 1px solid rgba(255,255,255,.24);
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+            color: #fff;
+            box-shadow: 0 16px 38px rgba(5,34,29,.18);
+            backdrop-filter: blur(12px);
+            animation: heroFadeUp .8s .4s both;
+          }
+          .hero-intake-kicker {
+            color: rgba(255,255,255,.78);
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+          }
+          .hero-intake-strip > div {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+          }
+          .hero-intake-strip > div span {
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.94);
+            color: #0F6E56;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: inset 0 0 0 1px rgba(15,110,86,.08);
           }
           .home-course-search > div {
             min-height: 58px;
@@ -608,7 +1061,31 @@ export default function Home() {
             display: block;
           }
           @media(max-width:560px) {
-            .home-course-search { margin-top: -18px; }
+            .hero-lead-copy {
+              font-size: 1rem !important;
+              line-height: 1.65 !important;
+              margin-bottom: 16px !important;
+            }
+            .hero-intake-strip {
+              width: 100%;
+              align-items: flex-start;
+              flex-direction: column;
+              gap: 8px;
+              border-radius: 18px;
+              padding: 13px;
+              margin-bottom: 24px;
+            }
+            .hero-intake-strip > div {
+              width: 100%;
+              display: grid;
+              grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            .hero-intake-strip > div span {
+              text-align: center;
+              padding: 8px 6px;
+              font-size: 11px;
+            }
+            .home-course-search { margin-top: 0; }
             .home-course-search > div { min-height: 52px; padding-left: 13px; }
             .home-course-search input { font-size: 14px; }
             .home-course-search button { padding: 0 13px; font-size: 11px; }
@@ -781,9 +1258,9 @@ export default function Home() {
 
           <FadeIn delay={0.2} style={{ minWidth: 0 }}>
             <span style={{ display: 'inline-block', fontSize: '11px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: '#0F6E56', background: '#E1F5EE', padding: '6px 14px', borderRadius: '100px', marginBottom: '16px' }}>About Us</span>
-            <h2 className="about-home-title" style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#1a1a1a', lineHeight: 1.2, marginBottom: '20px' }}>Shaping Tomorrow's <em style={{ fontStyle: 'italic', color: '#0F6E56' }}>Skilled Workforce</em></h2>
+            <h2 className="about-home-title" style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: '#1a1a1a', lineHeight: 1.2, marginBottom: '20px' }}>Shaping Tomorrow&apos;s <em style={{ fontStyle: 'italic', color: '#0F6E56' }}>Skilled Workforce</em></h2>
             <p className="about-home-intro" style={{ color: '#888', fontSize: '15px', marginBottom: '12px' }}>
-              Kinoo VTC is a public institution under the <strong style={{ color: '#1a1a1a' }}>County Government of Kiambu</strong>, located in Kikuyu along the Nairobi-Nakuru highway. We equip trainees with practical skills that open real doors in Kenya's economy.
+              Kinoo VTC is a public institution under the <strong style={{ color: '#1a1a1a' }}>County Government of Kiambu</strong>, located in Kikuyu along the Nairobi-Nakuru highway. We equip trainees with practical skills that open real doors in Kenya&apos;s economy.
             </p>
             {[
               'Hands-on training in fully equipped workshops across all departments',
@@ -821,7 +1298,7 @@ export default function Home() {
                 <span style={{ color: '#4ade80', fontSize: '14px', fontWeight: 600 }}>Duration: 1–3 Months</span>
               </div>
               <h3 className="fast-track-title" style={{ fontFamily: 'var(--serif)', fontSize: '2.2rem', color: '#fff', marginBottom: '8px' }}>Fast-Track Your Career</h3>
-              <p style={{ color: '#aaa', fontSize: '15px', maxWidth: '500px' }}>Can't commit to a full year? We offer intensive, highly practical short courses tailored for working adults and those looking for quick skills.</p>
+              <p style={{ color: '#aaa', fontSize: '15px', maxWidth: '500px' }}>Can&apos;t commit to a full year? We offer intensive, highly practical short courses tailored for working adults and those looking for quick skills.</p>
             </div>
             <Link className="fast-track-action" href="/courses?category=short" style={{ background: '#0F6E56', color: '#fff', padding: '16px 32px', borderRadius: '10px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)' }}>
               Explore Short Courses →
@@ -1045,88 +1522,8 @@ export default function Home() {
         <GalleryCarousel images={galleryImages} />
       </section>
 
-      {/* ── EVENTS ── */}
-      {events.filter(ev => {
-        if (!ev.date) return true;
-        const evDate = new Date(ev.date);
-        evDate.setHours(23,59,59,999);
-        return evDate.getTime() >= Date.now();
-      }).length > 0 && (
-        <section style={{ padding: '96px 8%', background: '#f8f7f4' }}>
-          <FadeIn style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '24px', marginBottom: '56px' }}>
-            <div>
-              <span style={{ display: 'inline-block', fontSize: '11px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', color: '#BA7517', background: '#FFF8E8', padding: '6px 14px', borderRadius: '100px', marginBottom: '16px' }}>📅 School Calendar</span>
-              <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', color: '#1a1a1a', marginBottom: '12px' }}>Upcoming Events</h2>
-              <p style={{ color: '#888', fontSize: '1.05rem', maxWidth: '500px' }}>Mark your calendar — from open days to graduations, there's always something exciting happening at Kinoo VTC.</p>
-            </div>
-          </FadeIn>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '28px' }}>
-            {events.filter(ev => {
-              if (!ev.date) return true;
-              const evDate = new Date(ev.date);
-              evDate.setHours(23,59,59,999);
-              return evDate.getTime() >= Date.now();
-            }).map((ev, i) => {
-              const d = new Date(ev.date);
-              const day = d.toLocaleDateString('en-KE', { day: '2-digit' });
-              const month = d.toLocaleDateString('en-KE', { month: 'short' }).toUpperCase();
-              const year = d.getFullYear();
-              const catColors = {
-                'Open Day': { bg: '#E1F5EE', color: '#0F6E56' },
-                'Exams': { bg: '#FEE2E2', color: '#991B1B' },
-                'Exhibition': { bg: '#EDE9FE', color: '#5B21B6' },
-                'Orientation': { bg: '#DBEAFE', color: '#1E40AF' },
-                'Sports': { bg: '#FEF3C7', color: '#92400E' },
-                'Graduation': { bg: '#FFF8E8', color: '#BA7517' },
-              };
-              const cat = catColors[ev.category] || { bg: '#E1F5EE', color: '#0F6E56' };
-              return (
-                <FadeIn key={ev.id} delay={i * 0.07}>
-                  <div style={{ background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.06)', transition: 'transform 0.25s, box-shadow 0.25s', display: 'flex', flexDirection: 'column' }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = '0 20px 60px rgba(0,0,0,0.13)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.06)'; }}>
-                    {/* Image */}
-                    <div style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden', flexShrink: 0 }}>
-                      <img src={ev.image} alt={ev.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s' }}
-                        onMouseEnter={e => e.target.style.transform = 'scale(1.06)'}
-                        onMouseLeave={e => e.target.style.transform = 'scale(1)'} />
-                      {/* Date Badge Overlay */}
-                      <div style={{ position: 'absolute', top: '14px', left: '14px', background: '#fff', borderRadius: '12px', padding: '8px 14px', textAlign: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.15)', minWidth: '54px' }}>
-                        <div style={{ fontSize: '22px', fontWeight: 800, color: '#0F6E56', lineHeight: 1 }}>{day}</div>
-                        <div style={{ fontSize: '10px', fontWeight: 700, color: '#888', letterSpacing: '1px' }}>{month}</div>
-                        <div style={{ fontSize: '10px', color: '#aaa' }}>{year}</div>
-                      </div>
-                      <div style={{ position: 'absolute', top: '14px', right: '14px', display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end' }}>
-                        <div style={{ background: cat.bg, color: cat.color, fontSize: '10px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', padding: '5px 10px', borderRadius: '100px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>{ev.category}</div>
-                        <div style={{ background: '#0F6E56', color: '#fff', fontSize: '10px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', padding: '5px 10px', borderRadius: '100px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>Upcoming</div>
-                      </div>
-                    </div>
-                    {/* Body */}
-                    <div style={{ padding: '22px 24px 24px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                      <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#1a1a1a', marginBottom: '10px', lineHeight: 1.3 }}>{ev.title}</h3>
-                      <p style={{ fontSize: '13px', color: '#666', lineHeight: 1.6, marginBottom: '16px', flexGrow: 1 }}>{ev.description}</p>
-                      <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#555', fontWeight: 500 }}>
-                          <svg width="14" height="14" fill="none" stroke="#0F6E56" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                          {ev.time}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#555', fontWeight: 500 }}>
-                          <svg width="14" height="14" fill="none" stroke="#0F6E56" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                          {ev.venue}
-                        </div>
-                      </div>
-                      {ev.badge && (
-                        <div style={{ marginTop: '14px', display: 'inline-block', background: '#EF9F27', color: '#1a1a1a', fontSize: '11px', fontWeight: 700, padding: '5px 12px', borderRadius: '100px', alignSelf: 'flex-start' }}>{ev.badge}</div>
-                      )}
-                    </div>
-                  </div>
-                </FadeIn>
-              );
-            })}
-          </div>
-        </section>
-      )}
+      {/* ── LATEST NEWS ── */}
+      <LatestNewsRail items={latestNews} />
 
       {/* ── TESTIMONIALS CAROUSEL ── */}
       <TestimonialsCarousel testimonials={testimonials} />
