@@ -209,7 +209,7 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
                   <span style={{ fontSize: 18 }}>🛠️</span>
                 </div>
                 <div>
-                  <h3 style={{ fontFamily: 'var(--sans)', fontSize: 15, fontWeight: 700, color: '#1a1a1a', margin: 0 }}>Department Tools & Uniform</h3>
+                  <h3 style={{ fontFamily: 'var(--sans)', fontSize: 15, fontWeight: 700, color: '#1a1a1a', margin: 0 }}>Department Tools &amp; Uniform</h3>
                   <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#888', margin: 0 }}>Bring on your first day</p>
                 </div>
               </div>
@@ -276,64 +276,9 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
           <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: '#aaa', marginTop: 16 }}>🔒 Secure M-PESA payment · No hidden charges</p>
         </div>
       </FadeIn>
-      {/* Styles */}
       <style>{`
-        .application-steps {
-          width: min(100%, 560px);
-          margin: 0 auto 28px;
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          position: relative;
-          padding: 0 18px;
-        }
-        .application-steps::before {
-          content: '';
-          position: absolute;
-          top: 18px;
-          left: calc(16.666% + 18px);
-          right: calc(16.666% + 18px);
-          height: 2px;
-          background: rgba(0,0,0,0.1);
-        }
-        .step-item {
-          min-width: 0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          position: relative;
-          z-index: 1;
-        }
-        .step-circle {
-          width: 36px;
-          height: 36px;
-          font-size: 14px;
-          border: 4px solid #f8fbfa;
-          box-sizing: content-box;
-        }
-        .step-label {
-          width: 100%;
-          max-width: 130px;
-          font-size: 11px;
-          line-height: 1.25;
-          text-align: center;
-          white-space: normal;
-        }
-
         @media (max-width: 650px) {
           .pre-app-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-        }
-        @media (max-width: 580px) {
-          .application-steps { padding: 0 2px; margin-bottom: 24px; }
-          .application-steps::before {
-            top: 15px;
-            left: calc(16.666% + 4px);
-            right: calc(16.666% + 4px);
-          }
-          .step-circle { width: 30px; height: 30px; font-size: 12px; border-width: 3px; }
-          .step-label { font-size: 10px; max-width: 94px; margin-top: 5px !important; }
-        }
-        @media (max-width: 380px) {
-          .step-label { font-size: 9px; max-width: 82px; }
         }
       `}</style>
     </div>
@@ -345,23 +290,26 @@ function PreApplicationScreen({ course, dbData, onProceed }) {
 ───────────────────────────────────────── */
 function ApplyInner({ dbData }) {
   const searchParams = useSearchParams();
-  const courseSlug = searchParams.get('course') || '';
-  const preName = searchParams.get('name') || '';
-  const prePhone = searchParams.get('phone') || '';
+  const courseParam = searchParams.get('course') || '';
   const skipPre = searchParams.get('skipPre') === 'true';
   const courseList = dbData?.courses || [];
-  const preselectedCourse = courseList.find(c => c.name === courseSlug) || null;
 
-  const [step, setStep] = useState(skipPre ? 'form' : 'pre'); // 'pre' | 'form' | 'success'
-  const [applicantName, setApplicantName] = useState(preName);
-  const [applicantEmail, setApplicantEmail] = useState(prePhone);
+  // Match by slug first (links from department/course pages), then by full name (legacy)
+  const preselectedCourse =
+    courseList.find(c => c.slug === courseParam) ||
+    courseList.find(c => c.name === decodeURIComponent(courseParam)) ||
+    null;
+
+  // skipPre=true (from course detail page) → jump straight to form ONLY when course is found
+  const [step, setStep] = useState((skipPre && preselectedCourse) ? 'form' : 'pre');
+  const [applicantName, setApplicantName] = useState(searchParams.get('name') || '');
+  const [applicantEmail, setApplicantEmail] = useState('');
 
   const handleSuccess = (name, email) => {
     setApplicantName(name);
     setApplicantEmail(email);
     setStep('success');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Track apply completion in funnel
     fetch('/api/funnel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stage: 'apply_completes' }) }).catch(() => {});
   };
 
@@ -431,6 +379,7 @@ function ApplyInner({ dbData }) {
           .application-step-label { font-size: 9px; max-width: 82px; }
         }
       `}</style>
+
       {/* ── Page Header ── */}
       <div style={{
         padding: '130px 8% 56px',
@@ -439,7 +388,7 @@ function ApplyInner({ dbData }) {
         textAlign: 'center',
       }}>
         <FadeIn>
-          {/* Step Indicator */}
+          {/* Step Indicator — hide step 1 when skipPre was used */}
           {step !== 'success' && (
             <div className="application-steps">
               {[
@@ -502,24 +451,26 @@ function ApplyInner({ dbData }) {
         {step === 'form' && (
           <FadeIn>
             <div style={{ maxWidth: 800, margin: '0 auto' }}>
-              {/* Back button */}
-              <button
-                onClick={() => { setStep('pre'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  background: 'none', border: 'none', color: '#0F6E56',
-                  fontFamily: 'var(--sans)', fontSize: 14, fontWeight: 600,
-                  cursor: 'pointer', padding: '0 0 20px', transition: 'opacity 0.2s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-              >
-                ← Back to Requirements
-              </button>
+              {/* Back to Requirements — only show if skipPre was NOT used */}
+              {!skipPre && (
+                <button
+                  onClick={() => { setStep('pre'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    background: 'none', border: 'none', color: '#0F6E56',
+                    fontFamily: 'var(--sans)', fontSize: 14, fontWeight: 600,
+                    cursor: 'pointer', padding: '0 0 20px', transition: 'opacity 0.2s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                >
+                  ← Back to Requirements
+                </button>
+              )}
 
               <AdmissionForm
                 dbData={dbData}
-                selectedCoursePre={preselectedCourse?.name || courseSlug}
+                selectedCoursePre={preselectedCourse?.name || decodeURIComponent(courseParam)}
                 prefilledName={searchParams.get('name') || ''}
                 prefilledPhone={searchParams.get('phone') || ''}
                 prefilledIdNo={searchParams.get('idNo') || ''}

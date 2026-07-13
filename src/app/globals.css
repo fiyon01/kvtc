@@ -29,7 +29,7 @@ body {
   line-height: 1.7;
   overflow-x: hidden;
 }
-a { text-decoration: none; }
+a { text-decoration: none; color: inherit; }
 img { max-width: 100%; display: block; }
 
 /* Custom Premium Scrollbar */

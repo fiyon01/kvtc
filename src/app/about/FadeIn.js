@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 
-export function FadeIn({ children, delay = 0, style = {} }) {
+export function FadeIn({ children, delay = 0, style = {}, className = '' }) {
   const ref = useRef();
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -16,6 +16,7 @@ export function FadeIn({ children, delay = 0, style = {} }) {
   return (
     <div
       ref={ref}
+      className={className}
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(28px)',

@@ -512,24 +512,35 @@ function PaymentModal({ name, phone: initialPhone, amount, application, onClose,
 // ── Date Field ────────────────────────────────────────────────
 function DateField({ value, onChange, flex=1, maxWidth=180, required=false }) {
   const ref = useRef();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const fmt = (v) => {
-    if (!v) return "";
-    const [y,m,d] = v.split("-");
+    if (!v || typeof v !== 'string') return "";
+    const parts = v.split("-");
+    if (parts.length < 3) return v; // fallback: return raw value
+    const [y, m, d] = parts;
     const mnames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    return `${d} ${mnames[+m-1]} ${y}`;
+    const monthName = mnames[+m - 1];
+    return monthName ? `${d} ${monthName} ${y}` : v;
   };
+
+  // Only show the formatted value after client mount to avoid hydration mismatch
+  const displayValue = mounted ? (value && typeof value === 'string' ? fmt(value) : "dd mmm yyyy") : "dd mmm yyyy";
+  const displayColor = mounted && value ? "#000" : "#bbb";
+
   return (
     <div style={{ flex:`${flex} 1 auto`, maxWidth, minWidth:70, position:"relative", display:"inline-block" }}
       onClick={() => { try { ref.current.showPicker(); } catch { ref.current.click(); } }}>
-      <span style={{
+      <span suppressHydrationWarning style={{
         display:"block", width:"100%",
         borderBottom:"1.5px dotted #444",
         padding:"0 22px 0 2px", lineHeight:"1.9em",
         fontFamily:"'Times New Roman',serif", fontSize:"inherit",
-        color:value?"#000":"#bbb", userSelect:"none", cursor:"pointer",
+        color: displayColor, userSelect:"none", cursor:"pointer",
         fontWeight: 400,
       }}>
-        {value ? fmt(value) : "dd mmm yyyy"}
+        {displayValue}
         <span style={{ position:"absolute", right:2, top:"50%", transform:"translateY(-50%)", fontSize:11, color:"#999", pointerEvents:"none" }}>▼</span>
       </span>
       <input ref={ref} type="date" value={value} onChange={e=>onChange(e.target.value)} required={required} aria-required={required}
@@ -621,15 +632,24 @@ export default function AdmissionForm({
   const [confirmedCourse, setConfirmedCourse] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kvtc_admission_form');
-      if (saved) return JSON.parse(saved);
-    } catch(e) {}
+    // If a specific course is being pre-selected (user clicked Apply on a course),
+    // ignore any stale localStorage to ensure the correct course is shown.
+    if (!selectedCoursePre) {
+      try {
+        const saved = localStorage.getItem('kvtc_admission_form');
+        if (saved) return JSON.parse(saved);
+      } catch(e) {}
+    } else {
+      // Clear stale localStorage so the new course pre-fill always wins
+      try { localStorage.removeItem('kvtc_admission_form'); } catch(e) {}
+    }
     return {
-      name: prefilledName, idNo: prefilledIdNo, dob: prefilledDob, tel: prefilledPhone, homeAddress: prefilledHomeAddress, residentialArea: prefilledResidentialArea,
-      kinName: prefilledKinName, kinIdNo: prefilledKinIdNo, kinTel: prefilledKinTel, relationship: prefilledRelationship,
-      course: selectedCoursePre, duration:"", examBody:"", startDate: prefilledStartDate,
-      signatureData:"", signDate:"", applicantPhoto:"",
+      name: prefilledName, idNo: prefilledIdNo, dob: prefilledDob, tel: prefilledPhone,
+      homeAddress: prefilledHomeAddress, residentialArea: prefilledResidentialArea,
+      kinName: prefilledKinName, kinIdNo: prefilledKinIdNo, kinTel: prefilledKinTel,
+      relationship: prefilledRelationship,
+      course: selectedCoursePre, duration: "", examBody: "", startDate: prefilledStartDate,
+      signatureData: "", signDate: "", applicantPhoto: "",
     };
   });
   const prefillAppliedRef = useRef(false);
@@ -644,24 +664,28 @@ export default function AdmissionForm({
   useEffect(() => {
     if (prefillAppliedRef.current) return;
     prefillAppliedRef.current = true;
-    const prefills = {
-      name: prefilledName,
-      idNo: prefilledIdNo,
-      dob: prefilledDob,
-      tel: prefilledPhone,
-      homeAddress: prefilledHomeAddress,
-      residentialArea: prefilledResidentialArea,
-      kinName: prefilledKinName,
-      kinIdNo: prefilledKinIdNo,
-      kinTel: prefilledKinTel,
-      relationship: prefilledRelationship,
-      course: selectedCoursePre,
-      startDate: prefilledStartDate,
-    };
 
     setForm(current => {
       const next = { ...current };
-      for (const [field, value] of Object.entries(prefills)) {
+
+      // ALWAYS force-apply the course if explicitly provided — never let stale cache win
+      if (selectedCoursePre) next.course = selectedCoursePre;
+
+      // Apply other prefill fields only if the field is currently empty
+      const otherPrefills = {
+        name: prefilledName,
+        idNo: prefilledIdNo,
+        dob: prefilledDob,
+        tel: prefilledPhone,
+        homeAddress: prefilledHomeAddress,
+        residentialArea: prefilledResidentialArea,
+        kinName: prefilledKinName,
+        kinIdNo: prefilledKinIdNo,
+        kinTel: prefilledKinTel,
+        relationship: prefilledRelationship,
+        startDate: prefilledStartDate,
+      };
+      for (const [field, value] of Object.entries(otherPrefills)) {
         if (value && !next[field]) next[field] = value;
       }
       return next;
@@ -698,12 +722,14 @@ export default function AdmissionForm({
     }
   }, [form.course, courseList, set]);
 
-  // Set default start date to today
+  // Set default start date and sign date to today — runs only on client to avoid SSR mismatch
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
-    set("startDate", today);
     set("signDate", today);
+    // Only set startDate if not already prefilled via URL param
+    setForm(f => ({ ...f, startDate: f.startDate || today }));
   }, [set]);
+
 
   const validateForm = () => {
     const requiredFields = [
