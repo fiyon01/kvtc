@@ -1,24 +1,38 @@
 :root {
+  /* Premium Color System */
   --green: #0F6E56;
   --green-light: #1D9E75;
   --green-pale: #E1F5EE;
+  --green-dark: #085041;
+  
   --blue: #2F79B7;
   --blue-deep: #245A87;
   --blue-pale: #EDF6FC;
+  
   --gold: #BA7517;
   --gold-light: #EF9F27;
   --gold-pale: #FAEEDA;
+  --gold-dark: #d98a1a;
+  
   --dark: #1a1a1a;
   --mid: #555;
   --soft: #888;
   --border: rgba(0,0,0,0.08);
   --white: #fff;
-  --off: #f8f7f4;
+  --off: #f9f8f6;
+  
+  /* Typography */
   --serif: 'Playfair Display', Georgia, serif;
   --sans: 'DM Sans', sans-serif;
+  
+  /* Spacing */
   --radius: 16px;
+  
+  /* Shadows - Premium Elevation System */
   --shadow: 0 4px 32px rgba(0,0,0,0.08);
   --shadow-lg: 0 16px 64px rgba(0,0,0,0.12);
+  --shadow-xl: 0 24px 96px rgba(0,0,0,0.15);
+  --shadow-hover: 0 24px 64px rgba(15, 110, 86, 0.12);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

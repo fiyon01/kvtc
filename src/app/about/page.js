@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { FadeIn } from './FadeIn';
 import FacultyGrid from './FacultyGrid';
-import { Target, Eye, Gem, ArrowRight, ShieldCheck, Wrench, Laptop, Utensils, Scissors, Lightbulb, Users, Shield, Heart, Sparkles } from 'lucide-react';
+import { Target, Eye, Gem, ArrowRight, ShieldCheck, Wrench, Laptop, Utensils, Scissors, Lightbulb, Users, Shield, Heart, Sparkles, Zap, Compass } from 'lucide-react';
 
 const leadership = [
   {
@@ -41,22 +41,25 @@ export default function About() {
   return (
     <div className="about-page">
       
-      {/* 1. CINEMATIC DARK-MODE HERO */}
-      <section className="abt-hero-dark">
-        <div className="abt-hero-orbs">
-          <div className="orb orb-green"></div>
-          <div className="orb orb-gold"></div>
+      {/* PREMIUM HERO SECTION */}
+      <section className="abt-hero-premium">
+        <div className="abt-hero-bg">
+          <div className="gradient-mesh"></div>
+          <div className="floating-orb orb-1"></div>
+          <div className="floating-orb orb-2"></div>
         </div>
         
-        <div className="abt-hero-glass-container">
+        <div className="abt-hero-content">
           <FadeIn>
-            <div className="abt-pill-badge-dark">
-              <Sparkles size={14} className="text-gold" />
-              <span>Who We Are</span>
+            <div className="abt-premium-badge">
+              <Compass size={16} />
+              <span>About Kinoo VTC</span>
             </div>
-            <h1 className="abt-title-dark">Empowering Kenya's Youth Through Skills.</h1>
-            <p className="abt-subtitle-dark">
-              We are a premier public institution committed to equipping trainees with practical, marketable skills that transform lives and build communities.
+            <h1 className="abt-hero-title">
+              Transforming Lives Through <span className="gradient-text">Practical Excellence</span>
+            </h1>
+            <p className="abt-hero-desc">
+              A premier public vocational training centre dedicated to equipping Kenya's youth with market-ready skills, professional expertise, and the confidence to excel in their chosen fields.
             </p>
           </FadeIn>
         </div>
@@ -276,97 +279,109 @@ export default function About() {
         }
         .text-gold { color: #EF9F27; }
         .text-green { color: #0F6E56; font-style: italic; }
+        .gradient-text { background: linear-gradient(135deg, #0F6E56, #EF9F27); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
-        /* ── 1. CINEMATIC DARK-MODE HERO ── */
-        .abt-hero-dark {
+        /* ── PREMIUM HERO SECTION ── */
+        .abt-hero-premium {
           position: relative;
-          min-height: 80vh;
+          min-height: 85vh;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 160px 24px 80px;
+          padding: 140px 24px 100px;
           overflow: hidden;
-          background: #06090e; /* Deep rich dark background */
+          background: #ffffff;
         }
         
-        .abt-hero-orbs {
+        .abt-hero-bg {
           position: absolute;
           inset: 0;
-          overflow: hidden;
           z-index: 0;
         }
-        .orb {
+        
+        .gradient-mesh {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse at 20% 30%, rgba(15, 110, 86, 0.08) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 70%, rgba(239, 159, 39, 0.06) 0%, transparent 50%);
+          animation: mesh-shift 15s ease-in-out infinite;
+        }
+        
+        @keyframes mesh-shift {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(8px, 8px) scale(1.02); }
+        }
+        
+        .floating-orb {
           position: absolute;
           border-radius: 50%;
-          filter: blur(120px);
-          opacity: 0.4;
-          animation: float 10s infinite ease-in-out alternate;
+          filter: blur(100px);
+          opacity: 0.3;
+          animation: float-smooth 12s ease-in-out infinite;
         }
-        .orb-green {
-          background: #0F6E56;
-          width: 50vw;
-          height: 50vw;
-          top: -10%;
-          left: -10%;
+        
+        .orb-1 {
+          width: 400px;
+          height: 400px;
+          background: linear-gradient(135deg, #0F6E56, #1D9E75);
+          top: -150px;
+          right: -100px;
         }
-        .orb-gold {
-          background: #EF9F27;
-          width: 40vw;
-          height: 40vw;
-          bottom: -10%;
-          right: -10%;
-          animation-delay: -5s;
+        
+        .orb-2 {
+          width: 350px;
+          height: 350px;
+          background: linear-gradient(135deg, #EF9F27, #d98a1a);
+          bottom: -100px;
+          left: -50px;
+          animation-delay: -6s;
         }
-        @keyframes float {
-          0% { transform: translate(0, 0) scale(1); }
-          100% { transform: translate(10%, 10%) scale(1.1); }
+        
+        @keyframes float-smooth {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(-20px, 20px); }
         }
 
-        .abt-hero-glass-container {
+        .abt-hero-content {
           position: relative;
           z-index: 2;
           text-align: center;
           max-width: 900px;
-          background: rgba(15, 23, 42, 0.4);
-          backdrop-filter: blur(40px);
-          -webkit-backdrop-filter: blur(40px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          padding: 80px 40px;
-          border-radius: 40px;
-          box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
         }
         
-        .abt-pill-badge-dark {
+        .abt-premium-badge {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
-          padding: 8px 18px;
+          gap: 10px;
+          background: rgba(15, 110, 86, 0.08);
+          border: 1px solid rgba(15, 110, 86, 0.2);
+          padding: 12px 24px;
           border-radius: 100px;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 700;
-          letter-spacing: 1px;
+          letter-spacing: 0.5px;
           text-transform: uppercase;
-          color: #e2e8f0;
-          margin-bottom: 24px;
+          color: #0F6E56;
+          margin-bottom: 32px;
         }
-        .abt-title-dark {
+        
+        .abt-hero-title {
           font-family: var(--serif);
-          font-size: clamp(2.5rem, 6vw, 4.8rem);
-          font-weight: 800;
+          font-size: clamp(2.8rem, 6vw, 5rem);
+          font-weight: 900;
           line-height: 1.1;
           margin: 0 0 24px;
-          letter-spacing: -0.04em;
-          color: #ffffff;
-          text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+          letter-spacing: -0.02em;
+          color: #0f172a;
         }
-        .abt-subtitle-dark {
+        
+        .abt-hero-desc {
           font-size: clamp(1.1rem, 2vw, 1.25rem);
-          color: #94a3b8;
-          line-height: 1.7;
-          max-width: 650px;
+          color: #64748b;
+          line-height: 1.8;
+          max-width: 680px;
           margin: 0 auto;
+          font-weight: 400;
         }
 
         /* ── 2. THE STORY ── */
